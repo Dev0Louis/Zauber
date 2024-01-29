@@ -2,7 +2,7 @@ package dev.louis.zauber.screen;
 
 import com.google.common.collect.Lists;
 import dev.louis.zauber.blocks.ZauberBlocks;
-import dev.louis.zauber.recipe.ModRecipes;
+import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.recipe.SpellRecipe;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -57,7 +57,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
     }
 
     public SpellTableScreenHandler(int syncId, PlayerInventory playerInventory, Property charge, final ScreenHandlerContext context) {
-        super(ModRecipes.SPELL_TABLE, syncId);
+        super(ZauberRecipes.SPELL_TABLE, syncId);
         int i;
         this.context = context;
         this.charge = charge;
@@ -189,7 +189,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
         this.selectedRecipe.set(-1);
         this.outputSlot.setStackNoCallbacks(ItemStack.EMPTY);
         if (!stack.isEmpty() && hasCharge()) {
-            this.availableRecipes = this.world.getRecipeManager().listAllOfType(ModRecipes.SPELL_RECIPE).stream()
+            this.availableRecipes = this.world.getRecipeManager().listAllOfType(ZauberRecipes.SPELL_RECIPE).stream()
                     .filter(recipe -> recipe.value().matches(input, world))
                     .sorted(Comparator.comparing(RecipeEntry::id))
                     .collect(Collectors.toList());
@@ -214,7 +214,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
 
     @Override
     public ScreenHandlerType<?> getType() {
-        return ModRecipes.SPELL_TABLE;
+        return ZauberRecipes.SPELL_TABLE;
     }
 
     public void setContentsChangedListener(Runnable contentsChangedListener) {
@@ -241,7 +241,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
                     return ItemStack.EMPTY;
                 }
                 slot2.onQuickTransfer(itemStack2, itemStack);
-            } else if (slot == 0 ? !this.insertItem(itemStack2, 2, 38, false) : (this.world.getRecipeManager().getFirstMatch(ModRecipes.SPELL_RECIPE, new SimpleInventory(itemStack2), this.world).isPresent() ? !this.insertItem(itemStack2, 0, 1, false) : (slot >= 2 && slot < 29 ? !this.insertItem(itemStack2, 29, 38, false) : slot >= 29 && slot < 38 && !this.insertItem(itemStack2, 2, 29, false)))) {
+            } else if (slot == 0 ? !this.insertItem(itemStack2, 2, 38, false) : (this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, new SimpleInventory(itemStack2), this.world).isPresent() ? !this.insertItem(itemStack2, 0, 1, false) : (slot >= 2 && slot < 29 ? !this.insertItem(itemStack2, 29, 38, false) : slot >= 29 && slot < 38 && !this.insertItem(itemStack2, 2, 29, false)))) {
                 return ItemStack.EMPTY;
             }
             if (itemStack2.isEmpty()) {

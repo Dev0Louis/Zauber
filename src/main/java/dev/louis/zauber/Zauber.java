@@ -12,7 +12,7 @@ import dev.louis.zauber.networking.ICanHasZauberPayload;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.networking.OptionSyncTask;
-import dev.louis.zauber.recipe.ModRecipes;
+import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.spell.*;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
@@ -46,10 +46,10 @@ public class Zauber implements ModInitializer {
             networkHandler.completeTask(OptionSyncTask.KEY);
         });
 
-        ModRecipes.init();
         PolymerNetworking.registerCommonPayload(Zauber.HAS_CLIENT_MODS, 0, ICanHasZauberPayload::read);
 
         Spells.init();
+        ZauberRecipes.init();
         ZauberItems.init();
         ZauberBlocks.init();
         ManaEffects.init();

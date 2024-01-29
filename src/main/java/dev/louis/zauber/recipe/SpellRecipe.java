@@ -53,7 +53,7 @@ public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, Polyme
 
     @Override
     public RecipeType<?> getType() {
-        return ModRecipes.SPELL_RECIPE;
+        return ZauberRecipes.SPELL_RECIPE;
     }
 
     public static class SpellRecipeSerializer implements RecipeSerializer<SpellRecipe> {

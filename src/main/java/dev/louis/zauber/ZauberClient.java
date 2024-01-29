@@ -5,7 +5,7 @@ import dev.louis.zauber.config.ZauberConfig;
 import dev.louis.zauber.keybind.SpellKeyBinding;
 import dev.louis.zauber.keybind.SpellKeybindManager;
 import dev.louis.zauber.networking.OptionSyncPacket;
-import dev.louis.zauber.recipe.ModRecipes;
+import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.spell.TargetingSpell;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -38,7 +38,7 @@ public class ZauberClient implements ClientModInitializer {
         createSpellKeyBind(Zauber.Spells.WIND_EXPEL, false);
         createSpellKeyBind(Zauber.Spells.SPROUT, false);
         createSpellKeyBind(Zauber.Spells.DASH, false);
-        ModRecipes.initClient();
+        ZauberRecipes.initClient();
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides){

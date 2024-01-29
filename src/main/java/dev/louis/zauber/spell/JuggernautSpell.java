@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JuggernautSpell extends Spell {
-
     public JuggernautSpell(SpellType<? extends Spell> spellType) {
         super(spellType);
     }

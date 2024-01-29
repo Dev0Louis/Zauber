@@ -13,7 +13,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 
-public class ModRecipes {
+public class ZauberRecipes {
     public static final RecipeType<SpellRecipe> SPELL_RECIPE = RecipeType.register(Zauber.MOD_ID + ":spell_recipe");
     public static final ScreenHandlerType<SpellTableScreenHandler> SPELL_TABLE = register(new Identifier(Zauber.MOD_ID, "spellcraft"), SpellTableScreenHandler::new);
     public static void init() {

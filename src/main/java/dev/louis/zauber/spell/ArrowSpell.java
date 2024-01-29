@@ -13,8 +13,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class ArrowSpell extends Spell {
-
-
     public ArrowSpell(SpellType<? extends Spell> spellType) {
         super(spellType);
     }
