@@ -1,6 +1,6 @@
 {
   "replace": false,
   "values": [
-    "chainsmpspells:spell_table"
+    "zauber:spell_table"
   ]
 }

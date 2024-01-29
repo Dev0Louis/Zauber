@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "charge=0": { "model": "zauber:block/spell_table" },
+    "charge=1": { "model": "zauber:block/charged_spell_table" },
+    "charge=2": { "model": "zauber:block/charged_spell_table" },
+    "charge=3": { "model": "zauber:block/charged_spell_table" },
+    "charge=4": { "model": "zauber:block/charged_spell_table" },
+    "charge=5": { "model": "zauber:block/charged_spell_table" },
+    "charge=6": { "model": "zauber:block/charged_spell_table" },
+    "charge=7": { "model": "zauber:block/charged_spell_table" },
+    "charge=8": { "model": "zauber:block/charged_spell_table" },
+    "charge=9": { "model": "zauber:block/charged_spell_table" },
+    "charge=10": { "model": "zauber:block/charged_spell_table" },
+    "charge=11": { "model": "zauber:block/charged_spell_table" },
+    "charge=12": { "model": "zauber:block/charged_spell_table" },
+    "charge=13": { "model": "zauber:block/charged_spell_table" },
+    "charge=14": { "model": "zauber:block/charged_spell_table" },
+    "charge=15": { "model": "zauber:block/charged_spell_table" },
+    "charge=16": { "model": "zauber:block/charged_spell_table" },
+    "charge=17": { "model": "zauber:block/charged_spell_table" },
+    "charge=18": { "model": "zauber:block/charged_spell_table" },
+    "charge=19": { "model": "zauber:block/charged_spell_table" },
+    "charge=20": { "model": "zauber:block/charged_spell_table" },
+    "charge=21": { "model": "zauber:block/charged_spell_table" },
+    "charge=22": { "model": "zauber:block/charged_spell_table" },
+    "charge=23": { "model": "zauber:block/charged_spell_table" },
+    "charge=24": { "model": "zauber:block/charged_spell_table" },
+    "charge=25": { "model": "zauber:block/charged_spell_table" },
+    "charge=26": { "model": "zauber:block/charged_spell_table" },
+    "charge=27": { "model": "zauber:block/charged_spell_table" },
+    "charge=28": { "model": "zauber:block/charged_spell_table" },
+    "charge=29": { "model": "zauber:block/charged_spell_table" },
+    "charge=30": { "model": "zauber:block/charged_spell_table" },
+    "charge=31": { "model": "zauber:block/charged_spell_table" },
+    "charge=32": { "model": "zauber:block/charged_spell_table" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+}
+

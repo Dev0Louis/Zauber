@@ -1,0 +1,18 @@
+{
+  "category.zauber.spells": "Cul Sppelz",
+  "key.zauber.spell.arrow": "Laggg Sppel",
+  "key.zauber.spell.push": "Thr-uw awey Sppel",
+  "key.zauber.spell.juggernaut": "OP-- GG YOU DIE!! Sppel",
+  "key.zauber.spell.pull": "Comm to me, I wand to cuttl Sppel",
+  "key.zauber.spell.rewind": "Ou Tim Trevel Sppel",
+  "key.zauber.spell.suicide": "Mage ded Sppel",
+  "key.zauber.spell.teleport": "Swydch Lukation Spell",
+  "key.zauber.spell.supernova": "Better Kaboom Spehl",
+
+  "message.zauber.mana.success": "Yu hav %s mawgic Powah (ENUGH!!!))",
+  "message.zauber.mana.fail": "Yu hafe %s mawgic Powah (NOt eNUGH!}",
+
+  "zauber.midnightconfig.title": "ChEinZMPClient Zedings (for Nertz)",
+  "zauber.midnightconfig.spellCooldown": "Sppel culduwn"
+
+}

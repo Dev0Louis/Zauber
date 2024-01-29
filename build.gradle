@@ -27,6 +27,12 @@ repositories {
 
     maven {url "https://maven.terraformersmc.com/releases/"}
     maven {url "https://oss.sonatype.org/content/repositories/snapshots/"}
+    maven {
+        name 'Xander Maven'
+        url 'https://maven.isxander.dev/releases'
+    }
+    mavenLocal()
+
 }
 
 dependencies {
@@ -38,11 +44,14 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    modImplementation "maven.modrinth:nebula:${project.nebula_version}"
+    modImplementation "dev.louis:Nebula:${project.nebula_version}"
 
-    include(modImplementation("maven.modrinth:midnightlib:${project.midnightlib_version}"))
+    modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${project.yacl_version}")
+
+    modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
     include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
+
 }
 
 processResources {

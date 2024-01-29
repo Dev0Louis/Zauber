@@ -1,0 +1,18 @@
+{
+  "category.zauber.spells": "Hechizo",
+  "key.zauber.spell.arrow": "Hechizo de la flecha",
+  "key.zauber.spell.suicide": "Hechizo del suicido",
+  "key.zauber.spell.push": "Hechizo del empujón",
+  "key.zauber.spell.juggernaut": "Hechizo del monstruo",
+  "key.zauber.spell.pull": "Hechizo de tirar",
+  "key.zauber.spell.rewind": "Hechizo del rebobinado",
+  "key.zauber.spell.teleport": "Hechizo de la teletransportación",
+
+  "message.zauber.mana.success": "Tienes %s Mana",
+  "message.zauber.mana.fail": "Tienes %s Mana",
+
+  "key.zauber.spell.supernova": "Hechizo  de la Supernova",
+
+  "zauber.midnightconfig.title": "Ajustes de ChainSMPClient ",
+  "zauber.midnightconfig.spellCooldown":"El tiempo de la reutilización de los hechizos"
+}

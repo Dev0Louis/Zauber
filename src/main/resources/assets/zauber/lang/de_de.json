@@ -1,0 +1,19 @@
+{
+  "category.zauber.spells": "Zauber",
+  "key.zauber.spell.arrow": "Pfeil Zauber",
+  "key.zauber.spell.suicide": "Selbstmord Zauber",
+  "key.zauber.spell.push": "Stoß Zauber",
+  "key.zauber.spell.juggernaut": "Unaufhaltsamer Zauber",
+  "key.zauber.spell.pull": "Zieh Zauber",
+  "key.zauber.spell.rewind": "Rückspul Zauber",
+  "key.zauber.spell.teleport": "Teleportations Zauber",
+  "key.zauber.spell.supernova": "Supernova Zauber",
+
+  "item.zauber.supernova_spell_book": "Supernova Zauberbuch",
+
+  "message.zauber.mana.success": "Du hast %s Mana",
+  "message.zauber.mana.fail": "Du hast %s Mana",
+
+  "zauber.midnightconfig.title": "ChainSMPClient Einstellungen",
+  "zauber.midnightconfig.spellCooldown":"Zauber abklingzeit"
+}

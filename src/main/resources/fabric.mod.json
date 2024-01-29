@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "chainsmpspells",
+  "id": "zauber",
   "version": "${version}",
-  "name": "ChainSMPSpells",
+  "name": "Zauber",
   "description": "Cool Spells",
   "authors": [
     "Louis"
@@ -11,18 +11,19 @@
     "website": "smpmc.eu"
   },
   "license": "MIT",
-  "icon": "assets/chainsmpspells/icon.png",
+  "icon": "assets/zauber/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.louis.chainsmpspells.ChainSMPSpells"
+      "dev.louis.zauber.Zauber"
     ],
     "client": [
-      "dev.louis.chainsmpspells.ChainSMPSpellsClient"
-    ]
+      "dev.louis.zauber.ZauberClient"
+    ],
+    "modmenu": [ "dev.louis.zauber.config.ModMenuIntegration" ]
   },
   "mixins": [
-    "ChainSMPSpells.mixins.json"
+    "Zauber.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.9",
