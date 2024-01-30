@@ -10,6 +10,9 @@
   "key.zauber.spell.supernova": "Supernova Spell",
   "key.zauber.spell.ice": "Ice Spell",
   "key.zauber.spell.fire": "Fire Spell",
+  "key.zazuber.spell.dash": "Dash Spell",
+  "key.zazuber.spell.sprout": "Sprout Spell",
+  "key.zazuber.spell.wind_expel": "Wind Expel Spell",
 
   "item.zauber.supernova_spell_book": "Supernova Spellbook",
   "item.zauber.juggernaut_spell_book": "Juggernaut Spellbook",
@@ -21,6 +24,9 @@
   "item.zauber.teleport_spell_book": "Teleport Spellbook",
   "item.zauber.ice_spell_book": "Ice Spellbook",
   "item.zauber.fire_spell_book": "Fire Spellbook",
+  "item.zauber.dash_spell_book": "Dash Spellbook",
+  "item.zauber.sprout_spell_book": "Sprout Spellbook",
+  "item.zauber.wind_expel_spell_book": "Wind Expel Spellbook",
 
   "container.spell_crafting": "Spell Table",
 

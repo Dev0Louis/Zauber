@@ -8,17 +8,21 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3d;
 
 public class DashSpell extends Spell {
     public DashSpell(SpellType<?> spellType) {
         super(spellType);
     }
 
+    protected Vec3d dashVelocity;
     @Override
     public void cast() {
         if(this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
             serverPlayer.setInvisible(true);
             serverPlayer.setInvulnerable(true);
+            serverPlayer.setNoDrag(true);
+            dashVelocity = serverPlayer.getRotationVector().multiply(1.5, 0.2, 1.5);
             ((DashingLivingEntity) serverPlayer).zauber$setDashing(true);
             serverPlayer.playSound(
                     SoundEvents.BLOCK_DEEPSLATE_TILES_HIT,
@@ -32,12 +36,13 @@ public class DashSpell extends Spell {
     @Override
     public void tick() {
         if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            if(serverPlayer.getVelocity().lengthSquared() < 0.5 && spellAge > 1) {
+            if(serverPlayer.getVelocity().lengthSquared() < 0.3 && spellAge > 2) {
                 stop();
+                return;
             }
 
             serverPlayer.getServerWorld().getOtherEntities(serverPlayer, serverPlayer.getBoundingBox().expand(0.2)).forEach(entity -> {
-                //entity.setVelocity(entity.getRotationVector().negate().add(0, 1, 0));
+                entity.setVelocity(entity.getRotationVector().negate().add(0, 0.75, 0));
                 entity.velocityModified = true;
             });
 
@@ -62,7 +67,7 @@ public class DashSpell extends Spell {
                     0.5,
                     0.1
             );
-            serverPlayer.setVelocity(serverPlayer.getRotationVector().multiply(1.5, 0.2, 1.5));
+            serverPlayer.setVelocity(dashVelocity);
             serverPlayer.velocityModified = true;
             serverPlayer.velocityDirty = true;
         }
@@ -72,6 +77,7 @@ public class DashSpell extends Spell {
     public void onEnd() {
         this.getCaster().setInvisible(false);
         this.getCaster().setInvulnerable(false);
+        this.getCaster().setNoDrag(true);
         ((DashingLivingEntity) this.getCaster()).zauber$setDashing(false);
 
     }
