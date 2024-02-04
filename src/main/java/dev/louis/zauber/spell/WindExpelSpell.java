@@ -17,7 +17,7 @@ public class WindExpelSpell extends Spell {
 
     @Override
     public void cast() {
-        var velocity = new Vec3d(0, 1.25, 0);
+        var velocity = new Vec3d(0, 1.1, 0);
         //if(getCaster().isSneaking()) velocity = velocity.multiply(1, 0.6, 1);
         this.getCaster().setVelocity(velocity);
 

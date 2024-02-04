@@ -56,13 +56,13 @@ public class SpellBookItem extends Item implements PolymerItem, PolymerKeepModel
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        if(Zauber.isClientVanilla(player))return Items.BOOK;
-        return itemStack.getItem();
+        if(Zauber.isClientModded(player)) return itemStack.getItem();
+        return Items.BOOK;
     }
 
     @Override
     public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipContext context, @Nullable ServerPlayerEntity player) {
-        if(Zauber.isClientVanilla(player))return PolymerItemUtils.createItemStack(itemStack, context, player);
-        return itemStack;
+        if(Zauber.isClientModded(player)) return itemStack;
+        return PolymerItemUtils.createItemStack(itemStack, context, player);
     }
 }

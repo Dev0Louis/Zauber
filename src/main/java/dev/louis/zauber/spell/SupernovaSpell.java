@@ -5,7 +5,10 @@ import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ZauberConfig;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 public class SupernovaSpell extends Spell {
     public SupernovaSpell(SpellType<? extends Spell> spellType) {
@@ -24,12 +27,22 @@ public class SupernovaSpell extends Spell {
             spawnParticleRing(serverPlayer, 60, 13.5f);
             spawnParticleRing(serverPlayer, 20, 4);
 
+            serverPlayer.playSound(
+                    SoundEvents.ENTITY_GENERIC_EXPLODE,
+                    SoundCategory.PLAYERS,
+                    4,
+                    1
+            );
+
             serverPlayer.getServerWorld().createExplosion(
+                    null,
+                    Explosion.createDamageSource(this.getCaster().getWorld(), this.getCaster()),
                     null,
                     this.getCaster().getX(),
                     this.getCaster().getEyeY(),
                     this.getCaster().getZ(),
                     ZauberConfig.getSupernovaExplosionPower(),
+                    true,
                     World.ExplosionSourceType.MOB
             );
         }

@@ -19,8 +19,8 @@ public class SpellTableItem extends PolymerBlockItem implements PolymerKeepModel
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        if(Zauber.isClientVanilla(player))return super.getPolymerItem(itemStack, player);
-        return this;
+        if(Zauber.isClientModded(player))return this;
+        return super.getPolymerItem(itemStack, player);
     }
 
 }

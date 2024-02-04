@@ -17,4 +17,9 @@ public class PullSpell extends TargetingSpell {
         pulledPlayer.setVelocity(velocity);
         pulledPlayer.velocityModified = true;
     }
+
+    @Override
+    public int getDuration() {
+        return 0;
+    }
 }

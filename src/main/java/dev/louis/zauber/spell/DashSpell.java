@@ -1,6 +1,5 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.zauber.accessor.DashingLivingEntity;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ZauberConfig;
@@ -23,7 +22,6 @@ public class DashSpell extends Spell {
             serverPlayer.setInvulnerable(true);
             serverPlayer.setNoDrag(true);
             dashVelocity = serverPlayer.getRotationVector().multiply(1.5, 0.2, 1.5);
-            ((DashingLivingEntity) serverPlayer).zauber$setDashing(true);
             serverPlayer.playSound(
                     SoundEvents.BLOCK_DEEPSLATE_TILES_HIT,
                     SoundCategory.PLAYERS,
@@ -78,8 +76,6 @@ public class DashSpell extends Spell {
         this.getCaster().setInvisible(false);
         this.getCaster().setInvulnerable(false);
         this.getCaster().setNoDrag(true);
-        ((DashingLivingEntity) this.getCaster()).zauber$setDashing(false);
-
     }
 
     @Override

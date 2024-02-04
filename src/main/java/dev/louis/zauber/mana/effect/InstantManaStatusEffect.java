@@ -25,7 +25,7 @@ public class InstantManaStatusEffect extends InstantStatusEffect implements Poly
     }
     @Override
     public StatusEffect getPolymerReplacement(ServerPlayerEntity player) {
-        if(Zauber.isClientVanilla(player))return null;
-        return this;
+        if(Zauber.isClientModded(player))return this;
+        return null;
     }
 }

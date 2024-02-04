@@ -1,5 +1,6 @@
 package dev.louis.zauber.mixin;
 
+import dev.louis.zauber.config.ZauberConfig;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -53,7 +54,7 @@ public abstract class ItemStackMixin implements ItemStackJuggernautModeAccessor 
     public boolean zauber$isValid(ServerWorld world) {
         long juggernautTicks = zauber$getJuggernautTick();
         if(juggernautTicks == 0L)return false;
-        return (((ServerWorldAccessor) world).getWorldProperties().getTime()- zauber$getJuggernautTick())<20*90;
+        return (((ServerWorldAccessor) world).getWorldProperties().getTime()- zauber$getJuggernautTick()) < ZauberConfig.getJuggernautSpellDuration();
     }
 
 

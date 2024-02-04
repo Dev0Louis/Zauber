@@ -26,8 +26,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import static dev.louis.zauber.Zauber.isClientVanilla;
-
 public class SpellTableBlock extends Block implements PolymerBlock, PolymerClientDecoded, PolymerKeepModel {
     private static final Text TITLE = Text.translatable("container.spell_crafting");
     public static final int MAX_CHARGE = 32;
@@ -41,9 +39,9 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.isClient)return ActionResult.SUCCESS;
-        boolean isVanilla = Zauber.isClientVanilla((ServerPlayerEntity) player);
-        if(isVanilla)return ActionResult.CONSUME;
-        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+
+        boolean isModded = Zauber.isClientModded((ServerPlayerEntity) player);
+        if(isModded) player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
         return ActionResult.CONSUME;
     }
 
@@ -99,7 +97,6 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
         return state.get(CHARGE) / 3 + 4;
     }
 
-
     @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.ENCHANTING_TABLE;
@@ -107,16 +104,15 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-        if(isClientVanilla(player))return this.getPolymerBlockState(state);
-        return state;
+        if(Zauber.isClientModded(player)) return state;
+        return this.getPolymerBlockState(state);
     }
 
     @Override
     public Block getPolymerBlock(BlockState state, ServerPlayerEntity player) {
-        if(isClientVanilla(player))return this.getPolymerBlock(state);
-        return this;
+        if(Zauber.isClientModded(player)) return this;
+        return this.getPolymerBlock(state);
     }
-
 
     public boolean handleMiningOnServer(ItemStack tool, BlockState state, BlockPos pos, ServerPlayerEntity player) {
         return false;

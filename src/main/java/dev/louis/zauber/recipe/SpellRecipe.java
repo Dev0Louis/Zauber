@@ -93,7 +93,7 @@ public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, Polyme
     }
 
     public Recipe<?> getPolymerReplacement(ServerPlayerEntity player) {
-        if (Zauber.isClientVanilla(player)) return PolymerRecipe.createStonecuttingRecipe(this);
-        return this;
+        if (Zauber.isClientModded(player)) return this;
+        return PolymerRecipe.createStonecuttingRecipe(this);
     }
 }

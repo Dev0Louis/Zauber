@@ -6,6 +6,7 @@ import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.nebula.api.spell.SpellType.Castability;
 import dev.louis.zauber.blocks.ZauberBlocks;
 import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.entity.ZauberEntityType;
 import dev.louis.zauber.items.ZauberItems;
 import dev.louis.zauber.mana.effect.ManaEffects;
 import dev.louis.zauber.networking.ICanHasZauberPayload;
@@ -30,6 +31,7 @@ public class Zauber implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "zauber";
     public static final int VERSION = 1;
+    public static final int POLYMER_NETWORK_VERSION = 1;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
 
     @Override
@@ -46,12 +48,13 @@ public class Zauber implements ModInitializer {
             networkHandler.completeTask(OptionSyncTask.KEY);
         });
 
-        PolymerNetworking.registerCommonPayload(Zauber.HAS_CLIENT_MODS, 0, ICanHasZauberPayload::read);
+        PolymerNetworking.registerCommonPayload(Zauber.HAS_CLIENT_MODS, POLYMER_NETWORK_VERSION, ICanHasZauberPayload::read);
 
         Spells.init();
         ZauberRecipes.init();
         ZauberItems.init();
         ZauberBlocks.init();
+        ZauberEntityType.init();
         ManaEffects.init();
     }
 
@@ -90,10 +93,10 @@ public class Zauber implements ModInitializer {
         }
     }
 
-    public static boolean isClientVanilla(@Nullable ServerPlayerEntity player) {
+    public static boolean isClientModded(@Nullable ServerPlayerEntity player) {
         if(player != null && player.networkHandler != null) {
             var version = PolymerServerNetworking.getSupportedVersion(player.networkHandler, Zauber.HAS_CLIENT_MODS);
-            return version == -1;
+            return version == POLYMER_NETWORK_VERSION;
         }
         return false;
     }

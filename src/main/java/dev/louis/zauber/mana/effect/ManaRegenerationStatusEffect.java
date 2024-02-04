@@ -34,7 +34,7 @@ public class ManaRegenerationStatusEffect extends StatusEffect implements Polyme
 
     @Override
     public StatusEffect getPolymerReplacement(ServerPlayerEntity player) {
-        if(Zauber.isClientVanilla(player))return null;
-        return this;
+        if(Zauber.isClientModded(player))return this;
+        return null;
     }
 }

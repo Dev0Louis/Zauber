@@ -16,7 +16,7 @@ public class PolymerScreenHandlerType<T extends ScreenHandler> extends ScreenHan
 
     @Override
     public ScreenHandlerType<?> getPolymerReplacement(ServerPlayerEntity player) {
-        if(Zauber.isClientVanilla(player))return fakeScreenHandlerType;
-        return this;
+        if(Zauber.isClientModded(player)) return this;
+        return fakeScreenHandlerType;
     }
 }

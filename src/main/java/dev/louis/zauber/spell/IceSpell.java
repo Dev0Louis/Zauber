@@ -6,8 +6,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 
-;
-
 public class IceSpell extends AreaEffectSpell {
     public IceSpell(SpellType<? extends AreaEffectSpell> spellType) {
         super(spellType, ParticleTypes.SNOWFLAKE, ZauberConfig.getIceSpellDuration());

@@ -6,7 +6,6 @@
   "mixins": [
     "ItemStackMixin",
     "LivingEntityMixin",
-    "PersistentProjectileEntityMixin",
     "ServerPlayNetworkHandlerMixin",
     "ServerWorldAccessor",
     "ServerWorldMixin",
