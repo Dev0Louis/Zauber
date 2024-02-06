@@ -29,7 +29,7 @@
     "fabricloader": ">=0.14.9",
     "fabric-api": "*",
     "minecraft": ">=1.20.3-",
-    "nebula": ">=4.0.0-beta.1",
+    "nebula": ">=5.0.0-",
     "polymer-core": ">=0.6.2+1.20.2"
   },
   "suggests": {
