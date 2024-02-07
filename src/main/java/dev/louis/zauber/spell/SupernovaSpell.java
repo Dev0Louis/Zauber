@@ -56,9 +56,7 @@ public class SupernovaSpell extends Spell {
                 double x = Math.cos(a) * radius;
                 double z = Math.sin(a) * radius;
                 serverPlayer.getServerWorld().spawnParticles(
-                        serverPlayer,
                         ParticleTypes.SMALL_FLAME,
-                        false,
                         serverPlayer.getX() + x,
                         serverPlayer.getEyeY() + y,
                         serverPlayer.getZ() + z,

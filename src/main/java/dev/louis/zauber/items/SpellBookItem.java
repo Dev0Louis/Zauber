@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -40,7 +41,16 @@ public class SpellBookItem extends Item implements PolymerItem, PolymerKeepModel
         return TypedActionResult.fail(itemStack);
     }
 
-
+    /**
+     * This converts to the new namespace if needed
+     * @param nbt
+     */
+    @Override
+    public void postProcessNbt(NbtCompound nbt) {
+        var spellString = nbt.getString("spell");
+        var spellId = Identifier.tryParse(spellString);
+        nbt.putString("spell", spellId.toString());
+    }
 
     public static Optional<SpellType<?>> getSpellType(ItemStack itemStack) {
         if(!itemStack.hasNbt() || itemStack.getNbt() == null)return Optional.empty();

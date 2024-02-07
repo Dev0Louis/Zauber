@@ -1,10 +1,10 @@
 package dev.louis.zauber.spell;
 
+import dev.louis.nebula.api.spell.Spell;
+import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.ZauberClient;
 import dev.louis.zauber.config.ZauberConfig;
-import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -18,26 +18,34 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public abstract class TargetingSpell extends Spell {
-    @Nullable
-    private Entity castedOn;
+    private Integer entityId;
 
     public TargetingSpell(SpellType<? extends Spell> spellType) {
         super(spellType);
     }
 
     @Override
+    public void setCaster(PlayerEntity caster) {
+        if(caster.getWorld().isClient()) {
+           castedOn(ZauberClient.getPlayerInView().orElse(null));
+        }
+        super.setCaster(caster);
+    }
+
+    @Override
     public void cast() {
-        if(ZauberClient.getPlayerInView().isPresent()) throw new IllegalStateException("Player in view is not present, even though it should be.");
-        castedOn(ZauberClient.getPlayerInView().get());
+
     }
 
-    public Entity castedOn(Entity castedOn) {
-        this.castedOn = castedOn;
-        return castedOn;
+    public void castedOn(Entity castedOn) {
+        if(castedOn == null)return;
+        this.entityId = castedOn.getId();
     }
 
+    @Nullable
     public Entity castedOn() {
-        return castedOn;
+        if(entityId == null)return null;
+        return getCaster().getWorld().getEntityById(entityId);
     }
 
     @Override
@@ -52,10 +60,14 @@ public abstract class TargetingSpell extends Spell {
     public PacketByteBuf readBuf(PacketByteBuf buf) {
         super.readBuf(buf);
         Optional<Integer> o = buf.readOptional(PacketByteBuf::readVarInt);
-        o.ifPresent(integer -> castedOn(getCaster().getWorld().getEntityById(integer)));
+        o.ifPresent(integer -> this.entityId = integer);
         return buf;
     }
 
+    @Override
+    public boolean isCastable() {
+        return castedOn() != null && super.isCastable();
+    }
 
     @Environment(EnvType.CLIENT)
     public static class TargetedPlayerSelector {

@@ -62,8 +62,11 @@ public class Zauber implements ModInitializer {
         public static List<SpellType<?>> targetingSpells;
         public static final Castability TARGETING =
                 Castability.DEFAULT.and((spellType, caster) -> {
-                    var playerInView = ZauberClient.getPlayerInView();
-                    return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ZauberConfig.getSyncedTargetingDistance();
+                    if(caster.getWorld().isClient()) {
+                        var playerInView = ZauberClient.getPlayerInView();
+                        return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ZauberConfig.getSyncedTargetingDistance();
+                    }
+                    return true;
                 });
 
         public static SpellType<ArrowSpell> ARROW = register("arrow", ArrowSpell::new, 2);

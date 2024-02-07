@@ -53,9 +53,7 @@ public class DashSpell extends Spell {
 
 
             serverPlayer.getServerWorld().spawnParticles(
-                    serverPlayer,
                     ParticleTypes.END_ROD,
-                    false,
                     serverPlayer.getX(),
                     serverPlayer.getY(),
                     serverPlayer.getZ(),
@@ -75,7 +73,7 @@ public class DashSpell extends Spell {
     public void onEnd() {
         this.getCaster().setInvisible(false);
         this.getCaster().setInvulnerable(false);
-        this.getCaster().setNoDrag(true);
+        this.getCaster().setNoDrag(false);
     }
 
     @Override

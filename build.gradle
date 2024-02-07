@@ -49,7 +49,11 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
     include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
+}
 
+remapJar {
+    //Till CITResewn updated :)
+    nestedJars.from(file('lib/citresewn-1.1.3+1.20.4.jar'))
 }
 
 processResources {

@@ -43,9 +43,7 @@ public class WindExpelSpell extends Spell {
             double sin = Math.sin(spellAge/1.75f) * 2.5;
             double cos = Math.cos(spellAge/1.75f) * 2.5;
             serverPlayer.getServerWorld().spawnParticles(
-                    serverPlayer,
                     ParticleTypes.CLOUD,
-                    false,
                     serverPlayer.getX() + sin,
                     serverPlayer.getY(),
                     serverPlayer.getZ() + cos,
@@ -78,9 +76,7 @@ public class WindExpelSpell extends Spell {
 
             //serverPlayer.playSound(SoundEvents.ENTITY_CAMEL_DASH, SoundCategory.PLAYERS, 2f, -1f);
             serverPlayer.getServerWorld().spawnParticles(
-                    serverPlayer,
                     ParticleTypes.SMOKE,
-                    false,
                     serverPlayer.getX(),
                     serverPlayer.getY(),
                     serverPlayer.getZ(),
