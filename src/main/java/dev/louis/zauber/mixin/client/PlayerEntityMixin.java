@@ -1,7 +1,7 @@
 package dev.louis.zauber.mixin.client;
 
 import dev.louis.zauber.ZauberClient;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +26,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Override
     public int getTeamColorValue() {
-        if(this.getWorld().isClient() && this.isTargetedPlayer()) return ZauberConfig.getTargetingColor().getRGB();
+        if(this.getWorld().isClient() && this.isTargetedPlayer()) return ConfigManager.getClientConfig().targetingColor().getRGB();
         return super.getTeamColorValue();
     }
 

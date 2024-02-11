@@ -1,11 +1,11 @@
 package dev.louis.zauber.spell;
 
 import com.google.common.collect.ImmutableList;
-import dev.louis.zauber.accessor.ItemStackJuggernautModeAccessor;
-import dev.louis.zauber.config.ZauberConfig;
-import dev.louis.zauber.mixin.ServerWorldAccessor;
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;;
+import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.duck.ItemStackJuggernautModeDuck;
+import dev.louis.zauber.mixin.ServerWorldAccessor;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
@@ -19,6 +19,8 @@ import net.minecraft.util.collection.DefaultedList;
 
 import java.util.ArrayList;
 import java.util.List;
+
+;
 
 public class JuggernautSpell extends Spell {
     public JuggernautSpell(SpellType<? extends Spell> spellType) {
@@ -73,7 +75,7 @@ public class JuggernautSpell extends Spell {
 
     @Override
     public int getDuration() {
-        return ZauberConfig.getJuggernautSpellDuration();
+        return ConfigManager.getServerConfig().juggernautSpellDuration();
     }
 
     @Override
@@ -98,7 +100,7 @@ public class JuggernautSpell extends Spell {
         if(itemStack.isEnchantable()) {
             enchantMax(itemStack);
         }
-        ItemStackJuggernautModeAccessor.access(itemStack).zauber$setJuggernautModeTick(tickWorldtime);
+        ItemStackJuggernautModeDuck.access(itemStack).zauber$setJuggernautModeTick(tickWorldtime);
         return itemStack;
     }
 
@@ -124,7 +126,7 @@ public class JuggernautSpell extends Spell {
                 ItemStack itemStack = list.get(i);
 
                 if (itemStack.isEmpty()) continue;
-                if (ItemStackJuggernautModeAccessor.access(itemStack).zauber$getJuggernautTick() <= 0L)continue;
+                if (ItemStackJuggernautModeDuck.access(itemStack).zauber$getJuggernautTick() <= 0L)continue;
                 list.set(i, ItemStack.EMPTY);
             }
         }

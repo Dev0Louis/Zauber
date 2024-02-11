@@ -2,7 +2,7 @@ package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -91,6 +91,6 @@ public class WindExpelSpell extends Spell {
 
     @Override
     public int getDuration() {
-        return ZauberConfig.getWindExpelSpellDuration();
+        return ConfigManager.getServerConfig().windExpelSpellDuration();
     }
 }

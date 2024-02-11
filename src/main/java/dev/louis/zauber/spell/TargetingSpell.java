@@ -4,7 +4,7 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.ZauberClient;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -104,7 +104,7 @@ public abstract class TargetingSpell extends Spell {
             if (client == null || client.getCameraEntity() == null) return;
 
             var pos = client.getCameraEntity().getEyePos();
-            int divider = ZauberConfig.getRaycastScanPrecision();
+            int divider = ConfigManager.getClientConfig().raycastScanPrecision();
             double i = 1.0 / divider;
             var x = client.getCameraEntity().getRotationVecClient().normalize().multiply(i);
 

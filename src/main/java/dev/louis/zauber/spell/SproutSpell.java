@@ -2,7 +2,7 @@ package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -49,6 +49,6 @@ public class SproutSpell extends Spell {
 
     @Override
     public int getDuration() {
-        return ZauberConfig.getSproutSpellDuration();
+        return ConfigManager.getServerConfig().sproutSpellDuration();
     }
 }

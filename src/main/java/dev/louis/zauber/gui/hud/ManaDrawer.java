@@ -1,7 +1,7 @@
 package dev.louis.zauber.gui.hud;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
@@ -16,7 +16,7 @@ public class ManaDrawer {
 
     private static void render(Identifier texture, DrawContext context, int x, int y) {
         context.getMatrices().push();
-        boolean invert = ZauberConfig.getManaDirection() == ManaDirection.LEFT;
+        boolean invert = ConfigManager.getClientConfig().manaDirection() == ManaDirection.LEFT;
 
         context.drawTexture(texture, x, y, 9, 9, 9, 9, invert ? -9 : 9, 9);
         context.getMatrices().pop();

@@ -2,7 +2,7 @@ package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -41,7 +41,7 @@ public class SupernovaSpell extends Spell {
                     this.getCaster().getX(),
                     this.getCaster().getEyeY(),
                     this.getCaster().getZ(),
-                    ZauberConfig.getSupernovaExplosionPower(),
+                    ConfigManager.getServerConfig().supernovaExplosionPower(),
                     true,
                     World.ExplosionSourceType.MOB
             );

@@ -1,6 +1,6 @@
 package dev.louis.zauber.mixin.client;
 
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.gui.hud.ManaDirection;
 import dev.louis.zauber.gui.hud.ManaDrawer;
 import net.minecraft.client.MinecraftClient;
@@ -58,7 +58,7 @@ public abstract class InGameHudMixin {
     }
 
     private int calculatePosition(int mid, int n, int w) {
-        if(ZauberConfig.getManaDirection() == ManaDirection.RIGHT) {
+        if(ConfigManager.getClientConfig().manaDirection() == ManaDirection.RIGHT) {
             return mid + w * 8 - 9;
         }else {
             return n - w * 8 - 9;

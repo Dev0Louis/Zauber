@@ -1,8 +1,8 @@
 package dev.louis.zauber.mixin.client;
 
-import dev.louis.zauber.ZauberClient;
-import dev.louis.zauber.config.ZauberConfig;
 import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.ZauberClient;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import org.jetbrains.annotations.Nullable;
@@ -40,10 +40,6 @@ public abstract class MinecraftClientMixin {
     }
 
     public void resetSpellCooldown() {
-        spellCooldown = getSpellCooldown();
-    }
-
-    public int getSpellCooldown() {
-        return ZauberConfig.getSpellCooldown();
+        spellCooldown = ConfigManager.getServerConfig().spellCooldown();
     }
 }

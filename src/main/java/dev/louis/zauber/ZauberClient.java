@@ -1,10 +1,11 @@
 package dev.louis.zauber;
 
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.ZauberEntityType;
 import dev.louis.zauber.keybind.SpellKeyBinding;
 import dev.louis.zauber.keybind.SpellKeybindManager;
+import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.render.entity.SpellArrowEntityRenderer;
@@ -12,6 +13,7 @@ import dev.louis.zauber.spell.TargetingSpell;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,9 +25,18 @@ import java.util.Optional;
 public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
 
+
     @Override
     public void onInitializeClient() {
-        ClientConfigurationNetworking.registerGlobalReceiver(OptionSyncPacket.TYPE, ZauberConfig::syncOptions);
+        ConfigManager.loadClientConfig();
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            ConfigManager.clearOverrideConfig();
+        });
+
+        ClientConfigurationNetworking.registerGlobalReceiver(OptionSyncPacket.TYPE, (packet, responseSender) -> {
+            ConfigManager.setOverrideConfig(packet.overrideConfig());
+            responseSender.sendPacket(new OptionSyncCompletePacket());
+        });
         TargetingSpell.TargetedPlayerSelector.init();
 
         createSpellKeyBind(Zauber.Spells.ARROW, false);

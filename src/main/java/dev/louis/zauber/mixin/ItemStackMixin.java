@@ -1,12 +1,12 @@
 package dev.louis.zauber.mixin;
 
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.duck.ItemStackJuggernautModeDuck;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
-import dev.louis.zauber.accessor.ItemStackJuggernautModeAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemStack.class)
-public abstract class ItemStackMixin implements ItemStackJuggernautModeAccessor {
+public abstract class ItemStackMixin implements ItemStackJuggernautModeDuck {
     @Shadow public abstract @Nullable NbtCompound getNbt();
     @Shadow public abstract void setCount(int count);
     @Shadow public abstract NbtCompound getOrCreateNbt();
@@ -54,7 +54,7 @@ public abstract class ItemStackMixin implements ItemStackJuggernautModeAccessor 
     public boolean zauber$isValid(ServerWorld world) {
         long juggernautTicks = zauber$getJuggernautTick();
         if(juggernautTicks == 0L)return false;
-        return (((ServerWorldAccessor) world).getWorldProperties().getTime()- zauber$getJuggernautTick()) < ZauberConfig.getJuggernautSpellDuration();
+        return (((ServerWorldAccessor) world).getWorldProperties().getTime()- zauber$getJuggernautTick()) < ConfigManager.getServerConfig().juggernautSpellDuration();
     }
 
 

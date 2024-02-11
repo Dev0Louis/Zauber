@@ -1,7 +1,7 @@
 package dev.louis.zauber.mixin;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +17,7 @@ public class IdentifierMixin {
             ordinal = 0
     )
     private static String convertToZauber(String namespace) {
-        if(!ZauberConfig.HAS_CONFIG_LOADED || ZauberConfig.shouldConvertOldNamespace()) {
+        if(ConfigManager.getServerConfig() == null || ConfigManager.getServerConfig().convertOldNamespace()) {
             return namespace.equals("chainsmpspells") ? Zauber.MOD_ID : namespace;
         }
 

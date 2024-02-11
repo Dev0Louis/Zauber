@@ -2,7 +2,7 @@ package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -21,7 +21,8 @@ public class DashSpell extends Spell {
             serverPlayer.setInvisible(true);
             serverPlayer.setInvulnerable(true);
             serverPlayer.setNoDrag(true);
-            dashVelocity = serverPlayer.getRotationVector().multiply(1.5, 0.2, 1.5);
+            var dashVelocityMultiplier = ConfigManager.getServerConfig().dashVelocityMultiplier();
+            dashVelocity = serverPlayer.getRotationVector().multiply(dashVelocityMultiplier, 0.2, dashVelocityMultiplier);
             serverPlayer.playSound(
                     SoundEvents.BLOCK_DEEPSLATE_TILES_HIT,
                     SoundCategory.PLAYERS,
@@ -78,6 +79,6 @@ public class DashSpell extends Spell {
 
     @Override
     public int getDuration() {
-        return ZauberConfig.getDashSpellDuration();
+        return ConfigManager.getServerConfig().dashSpellDuration();
     }
 }

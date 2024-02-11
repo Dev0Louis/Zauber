@@ -13,7 +13,6 @@ public record OptionSyncCompletePacket() implements FabricPacket {
         return new OptionSyncCompletePacket();
     }
 
-
     @Override
     public void write(PacketByteBuf buf) {
 

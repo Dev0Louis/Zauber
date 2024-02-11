@@ -5,7 +5,7 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.nebula.api.spell.SpellType.Castability;
 import dev.louis.zauber.blocks.ZauberBlocks;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.ZauberEntityType;
 import dev.louis.zauber.items.ZauberItems;
 import dev.louis.zauber.mana.effect.ManaEffects;
@@ -30,16 +30,15 @@ import java.util.List;
 public class Zauber implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "zauber";
-    public static final int VERSION = 1;
     public static final int POLYMER_NETWORK_VERSION = 1;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
 
     @Override
     public void onInitialize() {
-        ZauberConfig.init();
+        ConfigManager.loadServerConfig();
+
         ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
             if (ServerConfigurationNetworking.canSend(handler, OptionSyncPacket.TYPE.getId())) {
-                // Tasks are processed in order.
                 handler.addTask(new OptionSyncTask());
             }
         });
@@ -64,7 +63,7 @@ public class Zauber implements ModInitializer {
                 Castability.DEFAULT.and((spellType, caster) -> {
                     if(caster.getWorld().isClient()) {
                         var playerInView = ZauberClient.getPlayerInView();
-                        return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ZauberConfig.getSyncedTargetingDistance();
+                        return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ConfigManager.getServerConfig().targetingDistance();
                     }
                     return true;
                 });

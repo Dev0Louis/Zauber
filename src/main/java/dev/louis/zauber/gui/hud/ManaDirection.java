@@ -1,6 +1,17 @@
 package dev.louis.zauber.gui.hud;
 
-public enum ManaDirection {
-        LEFT,
-        RIGHT;
+import net.minecraft.util.StringIdentifiable;
+
+public enum ManaDirection implements StringIdentifiable {
+    LEFT,
+    RIGHT;
+
+    //public static final StringIdentifiable.EnumCodec<ManaDirection> CODEC = StringIdentifiable.createCodec(ManaDirection::values);
+
+    @Override
+    public String asString() {
+        return name();
     }
+
+
+}

@@ -1,13 +1,13 @@
 package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.config.ZauberConfig;
+import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleTypes;
 
 public class FireSpell extends AreaEffectSpell {
     public FireSpell(SpellType<? extends AreaEffectSpell> spellType) {
-        super(spellType, ParticleTypes.FLAME, ZauberConfig.getFireSpellDuration());
+        super(spellType, ParticleTypes.FLAME, ConfigManager.getServerConfig().fireSpellDuration());
     }
 
     @Override

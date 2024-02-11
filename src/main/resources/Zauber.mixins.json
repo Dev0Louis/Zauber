@@ -4,12 +4,12 @@
   "package": "dev.louis.zauber.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "IdentifierMixin",
     "ItemStackMixin",
     "LivingEntityMixin",
     "ServerPlayNetworkHandlerMixin",
     "ServerWorldAccessor",
-    "ServerWorldMixin",
-    "IdentifierMixin"
+    "ServerWorldMixin"
   ],
   "client": [
     "client.ControlsListWidgetMixin",
