@@ -1,5 +1,6 @@
 package dev.louis.zauber.blocks;
 
+import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.screen.SpellTableScreenHandler;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -28,6 +29,8 @@ import net.minecraft.world.World;
 
 public class SpellTableBlock extends Block implements PolymerBlock, PolymerClientDecoded, PolymerKeepModel {
     private static final Text TITLE = Text.translatable("container.spell_crafting");
+
+    public static final MapCodec<BulbBlock> CODEC = createCodec(BulbBlock::new);
     public static final int MAX_CHARGE = 32;
     public static final int MIN_CHARGE = 0;
     public static final IntProperty CHARGE = IntProperty.of("charge", MIN_CHARGE, MAX_CHARGE);
@@ -95,6 +98,11 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
 
     public static int getLightLevel(BlockState state) {
         return state.get(CHARGE) / 3 + 4;
+    }
+
+    @Override
+    protected MapCodec<? extends Block> getCodec() {
+        return CODEC;
     }
 
     @Override

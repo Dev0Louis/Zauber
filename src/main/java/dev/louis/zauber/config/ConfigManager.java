@@ -328,7 +328,7 @@ public class ConfigManager {
     private static Option<Double> doubleSlideOptionServer(String optionName, double defaultValue, double min, double max, Supplier<Double> getter, Consumer<Double> setter) {
         return Option.<Double>createBuilder()
                 .name(option(optionName))
-                .controller(integerOption -> DoubleSliderControllerBuilder.create(integerOption).range(min, max).step(0.1))
+                .controller(integerOption -> DoubleSliderControllerBuilder.create(integerOption).range(min, max).step(0.01))
                 .binding(
                         defaultValue,
                         getter,
@@ -343,7 +343,7 @@ public class ConfigManager {
     private static Option<Float> floatSlideOptionServer(String optionName, float defaultValue, float min, float max, Supplier<Float> getter, Consumer<Float> setter) {
         return Option.<Float>createBuilder()
                 .name(option(optionName))
-                .controller(integerOption -> FloatSliderControllerBuilder.create(integerOption).range(min, max).step(1f))
+                .controller(integerOption -> FloatSliderControllerBuilder.create(integerOption).range(min, max).step(0.1f))
                 .binding(
                         defaultValue,
                         getter,
