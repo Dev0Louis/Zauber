@@ -37,7 +37,7 @@ public class WindExpelSpell extends Spell {
                 }
                 return;
             } else {
-                serverPlayer.addVelocity(new Vec3d(0, ConfigManager.getServerConfig().windExpelAcceleration(), 0));
+                serverPlayer.addVelocity(new Vec3d(0, ConfigManager.getServerConfig().windExpelSpellAcceleration(), 0));
                 serverPlayer.velocityModified = true;
             }
             double sin = Math.sin(spellAge/1.75f) * 2.5;

@@ -2,7 +2,9 @@ package dev.louis.zauber.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.ConfigCategory;
+import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.*;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.gui.hud.ManaDirection;
@@ -96,7 +98,7 @@ public class ConfigManager {
         buf.writeInt(serverConfig.iceSpellDuration());
         buf.writeInt(serverConfig.juggernautSpellDuration());
         buf.writeInt(serverConfig.rewindSpellDuration());
-        buf.writeDouble(serverConfig.windExpelAcceleration());
+        buf.writeDouble(serverConfig.windExpelSpellAcceleration());
         buf.writeInt(serverConfig.windExpelSpellDuration());
         buf.writeBoolean(serverConfig.convertOldNamespace());
     }
@@ -165,147 +167,139 @@ public class ConfigManager {
         var clientCategory = ConfigCategory.createBuilder()
                 .name(category("client"))
                 .tooltip(tooltip("client"))
-                .group(OptionGroup.createBuilder()
-                        .name(group("client"))
-                        .description(OptionDescription.of(description("client")))
-                        .option(
-                                manaDirectionOption(
-                                        "mana_direction",
-                                        ManaDirection.LEFT,
-                                        () -> getClientConfig().manaDirection(),
-                                        (value) -> getClientConfig().manaDirection(value)
-                                )
+                .option(
+                        manaDirectionOption(
+                                "mana_direction",
+                                ManaDirection.LEFT,
+                                () -> getClientConfig().manaDirection(),
+                                (value) -> getClientConfig().manaDirection(value)
                         )
-                        .option(
-                                intFieldOption(
-                                        "raycast_scan_precision",
-                                        2,
-                                        1,
-                                        () -> getClientConfig().raycastScanPrecision(),
-                                        (value) -> getClientConfig().raycastScanPrecision(value)
-                                )
+                )
+                .option(
+                        intSlideOption(
+                                "raycast_scan_precision",
+                                2,
+                                1,
+                                10,
+                                () -> getClientConfig().raycastScanPrecision(),
+                                (value) -> getClientConfig().raycastScanPrecision(value)
                         )
-                        .option(
-                                colorOption(
-                                        "targeting_color",
-                                        Color.RED,
-                                        () -> getClientConfig().targetingColor(),
-                                        (value) -> getClientConfig().targetingColor(value)
-                                )
+                )
+                .option(
+                        colorOption(
+                                "targeting_color",
+                                Color.RED,
+                                () -> getClientConfig().targetingColor(),
+                                (value) -> getClientConfig().targetingColor(value)
                         )
-                        .build()
                 ).build();
-        var serverCategory = ConfigCategory.createBuilder()
+
+                        var serverCategory = ConfigCategory.createBuilder()
                 .name(category("server"))
                 .tooltip(tooltip("server"))
-                .group(OptionGroup.createBuilder()
-                        .name(group("server"))
-                        .description(OptionDescription.of(description("server")))
-                        .option(
-                                intSlideOptionServer(
-                                        "targeting_distance",
-                                        20,
-                                        5,
-                                        128,
-                                        () -> getServerConfig().targetingDistance(),
-                                        (value) -> getRealServerConfig().targetingDistance(value)
-                                )
+                .option(
+                        intSlideOptionServer(
+                                "targeting_distance",
+                                20,
+                                5,
+                                128,
+                                () -> getServerConfig().targetingDistance(),
+                                (value) -> getRealServerConfig().targetingDistance(value)
                         )
-                        .option(
-                                intSlideOptionServer(
-                                        "spell_cooldown",
-                                        10,
-                                        5,
-                                        100,
-                                        () -> getServerConfig().spellCooldown(),
-                                        (value) -> getServerConfig().spellCooldown(value)
-                                )
+                )
+                .option(
+                        intSlideOptionServer(
+                                "spell_cooldown",
+                                10,
+                                5,
+                                100,
+                                () -> getServerConfig().spellCooldown(),
+                                (value) -> getServerConfig().spellCooldown(value)
                         )
-                        .option(
-                                floatSlideOptionServer(
-                                        "supernova_explosion_power",
-                                        16.0f,
-                                        1.0f,
-                                        32.0f,
-                                        () -> getServerConfig().supernovaExplosionPower(),
-                                        (value) -> getRealServerConfig().supernovaExplosionPower(value)
-                                )
+                )
+                .option(
+                        floatSlideOptionServer(
+                                "supernova_explosion_power",
+                                16.0f,
+                                1.0f,
+                                32.0f,
+                                () -> getServerConfig().supernovaExplosionPower(),
+                                (value) -> getRealServerConfig().supernovaExplosionPower(value)
                         )
-                        .option(
-                                intFieldOptionServer(
-                                        "dash_spell_duration",
-                                        4,
-                                        () -> getServerConfig().dashSpellDuration(),
-                                        (value) -> getRealServerConfig().dashSpellDuration(value)
-                                )
+                )
+                .option(
+                        intFieldOptionServer(
+                                "dash_spell_duration",
+                                4,
+                                () -> getServerConfig().dashSpellDuration(),
+                                (value) -> getRealServerConfig().dashSpellDuration(value)
                         )
-                        .option(
-                                intFieldOptionServer(
-                                        "sprout_spell_duration",
-                                        20 * 10,
-                                        () -> getServerConfig().sproutSpellDuration(),
-                                        (value) -> getRealServerConfig().sproutSpellDuration(value)
-                                )
+                )
+                .option(
+                        intFieldOptionServer(
+                                "sprout_spell_duration",
+                                20 * 10,
+                                () -> getServerConfig().sproutSpellDuration(),
+                                (value) -> getRealServerConfig().sproutSpellDuration(value)
                         )
-                        .option(
-                                intFieldOptionServer(
-                                        "fire_spell_duration",
-                                        20,
-                                        () -> getServerConfig().fireSpellDuration(),
-                                        (value) -> getRealServerConfig().fireSpellDuration(value)
-                                )
+                )
+                .option(
+                        intFieldOptionServer(
+                                "fire_spell_duration",
+                                20,
+                                () -> getServerConfig().fireSpellDuration(),
+                                (value) -> getRealServerConfig().fireSpellDuration(value)
                         )
-                        .option(
-                                intFieldOptionServer(
-                                        "ice_spell_duration",
-                                        20,
-                                        () -> getServerConfig().iceSpellDuration(),
-                                        (value) -> getRealServerConfig().iceSpellDuration(value)
-                                )
+                )
+                .option(
+                        intFieldOptionServer(
+                                "ice_spell_duration",
+                                20,
+                                () -> getServerConfig().iceSpellDuration(),
+                                (value) -> getRealServerConfig().iceSpellDuration(value)
                         )
-                        .option(
-                                intFieldOptionServer(
-                                        "juggernaut_spell_duration",
-                                        120 * 20,
-                                        () -> getServerConfig().juggernautSpellDuration(),
-                                        (value) -> getRealServerConfig().juggernautSpellDuration(value)
-                                )
+                )
+                .option(
+                        intFieldOptionServer(
+                                "juggernaut_spell_duration",
+                                120 * 20,
+                                () -> getServerConfig().juggernautSpellDuration(),
+                                (value) -> getRealServerConfig().juggernautSpellDuration(value)
                         )
-                        .option(
-                                intFieldOptionServer(
-                                        "rewind_spell_duration",
-                                        6 * 20,
-                                        () -> getServerConfig().rewindSpellDuration(),
-                                        (value) -> getRealServerConfig().rewindSpellDuration(value)
-                                )
+                )
+                .option(
+                        intFieldOptionServer(
+                                "rewind_spell_duration",
+                                6 * 20,
+                                () -> getServerConfig().rewindSpellDuration(),
+                                (value) -> getRealServerConfig().rewindSpellDuration(value)
                         )
-                        .option(
-                                doubleSlideOptionServer(
-                                        "wind_expel_acceleration",
-                                        0.1,
-                                        0.01,
-                                        1,
-                                        () -> getServerConfig().windExpelAcceleration(),
-                                        (value) -> getRealServerConfig().windExpelAcceleration(value)
-                                )
+                )
+                .option(
+                        doubleSlideOptionServer(
+                                "wind_expel_spell_acceleration",
+                                0.1,
+                                0.01,
+                                1,
+                                () -> getServerConfig().windExpelSpellAcceleration(),
+                                (value) -> getRealServerConfig().windExpelSpellAcceleration(value)
                         )
-                        .option(
-                                intFieldOptionServer(
-                                        "wind_expel_spell_duration",
-                                        20,
-                                        () -> getServerConfig().windExpelSpellDuration(),
-                                        (value) -> getRealServerConfig().windExpelSpellDuration(value)
-                                )
+                )
+                .option(
+                        intFieldOptionServer(
+                                "wind_expel_spell_duration",
+                                20,
+                                () -> getServerConfig().windExpelSpellDuration(),
+                                (value) -> getRealServerConfig().windExpelSpellDuration(value)
                         )
-                        .option(
-                                booleanOption(
-                                        "convert_old_namespace",
-                                        false,
-                                        () -> getServerConfig().convertOldNamespace(),
-                                        (value) -> getRealServerConfig().convertOldNamespace(value)
-                                )
+                )
+                .option(
+                        booleanOption(
+                                "convert_old_namespace",
+                                false,
+                                () -> getServerConfig().convertOldNamespace(),
+                                (value) -> getRealServerConfig().convertOldNamespace(value)
                         )
-                        .build()
                 ).build();
         return List.of(clientCategory, serverCategory);
     }
@@ -404,9 +398,20 @@ public class ConfigManager {
                 .binding(
                         defaultValue,
                         getter,
-                        (integer) -> {
-                            if (canEditServerConfig()) setter.accept(integer);
-                        }
+                        setter
+
+                )
+                .build();
+    }
+
+    private static Option<Integer> intSlideOption(String optionName, int defaultValue, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
+        return Option.<Integer>createBuilder()
+                .name(option(optionName))
+                .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(min, max).step(1))
+                .binding(
+                        defaultValue,
+                        getter,
+                        setter
                 )
                 .build();
     }

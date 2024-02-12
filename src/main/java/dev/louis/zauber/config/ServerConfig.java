@@ -13,7 +13,7 @@ public class ServerConfig {
     private int iceSpellDuration;
     private int juggernautSpellDuration;
     private int rewindSpellDuration;
-    private double windExpelAcceleration;
+    private double windExpelSpellAcceleration;
     private int windExpelSpellDuration;
     private boolean convertOldNamespace;
 
@@ -28,7 +28,7 @@ public class ServerConfig {
             int iceSpellDuration,
             int juggernautSpellDuration,
             int rewindSpellDuration,
-            double windExpelAcceleration,
+            double windExpelSpellAcceleration,
             int windExpelSpellDuration,
             boolean convertOldNamespace
     ) {
@@ -42,7 +42,7 @@ public class ServerConfig {
         this.iceSpellDuration = iceSpellDuration;
         this.juggernautSpellDuration = juggernautSpellDuration;
         this.rewindSpellDuration = rewindSpellDuration;
-        this.windExpelAcceleration = windExpelAcceleration;
+        this.windExpelSpellAcceleration = windExpelSpellAcceleration;
         this.windExpelSpellDuration = windExpelSpellDuration;
         this.convertOldNamespace = convertOldNamespace;
     }
@@ -145,12 +145,12 @@ public class ServerConfig {
         return rewindSpellDuration;
     }
 
-    public void windExpelAcceleration(double windExpelAcceleration) {
-        this.windExpelAcceleration = windExpelAcceleration;
+    public void windExpelSpellAcceleration(double windExpelAcceleration) {
+        this.windExpelSpellAcceleration = windExpelAcceleration;
     }
 
-    public double windExpelAcceleration() {
-        return windExpelAcceleration;
+    public double windExpelSpellAcceleration() {
+        return windExpelSpellAcceleration;
     }
 
     public void windExpelSpellDuration(int windExpelSpellDuration) {
