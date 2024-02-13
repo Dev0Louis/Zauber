@@ -419,7 +419,7 @@ public class ConfigManager {
     private static Option<ManaDirection> manaDirectionOption(String optionName, ManaDirection defaultValue, Supplier<ManaDirection> getter, Consumer<ManaDirection> setter) {
         return Option.<ManaDirection>createBuilder()
                 .name(option(optionName))
-                .controller(manaDirectionOption -> EnumControllerBuilder.create(manaDirectionOption).enumClass(ManaDirection.class))
+                .controller(manaDirectionOption -> EnumControllerBuilder.create(manaDirectionOption).formatValue(value -> Text.translatable("zauber." + optionName + "." + value.name().toLowerCase())).enumClass(ManaDirection.class))
                 .binding(
                         defaultValue,
                         getter,

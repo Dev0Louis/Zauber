@@ -45,6 +45,8 @@
   "zauber.yacl.category.client": "Client Settings",
   "zauber.yacl.category.visual.group.mana": "Mana",
   "zauber.yacl.category.visual.group.spells": "Spells",
+  "zauber.yacl.mana_direction.right": "Rite",
+  "zauber.yacl.mana_direction.left": "Leaved",
   "zauber.yacl.option.convert_old_namespace": "Convert Old Namespace",
   "zauber.yacl.option.convert_old_namespace.desc": "Converts the old namespace (chainsmpspells) to the new one (zauber) by mixing into Identifier. You do not need this if you did not use chainsmpspells.",
   "zauber.yacl.option.dash_spell_duration": "Dash spell duration",

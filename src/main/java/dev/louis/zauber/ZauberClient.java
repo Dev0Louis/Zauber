@@ -20,8 +20,6 @@ import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Optional;
 
-;
-
 public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
 

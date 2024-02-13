@@ -10,8 +10,6 @@ public enum ManaDirection implements StringIdentifiable {
 
     @Override
     public String asString() {
-        return name();
+        return "zauber.mana_direction." + this.asString().toLowerCase();
     }
-
-
 }
