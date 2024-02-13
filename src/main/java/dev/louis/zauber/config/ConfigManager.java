@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.*;
 import dev.louis.zauber.Zauber;
@@ -307,6 +308,7 @@ public class ConfigManager {
     private static Option<Boolean> booleanOption(String optionName, boolean defaultValue, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         return Option.<Boolean>createBuilder()
                 .name(option(optionName))
+                .description(description(optionName))
                 .controller(TickBoxControllerBuilder::create)
                 .binding(
                         getter.get(),
@@ -322,6 +324,7 @@ public class ConfigManager {
     private static Option<Double> doubleSlideOptionServer(String optionName, double defaultValue, double min, double max, Supplier<Double> getter, Consumer<Double> setter) {
         return Option.<Double>createBuilder()
                 .name(option(optionName))
+                .description(description(optionName))
                 .controller(integerOption -> DoubleSliderControllerBuilder.create(integerOption).range(min, max).step(0.01))
                 .binding(
                         defaultValue,
@@ -337,6 +340,7 @@ public class ConfigManager {
     private static Option<Float> floatSlideOptionServer(String optionName, float defaultValue, float min, float max, Supplier<Float> getter, Consumer<Float> setter) {
         return Option.<Float>createBuilder()
                 .name(option(optionName))
+                .description(description(optionName))
                 .controller(integerOption -> FloatSliderControllerBuilder.create(integerOption).range(min, max).step(0.1f))
                 .binding(
                         defaultValue,
@@ -352,6 +356,7 @@ public class ConfigManager {
     private static Option<Integer> intSlideOptionServer(String optionName, int defaultValue, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
+                .description(description(optionName))
                 .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(min, max).step(1))
                 .binding(
                         defaultValue,
@@ -367,6 +372,7 @@ public class ConfigManager {
     private static Option<Integer> intFieldOptionServer(String optionName, int defaultValue, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
+                .description(description(optionName))
                 .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).min(0))
                 .binding(
                         defaultValue,
@@ -382,6 +388,7 @@ public class ConfigManager {
     private static Option<Color> colorOption(String optionName, Color defaultValue, Supplier<Color> getter, Consumer<Color> setter) {
         return Option.<Color>createBuilder()
                 .name(option(optionName))
+                //.description(description(optionName))
                 .controller(ColorControllerBuilder::create)
                 .binding(
                         defaultValue,
@@ -394,6 +401,7 @@ public class ConfigManager {
     private static Option<Integer> intFieldOption(String optionName, int defaultValue, int minValue, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
+                .description(description(optionName))
                 .controller(integerOption -> IntegerFieldControllerBuilder.create(integerOption).min(minValue))
                 .binding(
                         defaultValue,
@@ -407,6 +415,7 @@ public class ConfigManager {
     private static Option<Integer> intSlideOption(String optionName, int defaultValue, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
+                .description(description(optionName))
                 .controller(integerOption -> IntegerSliderControllerBuilder.create(integerOption).range(min, max).step(1))
                 .binding(
                         defaultValue,
@@ -419,6 +428,7 @@ public class ConfigManager {
     private static Option<ManaDirection> manaDirectionOption(String optionName, ManaDirection defaultValue, Supplier<ManaDirection> getter, Consumer<ManaDirection> setter) {
         return Option.<ManaDirection>createBuilder()
                 .name(option(optionName))
+                //.description(description(optionName))
                 .controller(manaDirectionOption -> EnumControllerBuilder.create(manaDirectionOption).formatValue(value -> Text.translatable("zauber." + optionName + "." + value.name().toLowerCase())).enumClass(ManaDirection.class))
                 .binding(
                         defaultValue,
@@ -475,8 +485,8 @@ public class ConfigManager {
         return yaclText("group", key);
     }
 
-    private static MutableText description(String key) {
-        return yaclText("description", key);
+    private static OptionDescription description(String key) {
+        return OptionDescription.of(Text.translatable("zauber.yacl.option.%s.desc".formatted(key)));
     }
 
     private static MutableText option(String key) {
