@@ -59,9 +59,7 @@ public class ConfigManager {
         if(FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             throw new IllegalStateException("Tried loading client config when not in the client environment");
         }
-        var clientConfig = read(ClientConfig.class, CLIENT_PATH);
-        System.out.println(clientConfig);
-        ConfigManager.clientConfig = clientConfig;
+        ConfigManager.clientConfig = read(ClientConfig.class, CLIENT_PATH);
         Zauber.LOGGER.info("Loaded Client Config");
     }
     public static void loadServerConfig() {
