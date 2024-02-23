@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -16,17 +17,14 @@ import static java.lang.Math.*;
 
 public abstract class AreaEffectSpell extends Spell {
     private final ParticleEffect particle;
-    private final int duration;
-    private Box spellCastingBox;
+    protected Box spellCastingBox;
 
     public AreaEffectSpell(
             SpellType<? extends AreaEffectSpell> spellType,
-            ParticleEffect particle,
-            int duration
+            ParticleEffect particle
     ) {
         super(spellType);
         this.particle = particle;
-        this.duration = duration;
     }
 
     @Override
@@ -37,17 +35,11 @@ public abstract class AreaEffectSpell extends Spell {
     @Override
     public void tick() {
         super.tick();
-        if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
+        if(this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
             spawnParticles(serverPlayer.getServerWorld());
-            for (Entity entity : getCaster().getWorld().getOtherEntities(getCaster(), spellCastingBox)) {
-                affect(entity);
-            }
+            BlockPos.stream(spellCastingBox).forEach(blockPos -> affect(serverPlayer.getServerWorld(), blockPos));
+            serverPlayer.getWorld().getOtherEntities(getCaster(), spellCastingBox).forEach(this::affect);
         }
-    }
-
-    @Override
-    public int getDuration() {
-        return duration;
     }
 
     /**
@@ -55,7 +47,13 @@ public abstract class AreaEffectSpell extends Spell {
      */
     protected void affect(Entity entity) {
         if(entity instanceof LivingEntity livingEntity && livingEntity.isMobOrPlayer()) entity.damage(getDamageSource(), 1);
-    };
+    }
+
+    /**
+     * This method can be overridden to run something when an Entity is affected by the spell.
+     */
+    protected void affect(ServerWorld serverWorld, BlockPos blockPos) {
+    }
 
     private static Box getSpellCastingBox(PlayerEntity player) {
         Vec3d playerRotation = player.getRotationVec(1.0f).normalize();
@@ -79,7 +77,7 @@ public abstract class AreaEffectSpell extends Spell {
         return player.getBoundingBox().stretch(adjustedRotation).expand(1.0, -0.5, 1.0).offset(adjustedRotation.multiply(multiplier).add(0, yOffset, 0));
     }
 
-    private void spawnParticles(ServerWorld world) {
+    protected void spawnParticles(ServerWorld world) {
         for (double x = spellCastingBox.minX; x < spellCastingBox.maxX; x = x + 0.7) {
             for (double y = spellCastingBox.minY; y < spellCastingBox.maxY; y = y + 0.7) {
                 for (double z = spellCastingBox.minZ; z < spellCastingBox.maxZ; z = z + 0.7) {

@@ -2,12 +2,14 @@ package dev.louis.zauber;
 
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.entity.ZauberEntityType;
+import dev.louis.zauber.entity.ManaHorseEntity;
+import dev.louis.zauber.entity.SpellArrowEntity;
 import dev.louis.zauber.keybind.SpellKeyBinding;
 import dev.louis.zauber.keybind.SpellKeybindManager;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.recipe.ZauberRecipes;
+import dev.louis.zauber.render.entity.ManaHorseEntityRenderer;
 import dev.louis.zauber.render.entity.SpellArrowEntityRenderer;
 import dev.louis.zauber.spell.TargetingSpell;
 import net.fabricmc.api.ClientModInitializer;
@@ -52,7 +54,8 @@ public class ZauberClient implements ClientModInitializer {
         createSpellKeyBind(Zauber.Spells.DASH, false);
         ZauberRecipes.initClient();
 
-        EntityRendererRegistry.register(ZauberEntityType.SPELL_ARROW, SpellArrowEntityRenderer::new);
+        EntityRendererRegistry.register(SpellArrowEntity.TYPE, SpellArrowEntityRenderer::new);
+        EntityRendererRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntityRenderer::new);
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides){

@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ConfigManager {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 

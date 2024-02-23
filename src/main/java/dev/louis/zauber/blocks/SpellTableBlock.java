@@ -30,7 +30,7 @@ import net.minecraft.world.World;
 public class SpellTableBlock extends Block implements PolymerBlock, PolymerClientDecoded, PolymerKeepModel {
     private static final Text TITLE = Text.translatable("container.spell_crafting");
 
-    public static final MapCodec<BulbBlock> CODEC = createCodec(BulbBlock::new);
+    public static final MapCodec<SpellTableBlock> CODEC = createCodec(SpellTableBlock::new);
     public static final int MAX_CHARGE = 32;
     public static final int MIN_CHARGE = 0;
     public static final IntProperty CHARGE = IntProperty.of("charge", MIN_CHARGE, MAX_CHARGE);

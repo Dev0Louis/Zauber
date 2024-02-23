@@ -4,6 +4,7 @@
   "package": "dev.louis.zauber.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "CommandManagerMixin",
     "IdentifierMixin",
     "ItemStackMixin",
     "LivingEntityMixin",
@@ -12,6 +13,7 @@
     "ServerWorldMixin"
   ],
   "client": [
+    "LivingEntityRendererMixin",
     "client.ControlsListWidgetMixin",
     "client.InGameHudMixin",
     "client.ItemStackNameMixin",

@@ -6,7 +6,8 @@ import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.nebula.api.spell.SpellType.Castability;
 import dev.louis.zauber.blocks.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.entity.ZauberEntityType;
+import dev.louis.zauber.entity.ManaHorseEntity;
+import dev.louis.zauber.entity.SpellArrowEntity;
 import dev.louis.zauber.items.ZauberItems;
 import dev.louis.zauber.mana.effect.ManaEffects;
 import dev.louis.zauber.networking.ICanHasZauberPayload;
@@ -15,11 +16,17 @@ import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.networking.OptionSyncTask;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.spell.*;
+import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -53,8 +60,18 @@ public class Zauber implements ModInitializer {
         ZauberRecipes.init();
         ZauberItems.init();
         ZauberBlocks.init();
-        ZauberEntityType.init();
+
+        registerEntity("spell_arrow", SpellArrowEntity.TYPE);
+        //FabricDefaultAttributeRegistry.register(SpellArrowEntity.TYPE, SpellArrowEntity.createMobAttributes());
+        registerEntity("mana_horse", ManaHorseEntity.TYPE);
+        FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
+
         ManaEffects.init();
+    }
+
+    public static <T extends Entity> void registerEntity(String path, EntityType<T> type) {
+        Registry.register(Registries.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, path), type);
+        PolymerEntityUtils.registerType(type);
     }
 
     public static class Spells {
@@ -81,6 +98,17 @@ public class Zauber implements ModInitializer {
         public static SpellType<WindExpelSpell> WIND_EXPEL = register("wind_expel", WindExpelSpell::new, 4);
         public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
         public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);
+        public static SpellType<ManaHorseSpell> MANA_HORSE = registerManaHorse("mana_horse", ManaHorseSpell::new, 4);
+
+
+        public static <T extends Spell> SpellType<T> registerManaHorse(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
+            return SpellType.register(
+                    Identifier.of(MOD_ID, spellName),
+                    SpellType.Builder.create(spellFactory, mana)
+                            .castability(Castability.DEFAULT.and((spellType, playerEntity) -> !playerEntity.hasVehicle()))
+                            .needsLearning(false)
+            );
+        }
 
         public static <T extends Spell> SpellType<T> register(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
             return SpellType.register(Identifier.of(MOD_ID, spellName),SpellType.Builder.create(spellFactory, mana));

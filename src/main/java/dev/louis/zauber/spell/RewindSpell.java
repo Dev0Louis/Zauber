@@ -11,8 +11,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.TeleportTarget;
 
-;
-
 public class RewindSpell extends Spell {
     public RewindSpell(SpellType<? extends Spell> spellType) {
         super(spellType);

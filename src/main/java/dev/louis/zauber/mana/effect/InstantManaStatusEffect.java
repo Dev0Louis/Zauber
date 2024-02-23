@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 public class InstantManaStatusEffect extends InstantStatusEffect implements PolymerStatusEffect {
     public InstantManaStatusEffect() {
         super(StatusEffectCategory.BENEFICIAL,
-                0x03ddfe);
+                0x5900e2);
     }
 
     @Override

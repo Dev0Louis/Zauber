@@ -33,6 +33,10 @@ repositories {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/zauber.accesswidener")
+}
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -48,7 +52,7 @@ dependencies {
 
     modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
-    include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
+    include(modCompileOnly "eu.pb4:polymer-core:${project.polymer_version}")
 }
 
 remapJar {

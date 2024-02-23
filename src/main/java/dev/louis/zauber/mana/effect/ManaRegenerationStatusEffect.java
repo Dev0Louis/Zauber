@@ -12,7 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class ManaRegenerationStatusEffect extends StatusEffect implements PolymerStatusEffect {
     public ManaRegenerationStatusEffect() {
         super(StatusEffectCategory.BENEFICIAL,
-                0x98D982);
+                0x7612ff);
     }
 
 

@@ -6,6 +6,7 @@ import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SpellArrowEntity extends ArrowEntity implements PolymerClientDecoded, PolymerKeepModel, PolymerEntity {
+    public static final EntityType<SpellArrowEntity> TYPE = EntityType.Builder.<SpellArrowEntity>create(SpellArrowEntity::new, SpawnGroup.MISC).setDimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build("spell_arrow");
+
     @Nullable
     private final Spell spell;
 
@@ -42,7 +45,7 @@ public class SpellArrowEntity extends ArrowEntity implements PolymerClientDecode
     }
 
     public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        return ZauberEntityType.SPELL_ARROW;
+        return TYPE;
         //if(Zauber.isClientModded(player)) return ZauberEntityType.SPELL_ARROW;
         //return EntityType.ARROW;
     }
