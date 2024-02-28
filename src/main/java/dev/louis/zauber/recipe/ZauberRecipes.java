@@ -2,9 +2,7 @@ package dev.louis.zauber.recipe;
 
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.screen.PolymerScreenHandlerType;
-import dev.louis.zauber.screen.SpellTableScreen;
 import dev.louis.zauber.screen.SpellTableScreenHandler;
-import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -21,7 +19,6 @@ public class ZauberRecipes {
     }
 
     public static void initClient() {
-        HandledScreens.register(SPELL_TABLE, SpellTableScreen::new);
     }
 
     private static <T extends ScreenHandler> ScreenHandlerType<T> register(Identifier id, ScreenHandlerType.Factory<T> factory) {

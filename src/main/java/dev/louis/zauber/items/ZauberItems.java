@@ -1,7 +1,7 @@
 package dev.louis.zauber.items;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.blocks.ZauberBlocks;
+import dev.louis.zauber.block.ZauberBlocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;

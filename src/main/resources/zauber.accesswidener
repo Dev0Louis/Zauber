@@ -1,3 +1,4 @@
 accessWidener v2 named
 extendable class net/minecraft/client/render/entity/HorseEntityRenderer
 accessible method net/minecraft/item/GoatHornItem setInstrument (Lnet/minecraft/item/ItemStack;Lnet/minecraft/registry/entry/RegistryEntry;)V
+accessible method net/minecraft/particle/DefaultParticleType <init> (Z)V

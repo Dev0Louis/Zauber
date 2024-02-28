@@ -1,27 +1,29 @@
 package dev.louis.zauber.entity;
 
 import dev.louis.nebula.api.NebulaPlayer;
+import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.spell.ManaHorseSpell;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.HorseColor;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.EntityView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-
 /*
 TODO: Making it item bound, making it shake before it returns in the item. Better death sound and effect.
  */
-public class ManaHorseEntity extends HorseEntity implements CustomRGBAEntity, Ownable {
+public class ManaHorseEntity extends HorseEntity implements Ownable {
     public static final EntityType<ManaHorseEntity> TYPE =
             EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).setDimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
     private ManaHorseSpell spell;
@@ -51,26 +53,37 @@ public class ManaHorseEntity extends HorseEntity implements CustomRGBAEntity, Ow
 
     @Override
     public void tick() {
-        if(!this.getWorld().isClient()) {
+        if (!this.getWorld().isClient()) {
             if (spell == null || spell.hasEnded()) {
                 this.discard();
             }
         } else {
-            var velocity = this.getVelocity();
-            this.getWorld().addParticle(ParticleTypes.WITCH, this.getX(), this.getEyeY() + 0.1, this.getZ(), velocity.getX() * 1.1, velocity.getY(), velocity.getZ() * 1.1);
+            spawnManaParticles();
         }
         super.tick();
     }
 
     public void spawnManaParticles() {
+        var x = (this.random.nextFloat() - 0.5) * 2;
+        var y = (this.random.nextFloat() - 0.5) * 2;
+        var z = (this.random.nextFloat() - 0.5) * 2;
+        var velocity = this.getVelocity();
+        this.getWorld().addParticle(ZauberParticleTypes.MANA_RUNE, this.getX() + x, this.getEyeY() + y, this.getZ() + z, velocity.getX() * 1.1, velocity.getY(), velocity.getZ() * 1.1);
+    }
 
+    @Override
+    public void onDeath(DamageSource damageSource) {
+        if(this.getWorld().isClient()) {
+            this.getWorld().addParticle(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY() + 2.0, this.getZ(), 0.0, 0.0, 0.0);
+        }
+
+        super.onDeath(damageSource);
     }
 
     @Override
     public void remove(RemovalReason reason) {
         if (reason.shouldDestroy()) {
-            this.getWorld().addParticle(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY() + 2.0, this.getZ(), 0.0, 0.0, 0.0);
-
+            this.playSound(SoundEvents.ENTITY_ENDER_EYE_DEATH, 3, 2);
         }
 
         if (spell != null) spell.interrupt();
@@ -78,11 +91,19 @@ public class ManaHorseEntity extends HorseEntity implements CustomRGBAEntity, Ow
     }
 
     @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return SoundEvents.ENTITY_ALLAY_HURT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.ENTITY_ENDER_EYE_DEATH;
+    }
+
+    @Override
     public boolean shouldSave() {
         return false;
     }
-
-
 
     @Override
     protected void removePassenger(Entity passenger) {
@@ -105,31 +126,6 @@ public class ManaHorseEntity extends HorseEntity implements CustomRGBAEntity, Ow
     @Override
     public HorseColor getVariant() {
         return HorseColor.WHITE;
-    }
-
-    @Override
-    public int getOverlay() {
-        return Color.WHITE.getRGB();
-    }
-
-    @Override
-    public float getRed() {
-        return 0;
-    }
-
-    @Override
-    public float getGreen() {
-        return 0;
-    }
-
-    @Override
-    public float getBlue() {
-        return 1f;
-    }
-
-    @Override
-    public float getAlpha() {
-        return 0.7f;
     }
 
     @Override

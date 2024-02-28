@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.louis.zauber.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "CommandManagerMixin",
+    "IdentifierMixin",
+    "ItemStackMixin",
+    "LivingEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "ServerWorldAccessor",
+    "ServerWorldMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

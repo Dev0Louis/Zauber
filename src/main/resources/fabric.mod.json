@@ -18,12 +18,18 @@
       "dev.louis.zauber.Zauber"
     ],
     "client": [
-      "dev.louis.zauber.ZauberClient"
+      "dev.louis.zauber.client.ZauberClient"
     ],
-    "modmenu": [ "dev.louis.zauber.config.ModMenuIntegration" ]
+    "modmenu": [
+      "dev.louis.zauber.client.config.ModMenuIntegration"
+    ]
   },
   "mixins": [
-    "Zauber.mixins.json"
+    "zauber.mixins.json",
+    {
+      "config": "zauber.client.mixins.json",
+      "environment": "client"
+    }
   ],
   "accessWidener": "zauber.accesswidener",
   "depends": {

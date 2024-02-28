@@ -1,6 +1,6 @@
 package dev.louis.zauber.mixin;
 
-import dev.louis.zauber.blocks.ZauberBlocks;
+import dev.louis.zauber.block.ZauberBlocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static dev.louis.zauber.blocks.SpellTableBlock.CHARGE;
-import static dev.louis.zauber.blocks.SpellTableBlock.MAX_CHARGE;
+import static dev.louis.zauber.block.SpellTableBlock.CHARGE;
+import static dev.louis.zauber.block.SpellTableBlock.MAX_CHARGE;
 
 @Mixin(ServerWorld.class)
 public class ServerWorldMixin {

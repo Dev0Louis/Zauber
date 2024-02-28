@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.nebula.api.spell.SpellType.Castability;
-import dev.louis.zauber.blocks.ZauberBlocks;
+import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.entity.SpellArrowEntity;
@@ -14,6 +14,7 @@ import dev.louis.zauber.networking.ICanHasZauberPayload;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.networking.OptionSyncTask;
+import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.spell.*;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
@@ -39,6 +40,8 @@ public class Zauber implements ModInitializer {
     public static final String MOD_ID = "zauber";
     public static final int POLYMER_NETWORK_VERSION = 1;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
+    //Hacky way to get Client data
+    public static PlayerViewGetter PLAYER_VIEWER_GETTER;
 
     @Override
     public void onInitialize() {
@@ -65,6 +68,9 @@ public class Zauber implements ModInitializer {
         //FabricDefaultAttributeRegistry.register(SpellArrowEntity.TYPE, SpellArrowEntity.createMobAttributes());
         registerEntity("mana_horse", ManaHorseEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
 
         ManaEffects.init();
     }
@@ -76,10 +82,18 @@ public class Zauber implements ModInitializer {
 
     public static class Spells {
         public static List<SpellType<?>> targetingSpells;
-        public static final Castability TARGETING =
+        private static final Castability TARGETING_CASTABILITY =
                 Castability.DEFAULT.and((spellType, caster) -> {
                     if(caster.getWorld().isClient()) {
-                        var playerInView = ZauberClient.getPlayerInView();
+                        var playerInView = PLAYER_VIEWER_GETTER.getPlayerInView();
+                        return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ConfigManager.getServerConfig().targetingDistance();
+                    }
+                    return true;
+                });
+        private static final Castability MANA_HORSE_CASTABILITY =
+                Castability.DEFAULT.and((spellType, caster) -> {
+                    if(caster.getWorld().isClient()) {
+                        var playerInView = PLAYER_VIEWER_GETTER.getPlayerInView();
                         return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ConfigManager.getServerConfig().targetingDistance();
                     }
                     return true;
@@ -87,11 +101,11 @@ public class Zauber implements ModInitializer {
 
         public static SpellType<ArrowSpell> ARROW = register("arrow", ArrowSpell::new, 2);
         public static SpellType<JuggernautSpell> JUGGERNAUT = register("juggernaut", JuggernautSpell::new, 20);
-        public static SpellType<PullSpell> PULL = register("pull", PullSpell::new, 2, TARGETING);
-        public static SpellType<PushSpell> PUSH = register("push", PushSpell::new, 2, TARGETING);
+        public static SpellType<PullSpell> PULL = register("pull", PullSpell::new, 2, TARGETING_CASTABILITY);
+        public static SpellType<PushSpell> PUSH = register("push", PushSpell::new, 2, TARGETING_CASTABILITY);
         public static SpellType<RewindSpell> REWIND = register("rewind", RewindSpell::new, 5);
         public static SpellType<SuicideSpell> SUICIDE = register("suicide", SuicideSpell::new, 1);
-        public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 5, TARGETING);
+        public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 5, TARGETING_CASTABILITY);
         public static SpellType<SupernovaSpell> SUPERNOVA = register("supernova", SupernovaSpell::new, 20);
         public static SpellType<FireSpell> FIRE = register("fire", FireSpell::new, 2);
         public static SpellType<IceSpell> ICE = register("ice", IceSpell::new, 2);

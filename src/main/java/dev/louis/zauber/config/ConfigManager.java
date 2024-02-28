@@ -5,13 +5,11 @@ import com.google.gson.GsonBuilder;
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
-import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.*;
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.gui.hud.ManaDirection;
+import dev.louis.zauber.mana.ManaDirection;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -28,32 +26,18 @@ import java.util.function.Supplier;
 public class ConfigManager {
     public static final int VERSION = 3;
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    /**public static final Codec<ServerConfig> SERVER_CONFIG_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    Codec.INT.fieldOf("targeting_distance").forGetter(ServerConfig::targetingDistance),
-                    Codec.FLOAT.fieldOf("supernova_explosion_power").forGetter(ServerConfig::supernovaExplosionPower),
-                    Codec.INT.fieldOf("dash_spell_duration").forGetter(ServerConfig::dashSpellDuration),
-                    Codec.INT.fieldOf("sprout_spell_duration").forGetter(ServerConfig::sproutSpellDuration),
-                    Codec.INT.fieldOf("fire_spell_duration").forGetter(ServerConfig::fireSpellDuration),
-                    Codec.INT.fieldOf("ice_spell_duration").forGetter(ServerConfig::iceSpellDuration),
-                    Codec.INT.fieldOf("juggernaut_spell_duration").forGetter(ServerConfig::juggernautSpellDuration),
-                    Codec.INT.fieldOf("rewind_spell_duration").forGetter(ServerConfig::rewindSpellDuration),
-                    Codec.INT.fieldOf("wind_expel_spell_duration").forGetter(ServerConfig::windExpelSpellDuration),
-                    Codec.BOOL.fieldOf("convert_old_namespace").forGetter(ServerConfig::convertOldNamespace)
-            ).apply(instance, ServerConfig::new));**/
-
-
-    private static final Path CLIENT_PATH = FabricLoader.getInstance().getConfigDir().resolve("zauber-client.json");
-    private static final Path SERVER_PATH = FabricLoader.getInstance().getConfigDir().resolve("zauber.json");
+    protected static final Path CLIENT_PATH = FabricLoader.getInstance().getConfigDir().resolve("zauber-client.json");
+    protected static final Path SERVER_PATH = FabricLoader.getInstance().getConfigDir().resolve("zauber.json");
 
     //Null in not client env.
-    private static ClientConfig clientConfig;
+    protected static ClientConfig clientConfig;
 
     //Null in not client env;
-    private static ServerConfig overrideConfig;
+    protected static ServerConfig overrideConfig;
 
-    private static ServerConfig serverConfig;
+    protected static ServerConfig serverConfig;
 
     public static void loadClientConfig() {
         if(FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
@@ -147,22 +131,7 @@ public class ConfigManager {
         return overrideConfig == null;
     }
 
-
-    public static Screen createScreen(Screen parent) {
-        return YetAnotherConfigLib.createBuilder()
-                .title(yaclText("title", "main"))
-                .categories(generateCategories())
-                .save(() -> {
-                    write(serverConfig, SERVER_PATH);
-                    if(clientConfig != null) {
-                        write(clientConfig, CLIENT_PATH);
-                    }
-                })
-                .build()
-                .generateScreen(parent);
-    }
-
-    private static <T> Collection<? extends ConfigCategory> generateCategories() {
+    protected static <T> Collection<? extends ConfigCategory> generateCategories()  {
         var clientCategory = ConfigCategory.createBuilder()
                 .name(category("client"))
                 .tooltip(tooltip("client"))
@@ -193,7 +162,7 @@ public class ConfigManager {
                         )
                 ).build();
 
-                        var serverCategory = ConfigCategory.createBuilder()
+        var serverCategory = ConfigCategory.createBuilder()
                 .name(category("server"))
                 .tooltip(tooltip("server"))
                 .option(
@@ -303,7 +272,7 @@ public class ConfigManager {
         return List.of(clientCategory, serverCategory);
     }
 
-    private static Option<Boolean> booleanOption(String optionName, boolean defaultValue, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+    protected static Option<Boolean> booleanOption(String optionName, boolean defaultValue, Supplier<Boolean> getter, Consumer<Boolean> setter) {
         return Option.<Boolean>createBuilder()
                 .name(option(optionName))
                 .description(description(optionName))
@@ -319,7 +288,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<Double> doubleSlideOptionServer(String optionName, double defaultValue, double min, double max, Supplier<Double> getter, Consumer<Double> setter) {
+    protected static Option<Double> doubleSlideOptionServer(String optionName, double defaultValue, double min, double max, Supplier<Double> getter, Consumer<Double> setter) {
         return Option.<Double>createBuilder()
                 .name(option(optionName))
                 .description(description(optionName))
@@ -335,7 +304,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<Float> floatSlideOptionServer(String optionName, float defaultValue, float min, float max, Supplier<Float> getter, Consumer<Float> setter) {
+    protected static Option<Float> floatSlideOptionServer(String optionName, float defaultValue, float min, float max, Supplier<Float> getter, Consumer<Float> setter) {
         return Option.<Float>createBuilder()
                 .name(option(optionName))
                 .description(description(optionName))
@@ -351,7 +320,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<Integer> intSlideOptionServer(String optionName, int defaultValue, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
+    protected static Option<Integer> intSlideOptionServer(String optionName, int defaultValue, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
                 .description(description(optionName))
@@ -367,7 +336,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<Integer> intFieldOptionServer(String optionName, int defaultValue, Supplier<Integer> getter, Consumer<Integer> setter) {
+    protected static Option<Integer> intFieldOptionServer(String optionName, int defaultValue, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
                 .description(description(optionName))
@@ -383,7 +352,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<Color> colorOption(String optionName, Color defaultValue, Supplier<Color> getter, Consumer<Color> setter) {
+    protected static Option<Color> colorOption(String optionName, Color defaultValue, Supplier<Color> getter, Consumer<Color> setter) {
         return Option.<Color>createBuilder()
                 .name(option(optionName))
                 //.description(description(optionName))
@@ -396,7 +365,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<Integer> intFieldOption(String optionName, int defaultValue, int minValue, Supplier<Integer> getter, Consumer<Integer> setter) {
+    protected static Option<Integer> intFieldOption(String optionName, int defaultValue, int minValue, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
                 .description(description(optionName))
@@ -410,7 +379,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<Integer> intSlideOption(String optionName, int defaultValue, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
+    protected static Option<Integer> intSlideOption(String optionName, int defaultValue, int min, int max, Supplier<Integer> getter, Consumer<Integer> setter) {
         return Option.<Integer>createBuilder()
                 .name(option(optionName))
                 .description(description(optionName))
@@ -423,7 +392,7 @@ public class ConfigManager {
                 .build();
     }
 
-    private static Option<ManaDirection> manaDirectionOption(String optionName, ManaDirection defaultValue, Supplier<ManaDirection> getter, Consumer<ManaDirection> setter) {
+    protected static Option<ManaDirection> manaDirectionOption(String optionName, ManaDirection defaultValue, Supplier<ManaDirection> getter, Consumer<ManaDirection> setter) {
         return Option.<ManaDirection>createBuilder()
                 .name(option(optionName))
                 //.description(description(optionName))
@@ -437,7 +406,7 @@ public class ConfigManager {
     }
 
 
-    private static <T> T read(Class<T> configClass, Path path) {
+    protected static <T> T read(Class<T> configClass, Path path) {
         try {
             if (!Files.exists(path)) {
                 writeDefault(configClass, path);
@@ -455,7 +424,7 @@ public class ConfigManager {
         }
     }
 
-    private static <T> void write(T config, Path path) {
+    protected static <T> void write(T config, Path path) {
         try {
             Files.writeString(path, GSON.toJson(config));
         } catch (IOException e) {
@@ -463,7 +432,7 @@ public class ConfigManager {
         }
     }
 
-    private static <T> T writeDefault(Class<T> configClass, Path path) throws Exception {
+    protected static <T> T writeDefault(Class<T> configClass, Path path) throws Exception {
         Files.createDirectories(path.getParent());
         //Files.createFile(path);
         var config = configClass.getDeclaredConstructor().newInstance();
@@ -471,27 +440,27 @@ public class ConfigManager {
         return config;
     }
 
-    private static MutableText category(String key) {
+    protected static MutableText category(String key) {
         return yaclText("category", key);
     }
 
-    private static MutableText tooltip(String key) {
+    protected static MutableText tooltip(String key) {
         return yaclText("tooltip", key);
     }
 
-    private static MutableText group(String key) {
+    protected static MutableText group(String key) {
         return yaclText("group", key);
     }
 
-    private static OptionDescription description(String key) {
+    protected static OptionDescription description(String key) {
         return OptionDescription.of(Text.translatable("zauber.yacl.option.%s.desc".formatted(key)));
     }
 
-    private static MutableText option(String key) {
+    protected static MutableText option(String key) {
         return yaclText("option", key);
     }
 
-    private static MutableText yaclText(String category, String key) {
+    protected static MutableText yaclText(String category, String key) {
         return Text.translatable("zauber.yacl.%s.%s".formatted(category, key));
     }
 }

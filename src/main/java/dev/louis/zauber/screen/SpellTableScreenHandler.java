@@ -1,9 +1,9 @@
 package dev.louis.zauber.screen;
 
 import com.google.common.collect.Lists;
-import dev.louis.zauber.blocks.ZauberBlocks;
-import dev.louis.zauber.recipe.ZauberRecipes;
+import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.recipe.SpellRecipe;
+import dev.louis.zauber.recipe.ZauberRecipes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingResultInventory;
@@ -27,8 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static dev.louis.zauber.blocks.SpellTableBlock.MAX_CHARGE;
-import static dev.louis.zauber.blocks.SpellTableBlock.MIN_CHARGE;
+import static dev.louis.zauber.block.SpellTableBlock.MAX_CHARGE;
+import static dev.louis.zauber.block.SpellTableBlock.MIN_CHARGE;
 
 public class SpellTableScreenHandler extends ScreenHandler{
     private final ScreenHandlerContext context;
