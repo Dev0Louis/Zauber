@@ -24,7 +24,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.minecraft.client.particle.EndRodParticle;
+import net.minecraft.client.particle.DragonBreathParticle;
 import net.minecraft.client.particle.ExplosionLargeParticle;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -70,7 +70,7 @@ public class ZauberClient implements ClientModInitializer, PlayerViewGetter {
         EntityRendererRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntityRenderer::new);
         ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION, ExplosionLargeParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION_EMITTER, ExplosionLargeParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_RUNE, EndRodParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_RUNE, DragonBreathParticle.Factory::new);
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides){

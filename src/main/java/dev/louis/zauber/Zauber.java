@@ -16,6 +16,7 @@ import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.networking.OptionSyncTask;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
+import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.spell.*;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
@@ -72,6 +73,7 @@ public class Zauber implements ModInitializer {
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
 
+        Ritual.init();
         ManaEffects.init();
     }
 
