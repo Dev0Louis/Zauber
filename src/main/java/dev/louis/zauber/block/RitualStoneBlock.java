@@ -58,6 +58,4 @@ public class RitualStoneBlock extends BlockWithEntity {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return world.isClient() ? null : validateTicker(type, RitualStoneBlockEntity.TYPE, RitualStoneBlockEntity::tick);
     }
-
-
 }

@@ -2,6 +2,7 @@ package dev.louis.zauber.block.entity;
 
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.particle.ZauberParticleTypes;
+import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.ritual.Ritual;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -9,14 +10,16 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.poi.PointOfInterest;
+import net.minecraft.world.poi.PointOfInterestStorage;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class RitualStoneBlockEntity extends BlockEntity {
     public static final BlockEntityType<RitualStoneBlockEntity> TYPE = BlockEntityType.Builder.create(RitualStoneBlockEntity::new, ZauberBlocks.RITUAL_STONE).build(null);
@@ -32,13 +35,7 @@ public class RitualStoneBlockEntity extends BlockEntity {
 
 
     public void init() {
-        Box box = Box.of(this.pos.toCenterPos(), 10, 10, 10);
-        this.itemSacrificer.clear();
-        System.out.println("INITING");
-        BlockPos.stream(box).forEach(blockPos -> {
-            world.getBlockEntity(blockPos, RitualItemSacrificerBlockEntity.TYPE).ifPresent((blockEntity) -> itemSacrificer.add(blockEntity.getPos()));
-        });
-        hasInitialised = true;
+
     }
 
     public static void tick(World world, BlockPos blockPos, BlockState state, RitualStoneBlockEntity ritualStoneBlockEntity) {
@@ -53,8 +50,8 @@ public class RitualStoneBlockEntity extends BlockEntity {
         final var ritual = ritualStoneBlockEntity.ritual;
         if(ritual != null) {
             if(ritual.shouldStop()) {
-                ritualStoneBlockEntity.ritual = null;
                 ritual.finish();
+                ritualStoneBlockEntity.ritual = null;
                 return;
             }
 
@@ -65,15 +62,12 @@ public class RitualStoneBlockEntity extends BlockEntity {
     protected void spawnConnectionParticle() {
         final Vec3d ritualPos = pos.toCenterPos();
         if(world.getTime() % 15 == 0) {
-            for (BlockPos blockPos : itemSacrificer) {
-
+            getRitualBlockPos().forEach(pointOfInterest -> {
                 final int steps = 10;
-                final Vec3d sacrificerPos = blockPos.toCenterPos();
+                final Vec3d sacrificerPos = pointOfInterest.getPos().toCenterPos();
                 for (int i = 0; i < steps; i++) {
-                    //System.out.println(i);
                     var delta = (double) i / steps;
-                    delta = Math.max(delta, 0.2);
-                    delta = Math.min(delta, 0.8);
+                    delta = (delta * 0.9) + 0.1;
                     var x = MathHelper.lerp(delta, sacrificerPos.x, ritualPos.x);
                     var y = MathHelper.lerp(delta, sacrificerPos.y, ritualPos.y);
                     var z = MathHelper.lerp(delta, sacrificerPos.z, ritualPos.z);
@@ -84,13 +78,17 @@ public class RitualStoneBlockEntity extends BlockEntity {
                             pos.getY(),
                             pos.getZ(),
                             1,
-                            0.,
-                            0.,
-                            0.,
+                            0,
+                            0,
+                            0,
                             0.0
                     );
+
                 }
-            }
+
+
+            });
+
         }
 
     }
@@ -101,6 +99,19 @@ public class RitualStoneBlockEntity extends BlockEntity {
             if (this.ritual != null) return;
             this.ritual = ritualStarter.tryStart(world, pos, player);
         });
+    }
+
+    private Stream<PointOfInterest> getRitualBlockPos() {
+        if (world instanceof ServerWorld serverWorld) {
+            return serverWorld.getPointOfInterestStorage()
+                    .getInSquare(
+                            poiType -> poiType.matchesKey(ZauberPointOfInterestTypes.RITUAL_BLOCKS_KEY),
+                            this.pos,
+                            20,
+                            PointOfInterestStorage.OccupationStatus.ANY
+                    );
+        }
+        return Stream.empty();
     }
 
     public void onRitualBlockPlaced(BlockPos pos) {

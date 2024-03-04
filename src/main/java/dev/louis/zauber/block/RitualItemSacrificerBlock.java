@@ -2,24 +2,38 @@ package dev.louis.zauber.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.block.entity.RitualItemSacrificerBlockEntity;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
+import eu.pb4.polymer.core.api.block.PolymerBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class RitualItemSacrificerBlock extends BlockWithEntity {
+public class RitualItemSacrificerBlock extends BlockWithEntity implements PolymerBlock {
     public static final MapCodec<RitualItemSacrificerBlock> CODEC = createCodec(RitualItemSacrificerBlock::new);
 
     public RitualItemSacrificerBlock(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (hand == Hand.OFF_HAND || world.isClient()) return ActionResult.FAIL;
+        ItemStack itemStack = player.getStackInHand(hand);
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof RitualItemSacrificerBlockEntity ritualItemSacrificerBlockEntity) {
+            return ritualItemSacrificerBlockEntity.offerItemStack(player, itemStack);
+        }
+
+        return ActionResult.SUCCESS;
     }
 
     @Override
@@ -39,29 +53,14 @@ public class RitualItemSacrificerBlock extends BlockWithEntity {
         return world.isClient() ? null : validateTicker(type, RitualItemSacrificerBlockEntity.TYPE, RitualItemSacrificerBlockEntity::tick);
     }
 
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        if (!world.isClient()) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof RitualItemSacrificerBlockEntity ritualItemSacrificerBlockEntity) {
-                ritualItemSacrificerBlockEntity.informRitualBlocks(ritualStoneBlockEntity -> ritualStoneBlockEntity.onRitualBlockPlaced(pos));
-            }
-        }
-    }
-
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!world.isClient()) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof RitualItemSacrificerBlockEntity ritualItemSacrificerBlockEntity) {
-                ritualItemSacrificerBlockEntity.informRitualBlocks(ritualStoneBlockEntity -> ritualStoneBlockEntity.onRitualBlockRemoved(pos));
-            }
-        }
-        return super.onBreak(world, pos, state, player);
-    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
+    }
+
+    @Override
+    public Block getPolymerBlock(BlockState state) {
+        return Blocks.RESPAWN_ANCHOR;
     }
 }

@@ -15,6 +15,7 @@ import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.networking.OptionSyncTask;
 import dev.louis.zauber.particle.ZauberParticleTypes;
+import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.spell.*;
@@ -64,6 +65,7 @@ public class Zauber implements ModInitializer {
         ZauberRecipes.init();
         ZauberItems.init();
         ZauberBlocks.init();
+        ZauberPointOfInterestTypes.init();
 
         registerEntity("spell_arrow", SpellArrowEntity.TYPE);
         //FabricDefaultAttributeRegistry.register(SpellArrowEntity.TYPE, SpellArrowEntity.createMobAttributes());
