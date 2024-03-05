@@ -1,7 +1,6 @@
 package dev.louis.zauber.ritual;
 
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -13,15 +12,15 @@ import java.util.List;
 public abstract class Ritual {
     public static final List<Starter> RITUALS = new ArrayList<>();
 
-    protected World world;
-    protected BlockPos pos;
-    protected LivingEntity initiator;
+    protected final World world;
+    protected final BlockPos pos;
+    protected final RitualStoneBlockEntity blockEntity;
     protected int age;
 
-    public Ritual(World world, BlockPos pos, LivingEntity initiator) {
+    public Ritual(World world, RitualStoneBlockEntity blockEntity) {
         this.world = world;
-        this.pos = pos;
-        this.initiator = initiator;
+        this.pos = blockEntity.getPos();
+        this.blockEntity = blockEntity;
     }
 
     public static void init() {
@@ -55,7 +54,7 @@ public abstract class Ritual {
     }
 
     public interface Starter {
-        Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity, LivingEntity initiator);
+        Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity);
     }
 
 }

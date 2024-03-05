@@ -41,7 +41,7 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.isClient)return ActionResult.SUCCESS;
+        if (world.isClient) return ActionResult.SUCCESS;
 
         boolean isModded = Zauber.isClientModded((ServerPlayerEntity) player);
         if(isModded) player.openHandledScreen(state.createScreenHandlerFactory(world, pos));

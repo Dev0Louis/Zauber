@@ -40,7 +40,7 @@ import java.util.List;
 public class Zauber implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "zauber";
-    public static final int POLYMER_NETWORK_VERSION = 1;
+    public static final int POLYMER_NETWORK_VERSION = 2;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
     //Hacky way to get Client data
     public static PlayerViewGetter PLAYER_VIEWER_GETTER;

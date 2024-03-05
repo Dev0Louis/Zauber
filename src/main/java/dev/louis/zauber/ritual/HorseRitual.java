@@ -5,7 +5,6 @@ import dev.louis.zauber.items.ZauberItems;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.item.Instrument;
 import net.minecraft.item.Instruments;
@@ -27,7 +26,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -37,15 +35,14 @@ public class HorseRitual extends Ritual {
     private final HorseEntity horse;
 
     //TODO: Make goat horn only consume while the ritual is running.
-    protected HorseRitual(World world, BlockPos ritualStonePos, LivingEntity initiator, HorseEntity horse) {
-        super(world, ritualStonePos, initiator);
+    protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, HorseEntity horse) {
+        super(world, blockEntity);
         this.horse = horse;
     }
 
     @Override
     public void tick() {
         if(age % 5 == 0) {
-
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
 
             final int steps = 10;
@@ -53,7 +50,6 @@ public class HorseRitual extends Ritual {
             final Vec3d ritualPos = pos.toCenterPos();
 
             for (int i = 0; i < (steps + 1); i++) {
-                //System.out.println(i);
                 var x = MathHelper.lerp((double) i / steps, horsePos.x, ritualPos.x);
                 var y = MathHelper.lerp((double) i / steps, horsePos.y, ritualPos.y);
                 var z = MathHelper.lerp((double) i / steps, horsePos.z, ritualPos.z);
@@ -71,8 +67,6 @@ public class HorseRitual extends Ritual {
                 );
             }
         }
-
-        //ParticleUtil.spawnParticle(world, ritualStonePos, Direction.UP, ParticleTypes.ANGRY_VILLAGER, horse.getPos().subtract(ritualStonePos.toCenterPos()), 1);
     }
 
     @Override
@@ -104,20 +98,21 @@ public class HorseRitual extends Ritual {
         return -2;
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity, LivingEntity initiator) {
+    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualStonePos = ritualStoneBlockEntity.getPos();
         var box = Box.of(ritualStonePos.toCenterPos(), 32, 20, 32);
 
-        HorseEntity horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        var optional = ritualStoneBlockEntity.getAvailableItems().filter(itemStack -> itemStack.isOf(Items.GOAT_HORN) && isCallGoatHorn(itemStack)).findAny();
-        if (optional.isEmpty() || horse == null) return null;
-        var itemStack = optional.get();
-        itemStack.decrement(1);
+        var horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
+        var itemStack = ritualStoneBlockEntity.getCollectedItems().stream().findAny();
+        if (horse.isEmpty() || itemStack.isEmpty()) return null;
+        ritualStoneBlockEntity.removeCollectedItem(itemStack.get());
 
-        return new HorseRitual(world, ritualStoneBlockEntity.getPos(), initiator, horse);
+        return new HorseRitual(world, ritualStoneBlockEntity, horse.get());
     }
 
-    private static boolean isCallGoatHorn(ItemStack itemStack) {
+    public static boolean isCallGoatHorn(ItemStack itemStack) {
+        if (!itemStack.isOf(Items.GOAT_HORN)) return false;
+
         var optionalInstrument = getInstrument(itemStack);
         if (optionalInstrument.isPresent()) {
             RegistryKey<Instrument> instrument = optionalInstrument.get().getKey().get();
@@ -141,13 +136,11 @@ public class HorseRitual extends Ritual {
     }
 
 
-    @Nullable
-    static <T extends Entity> T getNearestEntity(Class<? extends T> entityClass, BlockPos pos, Box box, World world) {
+    static <T extends Entity> Optional<T> getNearestEntity(Class<? extends T> entityClass, BlockPos pos, Box box, World world) {
         return getNearestEntity(entityClass, (entity) -> true, pos, box, world);
     }
 
-    @Nullable
-    static <T extends Entity> T getNearestEntity(Class<? extends T> entityClass, Predicate<T> predicate, BlockPos pos, Box box, World world) {
+    static <T extends Entity> Optional<T> getNearestEntity(Class<? extends T> entityClass, Predicate<T> predicate, BlockPos pos, Box box, World world) {
         var entities = world.getEntitiesByClass(entityClass, box, entityOfClass -> true);
         double x = pos.getX();
         double y = pos.getY();
@@ -157,7 +150,7 @@ public class HorseRitual extends Ritual {
         T entity = null;
 
         for(T entity2 : entities) {
-            if(!predicate.test(entity2))continue;
+            if (!predicate.test(entity2)) continue;
             double e = entity2.squaredDistanceTo(x, y, z);
             if (distance == -1.0 || e < distance) {
                 distance = e;
@@ -165,7 +158,7 @@ public class HorseRitual extends Ritual {
             }
         }
 
-        return entity;
+        return Optional.ofNullable(entity);
     }
 
 }

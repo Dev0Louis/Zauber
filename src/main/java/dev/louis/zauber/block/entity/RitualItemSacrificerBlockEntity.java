@@ -53,8 +53,7 @@ public class RitualItemSacrificerBlockEntity extends BlockEntity {
         if (ritualStoneBlockEntity.storedStack == ItemStack.EMPTY) return;
 
         if (ritualStoneBlockEntity.storedStack.isEmpty()) {
-            ritualStoneBlockEntity.storedStack = ItemStack.EMPTY;
-            ritualStoneBlockEntity.itemDisplayElement.setItem(ritualStoneBlockEntity.storedStack);
+            ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);
             return;
         }
 
@@ -74,9 +73,7 @@ public class RitualItemSacrificerBlockEntity extends BlockEntity {
         var pitch = 1;
         if (this.storedStack != ItemStack.EMPTY) {
             player.getInventory().offerOrDrop(this.storedStack);
-            this.storedStack = ItemStack.EMPTY;
-            this.ticksSinceItemsAdded = 0;
-            this.itemDisplayElement.setItem(this.storedStack);
+            setStoredStack(ItemStack.EMPTY);
             player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
             player.playSound(sound, volume, pitch);
             player.getItemCooldownManager().set(offeredStack.getItem(), 5);
@@ -86,14 +83,18 @@ public class RitualItemSacrificerBlockEntity extends BlockEntity {
         if (offeredStack.isEmpty()) return ActionResult.FAIL;
         player.getItemCooldownManager().set(offeredStack.getItem(), 5);
 
-        this.storedStack = offeredStack.copyWithCount(1);
-        this.ticksSinceItemsAdded = 0;
-        this.itemDisplayElement.setItem(this.storedStack);
+        setStoredStack(offeredStack.copyWithCount(1));
         player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
         player.playSound(sound, volume, pitch);
 
         offeredStack.decrement(1);
         player.getInventory().markDirty();
         return ActionResult.SUCCESS;
+    }
+
+    public void setStoredStack(ItemStack itemStack) {
+        this.storedStack = itemStack;
+        this.ticksSinceItemsAdded = 0;
+        this.itemDisplayElement.setItem(this.storedStack);
     }
 }
