@@ -1,12 +1,16 @@
 package dev.louis.zauber.ritual;
 
+import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.items.ZauberItems;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.Instrument;
+import net.minecraft.item.Instruments;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
@@ -15,6 +19,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.InstrumentTags;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -29,20 +35,19 @@ import java.util.function.Predicate;
 
 public class HorseRitual extends Ritual {
     private final HorseEntity horse;
-    private final ItemEntity itemEntity;
 
-    protected HorseRitual(World world, BlockPos ritualStonePos, LivingEntity initiator, HorseEntity horse, ItemEntity itemEntity) {
+    //TODO: Make goat horn only consume while the ritual is running.
+    protected HorseRitual(World world, BlockPos ritualStonePos, LivingEntity initiator, HorseEntity horse) {
         super(world, ritualStonePos, initiator);
         this.horse = horse;
-        this.itemEntity = itemEntity;
-        if (!itemEntity.getStack().isOf(Items.GOAT_HORN)) {
-            throw new IllegalStateException("Item Entity is not a goat horn. It is: " + itemEntity.getStack().getItem().toString()) ;
-        }
     }
 
     @Override
     public void tick() {
         if(age % 5 == 0) {
+
+            world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
+
             final int steps = 10;
             final Vec3d horsePos = horse.getPos();
             final Vec3d ritualPos = pos.toCenterPos();
@@ -82,27 +87,34 @@ public class HorseRitual extends Ritual {
 
     @Override
     public void finish() {
-        if (horse.isAlive() && itemEntity.isAlive()) {
+        if (horse.isAlive()) {
             horse.discard();
-            itemEntity.discard();
+            world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 4);
             world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, ZauberItems.SOUL_HORN.getDefaultStack(), 0, 0.3f, 0));
         }
     }
 
-    public static Ritual tryStart(World world, BlockPos ritualStonePos, LivingEntity initiator) {
+    @Override
+    public float getVolume() {
+        return 2;
+    }
+
+    @Override
+    public float getPitch() {
+        return -2;
+    }
+
+    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity, LivingEntity initiator) {
+        var ritualStonePos = ritualStoneBlockEntity.getPos();
         var box = Box.of(ritualStonePos.toCenterPos(), 32, 20, 32);
 
         HorseEntity horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        ItemEntity goatHorn = getNearestEntity(
-                ItemEntity.class,
-                (itemEntity) -> itemEntity.getStack().isOf(Items.GOAT_HORN) && isCallGoatHorn(itemEntity.getStack()),
-                ritualStonePos,
-                box,
-                world
-        );
-        if (horse == null || goatHorn == null) return null;
+        var optional = ritualStoneBlockEntity.getAvailableItems().filter(itemStack -> itemStack.isOf(Items.GOAT_HORN) && isCallGoatHorn(itemStack)).findAny();
+        if (optional.isEmpty() || horse == null) return null;
+        var itemStack = optional.get();
+        itemStack.decrement(1);
 
-        return new HorseRitual(world, ritualStonePos, initiator, horse, goatHorn);
+        return new HorseRitual(world, ritualStoneBlockEntity.getPos(), initiator, horse);
     }
 
     private static boolean isCallGoatHorn(ItemStack itemStack) {

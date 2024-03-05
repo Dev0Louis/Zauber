@@ -8,7 +8,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class RitualStoneBlockEntity extends BlockEntity {
@@ -97,11 +100,18 @@ public class RitualStoneBlockEntity extends BlockEntity {
         if (this.ritual != null) return;
         Ritual.RITUALS.forEach(ritualStarter -> {
             if (this.ritual != null) return;
-            this.ritual = ritualStarter.tryStart(world, pos, player);
+            this.ritual = ritualStarter.tryStart(world, this, player);
         });
+        if (this.ritual != null) {
+            var sound = this.ritual.getStartSound();
+            var volume = this.ritual.getVolume();
+            var pitch = -2;
+            player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
+            player.playSound(sound, volume, pitch);
+        }
     }
 
-    private Stream<PointOfInterest> getRitualBlockPos() {
+    public Stream<PointOfInterest> getRitualBlockPos() {
         if (world instanceof ServerWorld serverWorld) {
             return serverWorld.getPointOfInterestStorage()
                     .getInSquare(
@@ -110,6 +120,13 @@ public class RitualStoneBlockEntity extends BlockEntity {
                             20,
                             PointOfInterestStorage.OccupationStatus.ANY
                     );
+        }
+        return Stream.empty();
+    }
+
+    public Stream<ItemStack> getAvailableItems() {
+        if (world instanceof ServerWorld serverWorld) {
+            return getRitualBlockPos().map(poi -> serverWorld.getBlockEntity(poi.getPos(), RitualItemSacrificerBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get).filter(ritualItemSacrificerBlockEntity -> ritualItemSacrificerBlockEntity.storedStack != ItemStack.EMPTY).map(ritualItemSacrificerBlockEntity -> ritualItemSacrificerBlockEntity.storedStack);
         }
         return Stream.empty();
     }

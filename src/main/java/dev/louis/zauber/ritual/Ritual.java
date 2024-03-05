@@ -1,6 +1,9 @@
 package dev.louis.zauber.ritual;
 
+import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -39,8 +42,20 @@ public abstract class Ritual {
 
     public abstract boolean shouldStop();
 
+    public SoundEvent getStartSound() {
+        return SoundEvents.ENTITY_ARROW_HIT_PLAYER;
+    }
+
+    public float getPitch() {
+        return 1;
+    }
+
+    public float getVolume() {
+        return 1;
+    }
+
     public interface Starter {
-        Ritual tryStart(World world, BlockPos ritualStonePos, LivingEntity initiator);
+        Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity, LivingEntity initiator);
     }
 
 }
