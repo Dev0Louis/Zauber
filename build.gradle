@@ -31,6 +31,7 @@ repositories {
         name 'Xander Maven'
         url 'https://maven.isxander.dev/releases'
     }
+    mavenLocal()
 }
 
 loom {
@@ -53,7 +54,8 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    modImplementation "maven.modrinth:nebula:${project.nebula_version}"
+    //modImplementation "maven.modrinth:nebula:${project.nebula_version}"
+    modImplementation "dev.louis:Nebula:${project.nebula_version}"
 
     modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${project.yacl_version}")
 

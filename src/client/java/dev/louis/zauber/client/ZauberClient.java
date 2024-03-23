@@ -1,14 +1,13 @@
 package dev.louis.zauber.client;
 
+import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.PlayerViewGetter;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.client.keybind.SpellKeyBinding;
 import dev.louis.zauber.client.keybind.SpellKeybindManager;
 import dev.louis.zauber.client.render.entity.ManaHorseEntityRenderer;
 import dev.louis.zauber.client.render.entity.SpellArrowEntityRenderer;
 import dev.louis.zauber.client.screen.SpellTableScreen;
-import dev.louis.zauber.client.spell.TargetedPlayerSelector;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.entity.SpellArrowEntity;
@@ -17,6 +16,7 @@ import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -27,19 +27,16 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.particle.DragonBreathParticle;
 import net.minecraft.client.particle.ExplosionLargeParticle;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.hit.EntityHitResult;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
-
-public class ZauberClient implements ClientModInitializer, PlayerViewGetter {
+public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
-    public static ZauberClient INSTANCE;
+    public static PlayerEntity playerInView;
 
 
     @Override
     public void onInitializeClient() {
-        INSTANCE = this;
-        Zauber.PLAYER_VIEWER_GETTER = this;
-
         ConfigManager.loadClientConfig();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ConfigManager.clearOverrideConfig();
@@ -49,7 +46,18 @@ public class ZauberClient implements ClientModInitializer, PlayerViewGetter {
             ConfigManager.setOverrideConfig(packet.overrideConfig());
             responseSender.sendPacket(new OptionSyncCompletePacket());
         });
-        TargetedPlayerSelector.init();
+
+        ClientTickEvents.END_WORLD_TICK.register(world -> {
+            var player = world.client.player;
+            if (player != null) {
+                var result = player.raycast(24, 0, false);
+                if (result instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof PlayerEntity playerEntity) {
+                    playerInView = playerEntity;
+                } else {
+                    playerInView = null;
+                }
+            }
+        });
 
         createSpellKeyBind(Zauber.Spells.ARROW, false);
         createSpellKeyBind(Zauber.Spells.PULL, false);
@@ -79,16 +87,25 @@ public class ZauberClient implements ClientModInitializer, PlayerViewGetter {
         getSpellKeybindManager().setSpellKeyBinding(spellType, keybind);
     }
 
-    public static boolean isPlayerTargetable(PlayerEntity targetedPlayer) {
+    public static boolean isPlayerTargetable(@Nullable PlayerEntity targetedPlayer) {
+        if (targetedPlayer == null || !hasLearnedTargetingSpell()) return false;
         final var player = MinecraftClient.getInstance().player;
         return player != null && player.canSee(targetedPlayer) && player.isPartOfGame() && !(targetedPlayer.isCreative() || targetedPlayer.isSpectator() || targetedPlayer.isInvisibleTo(targetedPlayer) || player.isSpectator());
     }
+
+
+    private static boolean hasLearnedTargetingSpell() {
+        var client = MinecraftClient.getInstance();
+
+        if (client.player == null) return false;
+        for (SpellType<? extends Spell> spellType : Zauber.Spells.targetingSpells) {
+            if (spellType.isLearnedBy(client.player)) return true;
+        }
+        return false;
+    }
+
     public static SpellKeybindManager getSpellKeybindManager() {
         if (spellKeybindManager != null) return spellKeybindManager;
         return (spellKeybindManager = new SpellKeybindManager());
-    }
-
-    public Optional<PlayerEntity> getPlayerInView() {
-        return TargetedPlayerSelector.getPlayerInView();
     }
 }

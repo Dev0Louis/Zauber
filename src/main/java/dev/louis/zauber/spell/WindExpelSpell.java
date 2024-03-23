@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -11,8 +12,9 @@ import net.minecraft.util.math.Vec3d;
 
 public class WindExpelSpell extends Spell {
     int ticksSneaking = 0;
-    public WindExpelSpell(SpellType<?> spellType) {
-        super(spellType);
+
+    public WindExpelSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
     @Override
@@ -28,7 +30,7 @@ public class WindExpelSpell extends Spell {
     @Override
     public void tick() {
         if (this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            if (serverPlayer.isSneaking() && this.spellAge > 5) {
+            if (serverPlayer.isSneaking() && this.age > 5) {
                 serverPlayer.setVelocity(serverPlayer.getVelocity().multiply(0,0.7,0));
                 serverPlayer.velocityModified = true;
                 ticksSneaking++;
@@ -40,8 +42,8 @@ public class WindExpelSpell extends Spell {
                 serverPlayer.addVelocity(new Vec3d(0, ConfigManager.getServerConfig().windExpelSpellAcceleration(), 0));
                 serverPlayer.velocityModified = true;
             }
-            double sin = Math.sin(spellAge/1.75f) * 2.5;
-            double cos = Math.cos(spellAge/1.75f) * 2.5;
+            double sin = Math.sin(age/1.75f) * 2.5;
+            double cos = Math.cos(age/1.75f) * 2.5;
             serverPlayer.getServerWorld().spawnParticles(
                     ParticleTypes.CLOUD,
                     serverPlayer.getX() + sin,
@@ -61,7 +63,7 @@ public class WindExpelSpell extends Spell {
     }
 
     @Override
-    public void onEnd() {
+    public void finish() {
         if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
             if (this.wasInterrupted()) {
                 this.getCaster().playSound(SoundEvents.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1f, -1f);

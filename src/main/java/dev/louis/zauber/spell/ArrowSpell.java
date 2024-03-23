@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.entity.SpellArrowEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -12,8 +13,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class ArrowSpell extends Spell {
-    public ArrowSpell(SpellType<? extends Spell> spellType) {
-        super(spellType);
+    public ArrowSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
     @Override

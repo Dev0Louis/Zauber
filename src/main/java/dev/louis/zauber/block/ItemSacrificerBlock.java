@@ -1,7 +1,7 @@
 package dev.louis.zauber.block;
 
 import com.mojang.serialization.MapCodec;
-import dev.louis.zauber.block.entity.RitualItemSacrificerBlockEntity;
+import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,10 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class RitualItemSacrificerBlock extends BlockWithEntity implements PolymerBlock {
-    public static final MapCodec<RitualItemSacrificerBlock> CODEC = createCodec(RitualItemSacrificerBlock::new);
+public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock {
+    public static final MapCodec<ItemSacrificerBlock> CODEC = createCodec(ItemSacrificerBlock::new);
 
-    public RitualItemSacrificerBlock(Settings settings) {
+    public ItemSacrificerBlock(Settings settings) {
         super(settings);
     }
 
@@ -29,8 +29,8 @@ public class RitualItemSacrificerBlock extends BlockWithEntity implements Polyme
         ItemStack itemStack = player.getStackInHand(hand);
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof RitualItemSacrificerBlockEntity ritualItemSacrificerBlockEntity) {
-            return ritualItemSacrificerBlockEntity.offerItemStack(player, itemStack);
+        if (blockEntity instanceof ItemSacrificerBlockEntity itemSacrificerBlockEntity) {
+            return itemSacrificerBlockEntity.offerItemStack(player, itemStack);
         }
 
         return ActionResult.SUCCESS;
@@ -44,13 +44,13 @@ public class RitualItemSacrificerBlock extends BlockWithEntity implements Polyme
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new RitualItemSacrificerBlockEntity(pos, state);
+        return new ItemSacrificerBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient() ? null : validateTicker(type, RitualItemSacrificerBlockEntity.TYPE, RitualItemSacrificerBlockEntity::tick);
+        return world.isClient() ? null : validateTicker(type, ItemSacrificerBlockEntity.TYPE, ItemSacrificerBlockEntity::tick);
     }
 
 

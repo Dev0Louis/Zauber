@@ -8,6 +8,7 @@ import dev.louis.zauber.duck.ItemStackJuggernautModeDuck;
 import dev.louis.zauber.mixin.ServerWorldAccessor;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -20,11 +21,9 @@ import net.minecraft.util.collection.DefaultedList;
 import java.util.ArrayList;
 import java.util.List;
 
-;
-
 public class JuggernautSpell extends Spell {
-    public JuggernautSpell(SpellType<? extends Spell> spellType) {
-        super(spellType);
+    public JuggernautSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
     @Override
@@ -58,16 +57,16 @@ public class JuggernautSpell extends Spell {
 
     @Override
     public void tick() {
-        if(spellAge % 10 == 0) {
+        if(age % 10 == 0) {
             this.getCaster().getManaManager().addMana(1);
         }
-        if(spellAge % 40 == 0) {
-            if(spellAge > 2200) {
+        if(age % 40 == 0) {
+            if(age > 2200) {
                 playWarningSound();
             }
         }
-        if(spellAge > 2350) {
-            if(spellAge % 5 == 0) {
+        if(age > 2350) {
+            if(age % 5 == 0) {
                 playWarningSound();
             }
         }
@@ -79,7 +78,7 @@ public class JuggernautSpell extends Spell {
     }
 
     @Override
-    public void onEnd() {
+    public void finish() {
         JuggernautSpell.clearJuggernautItems((ServerPlayerEntity) getCaster());
         if(getCaster().isAlive()) {
             getCaster().damage(getCaster().getDamageSources().magic(), 100f);

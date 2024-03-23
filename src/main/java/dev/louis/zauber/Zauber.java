@@ -3,7 +3,6 @@ package dev.louis.zauber;
 import com.mojang.logging.LogUtils;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.nebula.api.spell.SpellType.Castability;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.ManaHorseEntity;
@@ -42,8 +41,6 @@ public class Zauber implements ModInitializer {
     public static final String MOD_ID = "zauber";
     public static final int POLYMER_NETWORK_VERSION = 2;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
-    //Hacky way to get Client data
-    public static PlayerViewGetter PLAYER_VIEWER_GETTER;
 
     @Override
     public void onInitialize() {
@@ -86,7 +83,7 @@ public class Zauber implements ModInitializer {
 
     public static class Spells {
         public static List<SpellType<?>> targetingSpells;
-        private static final Castability TARGETING_CASTABILITY =
+        /** private static final Castability TARGETING_CASTABILITY =
                 Castability.DEFAULT.and((spellType, caster) -> {
                     if(caster.getWorld().isClient()) {
                         var playerInView = PLAYER_VIEWER_GETTER.getPlayerInView();
@@ -101,15 +98,15 @@ public class Zauber implements ModInitializer {
                         return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ConfigManager.getServerConfig().targetingDistance();
                     }
                     return true;
-                });
+                });**/
 
         public static SpellType<ArrowSpell> ARROW = register("arrow", ArrowSpell::new, 2);
         public static SpellType<JuggernautSpell> JUGGERNAUT = register("juggernaut", JuggernautSpell::new, 20);
-        public static SpellType<PullSpell> PULL = register("pull", PullSpell::new, 2, TARGETING_CASTABILITY);
-        public static SpellType<PushSpell> PUSH = register("push", PushSpell::new, 2, TARGETING_CASTABILITY);
+        public static SpellType<PullSpell> PULL = register("pull", PullSpell::new, 2);
+        public static SpellType<PushSpell> PUSH = register("push", PushSpell::new, 2);
         public static SpellType<RewindSpell> REWIND = register("rewind", RewindSpell::new, 5);
         public static SpellType<SuicideSpell> SUICIDE = register("suicide", SuicideSpell::new, 1);
-        public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 5, TARGETING_CASTABILITY);
+        public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 5);
         public static SpellType<SupernovaSpell> SUPERNOVA = register("supernova", SupernovaSpell::new, 20);
         public static SpellType<FireSpell> FIRE = register("fire", FireSpell::new, 2);
         public static SpellType<IceSpell> ICE = register("ice", IceSpell::new, 2);
@@ -122,18 +119,12 @@ public class Zauber implements ModInitializer {
         public static <T extends Spell> SpellType<T> registerManaHorse(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
             return SpellType.register(
                     Identifier.of(MOD_ID, spellName),
-                    SpellType.Builder.create(spellFactory, mana)
-                            .castability(Castability.DEFAULT.and((spellType, playerEntity) -> !playerEntity.hasVehicle()))
-                            .needsLearning(false)
+                    SpellType.Builder.create(spellFactory, mana).needsLearning(false)
             );
         }
 
         public static <T extends Spell> SpellType<T> register(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
             return SpellType.register(Identifier.of(MOD_ID, spellName),SpellType.Builder.create(spellFactory, mana));
-        }
-
-        public static <T extends Spell> SpellType<T> register(String spellName, SpellType.SpellFactory<T> spellFactory, int mana, Castability castability) {
-            return SpellType.register(Identifier.of(MOD_ID, spellName),SpellType.Builder.create(spellFactory, mana).castability(castability));
         }
 
         public static void init() {

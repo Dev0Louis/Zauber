@@ -1,12 +1,13 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
 public class PushSpell extends TargetingSpell {
-    public PushSpell(SpellType<? extends Spell> spellType) {
-        super(spellType);
+
+    public PushSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
     @Override

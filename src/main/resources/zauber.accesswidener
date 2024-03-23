@@ -5,3 +5,4 @@ accessible method net/minecraft/item/GoatHornItem setInstrument (Lnet/minecraft/
 accessible method net/minecraft/particle/DefaultParticleType <init> (Z)V
 accessible field net/minecraft/entity/decoration/DisplayEntity LEFT_ROTATION Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/decoration/DisplayEntity SCALE Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/client/world/ClientWorld client Lnet/minecraft/client/MinecraftClient;

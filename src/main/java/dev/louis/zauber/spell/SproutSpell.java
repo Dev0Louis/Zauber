@@ -4,14 +4,16 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.block.Fertilizable;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldEvents;
 
 public class SproutSpell extends Spell {
     public int grownCrops = 0;
-    public SproutSpell(SpellType<?> spellType) {
-        super(spellType);
+
+    public SproutSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
     @Override

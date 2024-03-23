@@ -5,6 +5,7 @@ import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
@@ -12,8 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class IceSpell extends AreaEffectSpell {
-    public IceSpell(SpellType<? extends AreaEffectSpell> spellType) {
-        super(spellType, ParticleTypes.SNOWFLAKE);
+    public IceSpell(SpellType<? extends AreaEffectSpell> spellType, PlayerEntity caster) {
+        super(spellType, caster, ParticleTypes.SNOWFLAKE);
     }
 
     @Override

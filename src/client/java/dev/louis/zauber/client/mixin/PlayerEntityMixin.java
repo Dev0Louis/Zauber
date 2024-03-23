@@ -31,10 +31,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     private boolean isTargetedPlayer() {
-        var targetedPlayer = ZauberClient.INSTANCE.getPlayerInView();
-        if(targetedPlayer.isEmpty())return false;
-        if(ZauberClient.isPlayerTargetable(targetedPlayer.get())) {
-            return (Object) this == targetedPlayer.get();
+        if(ZauberClient.isPlayerTargetable(ZauberClient.playerInView)) {
+            return (Object) this == ZauberClient.playerInView;
         }
         return false;
     }

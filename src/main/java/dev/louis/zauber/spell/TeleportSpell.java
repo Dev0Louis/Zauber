@@ -1,14 +1,14 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 
 public class TeleportSpell extends TargetingSpell {
-    public TeleportSpell(SpellType<? extends Spell> spellType) {
-        super(spellType);
+    public TeleportSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
     @Override

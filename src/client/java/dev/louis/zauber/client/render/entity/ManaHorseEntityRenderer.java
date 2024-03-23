@@ -28,7 +28,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
     public final Identifier octagram = new Identifier(Zauber.MOD_ID, "textures/symbol/octagram.png");
     public final Identifier spell_rings = new Identifier(Zauber.MOD_ID, "textures/symbol/spell_rings.png");
     public final Identifier spell2 = new Identifier(Zauber.MOD_ID, "textures/symbol/spell2.png");
-    public final Identifier spell3 = new Identifier(Zauber.MOD_ID, "textures/symbol/spell3.png");
+    public final Identifier spell3 = new Identifier(Zauber.MOD_ID, "textures/symbol/spell3-old.png");
     public final Identifier spell4 = new Identifier(Zauber.MOD_ID, "textures/symbol/spell4.png");
 
 

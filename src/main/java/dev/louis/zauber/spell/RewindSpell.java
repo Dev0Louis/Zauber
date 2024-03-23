@@ -5,6 +5,7 @@ import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.config.ConfigManager;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -12,11 +13,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.TeleportTarget;
 
 public class RewindSpell extends Spell {
-    public RewindSpell(SpellType<? extends Spell> spellType) {
-        super(spellType);
-    }
     private ServerWorld rewindWorld;
     private TeleportTarget rewindTarget;
+
+    public RewindSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
+    }
 
     @Override
     public void cast() {
@@ -29,12 +31,12 @@ public class RewindSpell extends Spell {
     public void tick() {
         super.tick();
         if (this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            if(spellAge % 10 == 0) playPingSound(serverPlayer);
+            if(age % 10 == 0) playPingSound(serverPlayer);
         }
     }
 
     @Override
-    public void onEnd() {
+    public void finish() {
         if(!this.wasInterrupted && this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
             double x = rewindTarget.position.getX();
             double y = rewindTarget.position.getY();

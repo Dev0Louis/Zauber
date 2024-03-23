@@ -1,13 +1,11 @@
 package dev.louis.zauber.block.entity;
 
-import dev.louis.zauber.block.ZauberBlocks;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -16,36 +14,34 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Vector3f;
 
-public class RitualItemSacrificerBlockEntity extends BlockEntity {
-    public static final BlockEntityType<RitualItemSacrificerBlockEntity> TYPE = BlockEntityType.Builder.create(RitualItemSacrificerBlockEntity::new, ZauberBlocks.RITUAL_ITEM_SACRIFICER).build(null);
+public class ItemSacrificerBlockEntity extends BlockEntity {
+    public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = null;//BlockEntityType.Builder.create(ItemSacrificerBlockEntity::new, ZauberBlocks.ITEM_SACRIFICER).build(null);
     public ItemStack storedStack = ItemStack.EMPTY;
-    public boolean firstTick = true;
-    private ElementHolder holder;
     private ItemDisplayElement itemDisplayElement;
+    public boolean firstTick = true;
     private int ticksSinceItemsAdded;
 
-    public RitualItemSacrificerBlockEntity(BlockPos pos, BlockState state) {
+    public ItemSacrificerBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
     }
 
     private void init() {
-        holder = new ElementHolder();
+        var holder = new ElementHolder();
         ChunkAttachment.ofTicking(holder, (ServerWorld) world, pos.up());
 
         itemDisplayElement = new ItemDisplayElement();
         itemDisplayElement.setOffset(new Vec3d(0, -0.25, 0));
-        itemDisplayElement.setModelTransformation(ModelTransformationMode.NONE);
+        this.itemDisplayElement.setBillboardMode(DisplayEntity.BillboardMode.FIXED);
         holder.addElement(itemDisplayElement);
         this.firstTick = false;
-        this.itemDisplayElement.setBillboardMode(DisplayEntity.BillboardMode.FIXED);
-
     }
 
-    public static void tick(World world, BlockPos blockPos, BlockState state, RitualItemSacrificerBlockEntity ritualStoneBlockEntity) {
+    public static void tick(World world, BlockPos blockPos, BlockState state, ItemSacrificerBlockEntity ritualStoneBlockEntity) {
         if (ritualStoneBlockEntity.firstTick) {
             ritualStoneBlockEntity.init();
         }
@@ -57,11 +53,19 @@ public class RitualItemSacrificerBlockEntity extends BlockEntity {
             return;
         }
 
+
         ritualStoneBlockEntity.ticksSinceItemsAdded++;
-        float scaleMultiplier = Math.min(1, ritualStoneBlockEntity.ticksSinceItemsAdded / 30f);
+        ritualStoneBlockEntity.itemDisplayElement
+                .setRightRotation(
+                        RotationAxis.POSITIVE_Y.rotationDegrees(world.getTime() * ((ritualStoneBlockEntity.storedStack.getItem().hashCode() % 40) / 40f))
+                );
 
 
-        float size = (float) ((float) (Math.sin(ritualStoneBlockEntity.ticksSinceItemsAdded / 10f) / 30) + 0.4) * scaleMultiplier;
+        ritualStoneBlockEntity.itemDisplayElement.setOffset(new Vec3d(0, -0.25 + (0.2 * Math.abs(Math.sin(ritualStoneBlockEntity.ticksSinceItemsAdded / 100f))), 0));
+        float multiplier = Math.min(1, ritualStoneBlockEntity.ticksSinceItemsAdded / 10f);
+
+
+        float size = (float) ((float) (Math.sin(ritualStoneBlockEntity.ticksSinceItemsAdded / 50f) / 30) + 0.4) * multiplier;
         ritualStoneBlockEntity.itemDisplayElement.setScale(new Vector3f(size, size, size));
     }
 

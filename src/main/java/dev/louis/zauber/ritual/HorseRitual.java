@@ -6,10 +6,7 @@ import dev.louis.zauber.particle.ZauberParticleTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.item.Instrument;
-import net.minecraft.item.Instruments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
@@ -27,12 +24,16 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class HorseRitual extends Ritual {
     private final HorseEntity horse;
+    private final List<Item> needed = new ArrayList<>(List.of(Items.GOAT_HORN));
+    private final List<ItemStack> consumed = new ArrayList<>();
 
     //TODO: Make goat horn only consume while the ritual is running.
     protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, HorseEntity horse) {
@@ -94,6 +95,15 @@ public class HorseRitual extends Ritual {
     }
 
     @Override
+    public boolean offer(ItemStack itemStack) {
+        if (needed.remove(itemStack.getItem())) {
+            consumed.add(itemStack);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public float getPitch() {
         return -2;
     }
@@ -102,12 +112,10 @@ public class HorseRitual extends Ritual {
         var ritualStonePos = ritualStoneBlockEntity.getPos();
         var box = Box.of(ritualStonePos.toCenterPos(), 32, 20, 32);
 
+        var collectedItems = ritualStoneBlockEntity.getCollectedItems();
+        if (collectedItems.size() != 1) return null;
         var horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        var itemStack = ritualStoneBlockEntity.getCollectedItems().stream().findAny();
-        if (horse.isEmpty() || itemStack.isEmpty()) return null;
-        ritualStoneBlockEntity.removeCollectedItem(itemStack.get());
-
-        return new HorseRitual(world, ritualStoneBlockEntity, horse.get());
+        return horse.map(horseEntity -> new HorseRitual(world, ritualStoneBlockEntity, horseEntity)).orElse(null);
     }
 
     public static boolean isCallGoatHorn(ItemStack itemStack) {

@@ -1,6 +1,7 @@
 package dev.louis.zauber.ritual;
 
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -52,6 +53,8 @@ public abstract class Ritual {
     public float getVolume() {
         return 1;
     }
+
+    public abstract boolean offer(ItemStack itemStack);
 
     public interface Starter {
         Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity);

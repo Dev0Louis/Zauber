@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.TntEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -16,8 +17,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
 public class FireSpell extends AreaEffectSpell {
-    public FireSpell(SpellType<? extends AreaEffectSpell> spellType) {
-        super(spellType, ParticleTypes.FLAME);
+    public FireSpell(SpellType<? extends AreaEffectSpell> spellType, PlayerEntity caster) {
+        super(spellType, caster, ParticleTypes.FLAME);
     }
 
     @Override

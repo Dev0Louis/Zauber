@@ -54,7 +54,7 @@ public class ManaHorseEntity extends HorseEntity implements Ownable {
     @Override
     public void tick() {
         if (!this.getWorld().isClient()) {
-            if (spell == null || spell.hasEnded()) {
+            if (spell == null || spell.shouldStop()) {
                 this.discard();
             }
         } else {

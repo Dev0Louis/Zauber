@@ -1,13 +1,10 @@
 package dev.louis.zauber.block;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.block.entity.RitualItemSacrificerBlockEntity;
-import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.enums.Instrument;
-import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
@@ -28,7 +25,7 @@ public class ZauberBlocks {
                             .ticksRandomly()
             )
     );
-    public static final Block RITUAL_STONE = Registry.register(
+    /*public static final Block RITUAL_STONE = Registry.register(
             Registries.BLOCK, new Identifier(Zauber.MOD_ID, "ritual_stone"),
             new RitualStoneBlock(
                     FabricBlockSettings.create()
@@ -39,9 +36,9 @@ public class ZauberBlocks {
                             .pistonBehavior(PistonBehavior.BLOCK)
             )
     );
-    public static final Block RITUAL_ITEM_SACRIFICER = Registry.register(
-            Registries.BLOCK, new Identifier(Zauber.MOD_ID, "ritual_item_sacrificer"),
-            new RitualItemSacrificerBlock(
+    public static final Block ITEM_SACRIFICER = Registry.register(
+            Registries.BLOCK, new Identifier(Zauber.MOD_ID, "item_sacrificer"),
+            new ItemSacrificerBlock(
                     FabricBlockSettings.create()
                             .mapColor(MapColor.IRON_GRAY)
                             .requiresTool()
@@ -49,10 +46,10 @@ public class ZauberBlocks {
                             .sounds(BlockSoundGroup.LODESTONE)
                             .pistonBehavior(PistonBehavior.BLOCK)
             )
-    );
+    );*/
 
     public static void init() {
-        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "ritual_block"), RitualStoneBlockEntity.TYPE);
-        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "ritual_item_sacrificer"), RitualItemSacrificerBlockEntity.TYPE);
+        //Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "ritual_block"), RitualStoneBlockEntity.TYPE);
+        //Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "item_sacrificer"), ItemSacrificerBlockEntity.TYPE);
     }
 }

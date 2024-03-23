@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -11,8 +12,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
 public class SupernovaSpell extends Spell {
-    public SupernovaSpell(SpellType<? extends Spell> spellType) {
-        super(spellType);
+
+    public SupernovaSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
     @Override
@@ -71,13 +73,7 @@ public class SupernovaSpell extends Spell {
     }
 
     @Override
-    public void onEnd() {
-        super.onEnd();
+    public void finish() {
         if(this.getCaster().isAlive()) this.getCaster().kill();
-    }
-
-    @Override
-    public int getDuration() {
-        return 1;
     }
 }

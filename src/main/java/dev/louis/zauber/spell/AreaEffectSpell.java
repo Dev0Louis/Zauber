@@ -21,9 +21,10 @@ public abstract class AreaEffectSpell extends Spell {
 
     public AreaEffectSpell(
             SpellType<? extends AreaEffectSpell> spellType,
+            PlayerEntity caster,
             ParticleEffect particle
     ) {
-        super(spellType);
+        super(spellType, caster);
         this.particle = particle;
     }
 

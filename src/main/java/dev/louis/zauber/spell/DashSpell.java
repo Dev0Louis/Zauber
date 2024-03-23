@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -10,11 +11,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 
 public class DashSpell extends Spell {
-    public DashSpell(SpellType<?> spellType) {
-        super(spellType);
+    protected Vec3d dashVelocity;
+
+    public DashSpell(SpellType<?> spellType, PlayerEntity caster) {
+        super(spellType, caster);
     }
 
-    protected Vec3d dashVelocity;
     @Override
     public void cast() {
         if(this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
@@ -35,7 +37,7 @@ public class DashSpell extends Spell {
     @Override
     public void tick() {
         if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            if(serverPlayer.getVelocity().lengthSquared() < 0.3 && spellAge > 2) {
+            if(serverPlayer.getVelocity().lengthSquared() < 0.3 && age > 2) {
                 stop();
                 return;
             }
@@ -71,7 +73,7 @@ public class DashSpell extends Spell {
     }
 
     @Override
-    public void onEnd() {
+    public void finish() {
         this.getCaster().setInvisible(false);
         this.getCaster().setInvulnerable(false);
         this.getCaster().setNoDrag(false);
