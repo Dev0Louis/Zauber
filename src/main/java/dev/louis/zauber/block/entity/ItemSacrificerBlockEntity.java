@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import org.joml.Vector3f;
 
 public class ItemSacrificerBlockEntity extends BlockEntity {
-    public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = null;//BlockEntityType.Builder.create(ItemSacrificerBlockEntity::new, ZauberBlocks.ITEM_SACRIFICER).build(null);
+    public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = BlockEntityType.Builder.create(ItemSacrificerBlockEntity::new, ZauberBlocks.ITEM_SACRIFICER).build(null);
     public ItemStack storedStack = ItemStack.EMPTY;
     private ItemDisplayElement itemDisplayElement;
     public boolean firstTick = true;

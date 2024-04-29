@@ -5,6 +5,7 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.entity.HauntingDamageEntity;
 import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.entity.SpellArrowEntity;
 import dev.louis.zauber.items.ZauberItems;
@@ -52,6 +53,7 @@ public class Zauber implements ModInitializer {
             }
         });
 
+
         ServerConfigurationNetworking.registerGlobalReceiver(OptionSyncCompletePacket.TYPE, (packet, networkHandler, responseSender) -> {
             networkHandler.completeTask(OptionSyncTask.KEY);
         });
@@ -65,9 +67,10 @@ public class Zauber implements ModInitializer {
         ZauberPointOfInterestTypes.init();
 
         registerEntity("spell_arrow", SpellArrowEntity.TYPE);
-        //FabricDefaultAttributeRegistry.register(SpellArrowEntity.TYPE, SpellArrowEntity.createMobAttributes());
+        registerEntity("haunting_damage", HauntingDamageEntity.TYPE);
         registerEntity("mana_horse", ManaHorseEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
+        //FabricDefaultAttributeRegistry.register(HauntingSword.TYPE, HauntingSword.createBaseAttributes());
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
@@ -83,23 +86,6 @@ public class Zauber implements ModInitializer {
 
     public static class Spells {
         public static List<SpellType<?>> targetingSpells;
-        /** private static final Castability TARGETING_CASTABILITY =
-                Castability.DEFAULT.and((spellType, caster) -> {
-                    if(caster.getWorld().isClient()) {
-                        var playerInView = PLAYER_VIEWER_GETTER.getPlayerInView();
-                        return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ConfigManager.getServerConfig().targetingDistance();
-                    }
-                    return true;
-                });
-        private static final Castability MANA_HORSE_CASTABILITY =
-                Castability.DEFAULT.and((spellType, caster) -> {
-                    if(caster.getWorld().isClient()) {
-                        var playerInView = PLAYER_VIEWER_GETTER.getPlayerInView();
-                        return playerInView.isPresent() && caster.distanceTo(playerInView.get()) < ConfigManager.getServerConfig().targetingDistance();
-                    }
-                    return true;
-                });**/
-
         public static SpellType<ArrowSpell> ARROW = register("arrow", ArrowSpell::new, 2);
         public static SpellType<JuggernautSpell> JUGGERNAUT = register("juggernaut", JuggernautSpell::new, 20);
         public static SpellType<PullSpell> PULL = register("pull", PullSpell::new, 2);
@@ -113,10 +99,11 @@ public class Zauber implements ModInitializer {
         public static SpellType<WindExpelSpell> WIND_EXPEL = register("wind_expel", WindExpelSpell::new, 4);
         public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
         public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);
-        public static SpellType<ManaHorseSpell> MANA_HORSE = registerManaHorse("mana_horse", ManaHorseSpell::new, 4);
+        public static SpellType<RefusalOfDeathSpell> REFUSAL_OF_DEATH = register("refusal_of_death", RefusalOfDeathSpell::new, 2);
+        public static SpellType<ManaHorseSpell> MANA_HORSE = registerNoLearning("mana_horse", ManaHorseSpell::new, 4);
 
 
-        public static <T extends Spell> SpellType<T> registerManaHorse(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
+        public static <T extends Spell> SpellType<T> registerNoLearning(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
             return SpellType.register(
                     Identifier.of(MOD_ID, spellName),
                     SpellType.Builder.create(spellFactory, mana).needsLearning(false)

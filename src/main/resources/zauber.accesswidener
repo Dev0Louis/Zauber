@@ -6,3 +6,5 @@ accessible method net/minecraft/particle/DefaultParticleType <init> (Z)V
 accessible field net/minecraft/entity/decoration/DisplayEntity LEFT_ROTATION Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/decoration/DisplayEntity SCALE Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/client/world/ClientWorld client Lnet/minecraft/client/MinecraftClient;
+accessible method net/minecraft/entity/LivingEntity applyDamage (Lnet/minecraft/entity/damage/DamageSource;F)V
+accessible method net/minecraft/entity/damage/DamageSource <init> (Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;)V

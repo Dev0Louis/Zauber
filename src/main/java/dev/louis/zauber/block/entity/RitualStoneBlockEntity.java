@@ -1,6 +1,7 @@
 package dev.louis.zauber.block.entity;
 
 import com.google.common.collect.ImmutableList;
+import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.ritual.Ritual;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -31,7 +32,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class RitualStoneBlockEntity extends BlockEntity {
-    public static final BlockEntityType<RitualStoneBlockEntity> TYPE = null;//BlockEntityType.Builder.create(RitualStoneBlockEntity::new, ZauberBlocks.RITUAL_STONE).build(null);
+    public static final BlockEntityType<RitualStoneBlockEntity> TYPE = BlockEntityType.Builder.create(RitualStoneBlockEntity::new, ZauberBlocks.RITUAL_STONE).build(null);
     private final ElementHolder holder;
     @Nullable
     private Ritual ritual;

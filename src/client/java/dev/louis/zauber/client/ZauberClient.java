@@ -71,6 +71,8 @@ public class ZauberClient implements ClientModInitializer {
         createSpellKeyBind(Zauber.Spells.JUGGERNAUT, true);
         createSpellKeyBind(Zauber.Spells.WIND_EXPEL, false);
         createSpellKeyBind(Zauber.Spells.SPROUT, false);
+        createSpellKeyBind(Zauber.Spells.REFUSAL_OF_DEATH, false);
+        createSpellKeyBind(Zauber.Spells.TIME_FREEZE, false);
         createSpellKeyBind(Zauber.Spells.DASH, false);
         HandledScreens.register(ZauberRecipes.SPELL_TABLE, SpellTableScreen::new);
 
