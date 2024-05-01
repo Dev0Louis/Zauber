@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Ritual {
-    public static final List<Starter> RITUALS = new ArrayList<>();
+    public static final List<Starter> RITUAL_STARTERS = new ArrayList<>();
 
     protected final World world;
     protected final BlockPos pos;
@@ -25,13 +25,13 @@ public abstract class Ritual {
 
     public static void init() {
         //The order is important as the Rituals are checked in order.
-        RITUALS.add(HorseRitual::tryStart);
+        RITUAL_STARTERS.add(HorseRitual::tryStart);
     }
 
 
     public abstract void tick();
 
-    public abstract void start();
+    public abstract void onStart();
 
     public abstract void finish();
 

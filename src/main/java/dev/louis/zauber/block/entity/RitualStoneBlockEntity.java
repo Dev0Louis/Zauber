@@ -1,7 +1,7 @@
 package dev.louis.zauber.block.entity;
 
+import dev.louis.zauber.block.ManaStorageBlock;
 import dev.louis.zauber.block.ZauberBlocks;
-import dev.louis.zauber.items.RitualItem;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.ritual.Ritual;
@@ -122,23 +122,38 @@ public class RitualStoneBlockEntity extends BlockEntity {
     public void onBlockClicked(PlayerEntity player, World world, BlockPos pos) {
         System.out.println("CLICKED " + player.getNameForScoreboard() + " state " + this.state);
 
+        if (player.isSneaking()) {
+            this.fail(false);
+            return;
+        }
+
         switch (this.state) {
             case READY -> {
-                if (player.isSneaking()) {
-                    this.fail(false);
-                    return;
-                }
-                this.ritual = ((RitualItem)ritualItem.getItem()).getRitualType().starter().tryStart(world, this);
                 this.state = State.ACTIVE;
             }
             case INACTIVE -> {
-                if (this.ritualItem == ItemStack.EMPTY && player.getMainHandStack().getItem() instanceof RitualItem) {
+                if (this.ritualItem == ItemStack.EMPTY) {
                     this.ritualItem = player.getMainHandStack().copyWithCount(1);
                     player.getMainHandStack().decrement(1);
-                    this.state = State.READY;
+                    var ritual = getRitual(world, pos);
+                    if (ritual != null) {
+                        ritual.onStart();
+                        this.state = State.READY;
+                        return;
+                    }
+                    // No ritual could start. Sad :(
                 }
             }
         }
+    }
+
+    @Nullable
+    private Ritual getRitual(World world, BlockPos pos) {
+        for (Ritual.Starter starter : Ritual.RITUAL_STARTERS) {
+            var ritual = starter.tryStart(world, this);
+            if (ritual != null) return ritual;
+        }
+        return null;
     }
 
 
@@ -146,15 +161,15 @@ public class RitualStoneBlockEntity extends BlockEntity {
     protected void spawnConnectionParticle() {
         final Vec3d ritualPos = pos.toCenterPos();
         if(world.getTime() % 15 == 0) {
-            getRitualBlockPos().forEach(pointOfInterest -> {
+            Stream.concat(this.getManaStorages(), this.getItemSacrificers()).forEach(blockEntity -> {
                 final int steps = 10;
-                final Vec3d sacrificerPos = pointOfInterest.getPos().toCenterPos();
+                final Vec3d ritualBlockPos = blockEntity.getPos().toCenterPos();
                 for (int i = 0; i < steps; i++) {
                     var delta = (double) i / steps;
                     delta = (delta * 0.9) + 0.1;
-                    var x = MathHelper.lerp(delta, sacrificerPos.x, ritualPos.x);
-                    var y = MathHelper.lerp(delta, sacrificerPos.y, ritualPos.y);
-                    var z = MathHelper.lerp(delta, sacrificerPos.z, ritualPos.z);
+                    var x = MathHelper.lerp(delta, ritualBlockPos.x, ritualPos.x);
+                    var y = MathHelper.lerp(delta, ritualBlockPos.y, ritualPos.y);
+                    var z = MathHelper.lerp(delta, ritualBlockPos.z, ritualPos.z);
                     Vec3d pos = new Vec3d(x, y, z);
                     ((ServerWorld)world).spawnParticles(
                             ZauberParticleTypes.MANA_RUNE,
@@ -172,8 +187,7 @@ public class RitualStoneBlockEntity extends BlockEntity {
         }
     }
 
-
-    public Stream<PointOfInterest> getRitualBlockPos() {
+    public Stream<PointOfInterest> getRitualBlockPoses() {
         if (world instanceof ServerWorld serverWorld) {
             return serverWorld.getPointOfInterestStorage()
                     .getInSquare(
@@ -186,16 +200,17 @@ public class RitualStoneBlockEntity extends BlockEntity {
         return Stream.empty();
     }
 
-    public Stream<BlockPos> getItemSacrificersPos() {
+    public Stream<ItemSacrificerBlockEntity> getItemSacrificers() {
         if (world instanceof ServerWorld serverWorld) {
-            return getRitualBlockPos().map(poi -> serverWorld.getBlockEntity(poi.getPos(), ItemSacrificerBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get).filter(blockEntity -> blockEntity.storedStack != ItemStack.EMPTY).map(BlockEntity::getPos);
+            return getRitualBlockPoses().map(poi -> serverWorld.getBlockEntity(poi.getPos(), ItemSacrificerBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get).filter(blockEntity -> blockEntity.storedStack != ItemStack.EMPTY);
         }
         return Stream.empty();
     }
 
-    public Stream<ItemSacrificerBlockEntity> getItemSacrificers() {
+
+    public Stream<ManaStorageBlockEntity> getManaStorages() {
         if (world instanceof ServerWorld serverWorld) {
-            return getItemSacrificersPos().map(pos1 -> serverWorld.getBlockEntity(pos1, ItemSacrificerBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get);
+            return getRitualBlockPoses().map(poi -> serverWorld.getBlockEntity(poi.getPos(), ManaStorageBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get).filter(blockEntity -> blockEntity.getCachedState().get(ManaStorageBlock.MANA_LEVEL) > 0);
         }
         return Stream.empty();
     }

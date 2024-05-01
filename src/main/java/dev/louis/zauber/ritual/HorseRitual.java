@@ -74,7 +74,7 @@ public class HorseRitual extends Ritual {
     }
 
     @Override
-    public void start() {
+    public void onStart() {
 
     }
 

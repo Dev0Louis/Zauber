@@ -33,20 +33,6 @@
     "charge=30": { "model": "zauber:block/charged_spell_table" },
     "charge=31": { "model": "zauber:block/charged_spell_table" },
     "charge=32": { "model": "zauber:block/charged_spell_table" }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   }
 }
 

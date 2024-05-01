@@ -53,7 +53,6 @@ public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock
         return world.isClient() ? null : validateTicker(type, ItemSacrificerBlockEntity.TYPE, ItemSacrificerBlockEntity::tick);
     }
 
-
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;

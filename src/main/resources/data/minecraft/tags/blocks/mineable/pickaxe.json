@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
-    "zauber:spell_table"
+    "zauber:spell_table",
+    "zauber:ritual_stone",
+    "zauber:item_sacrificer",
+    "zauber:ritual_stone",
+    "zauber:mana_storage"
   ]
 }
