@@ -1,12 +1,16 @@
 package dev.louis.zauber.ritual;
 
+import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.items.ZauberItems;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.Instrument;
+import net.minecraft.item.Instruments;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
@@ -23,21 +27,20 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class HorseRitual extends Ritual {
+    private final ItemSacrificerBlockEntity sacrificerWithGoatHorn;
     private final HorseEntity horse;
-    private final List<Item> needed = new ArrayList<>(List.of(Items.GOAT_HORN));
-    private final List<ItemStack> consumed = new ArrayList<>();
 
     //TODO: Make goat horn only consume while the ritual is running.
-    protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, HorseEntity horse) {
+    protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, ItemSacrificerBlockEntity sacrificerWithGoatHorn, HorseEntity horse) {
         super(world, blockEntity);
+        this.sacrificerWithGoatHorn = sacrificerWithGoatHorn;
         this.horse = horse;
     }
 
@@ -82,7 +85,10 @@ public class HorseRitual extends Ritual {
 
     @Override
     public void finish() {
-        if (horse.isAlive()) {
+        //ItemSacrificerBlockEntity with a call goat horn.
+
+        if (horse.isAlive() && HorseRitual.isCallGoatHorn(sacrificerWithGoatHorn.storedStack)) {
+            sacrificerWithGoatHorn.setStoredStack(ItemStack.EMPTY);
             horse.discard();
             world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 4);
             world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, ZauberItems.SOUL_HORN.getDefaultStack(), 0, 0.3f, 0));
@@ -95,15 +101,6 @@ public class HorseRitual extends Ritual {
     }
 
     @Override
-    public boolean offer(ItemStack itemStack) {
-        if (needed.remove(itemStack.getItem())) {
-            consumed.add(itemStack);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public float getPitch() {
         return -2;
     }
@@ -112,14 +109,18 @@ public class HorseRitual extends Ritual {
         var ritualStonePos = ritualStoneBlockEntity.getPos();
         var box = Box.of(ritualStonePos.toCenterPos(), 32, 20, 32);
 
-        var collectedItems = ritualStoneBlockEntity.getCollectedItems();
-        if (collectedItems.size() != 1) return null;
+        //var availableItemStacks = ritualStoneBlockEntity.getAvailableItemStacks();
+        //if (availableItemStacks.count() != 1) return null;
+        var blockEntityWithGoatHorn = ritualStoneBlockEntity.getItemSacrificers().filter(blockEntity -> HorseRitual.isCallGoatHorn(blockEntity.storedStack)).findAny();
         var horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        return horse.map(horseEntity -> new HorseRitual(world, ritualStoneBlockEntity, horseEntity)).orElse(null);
+        if(blockEntityWithGoatHorn.isEmpty() || horse.isEmpty()) return null;
+        return new HorseRitual(world, ritualStoneBlockEntity, blockEntityWithGoatHorn.get(), horse.get());
     }
 
-    public static boolean isCallGoatHorn(ItemStack itemStack) {
-        if (!itemStack.isOf(Items.GOAT_HORN)) return false;
+
+
+    public static boolean isCallGoatHorn(@Nullable ItemStack itemStack) {
+        if (itemStack == null || !itemStack.isOf(Items.GOAT_HORN)) return false;
 
         var optionalInstrument = getInstrument(itemStack);
         if (optionalInstrument.isPresent()) {

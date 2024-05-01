@@ -36,7 +36,7 @@ public class RitualStoneBlock extends BlockWithEntity {
         } else {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
-                ritualStoneBlockEntity.onBlockClicked(player);
+                ritualStoneBlockEntity.onBlockClicked(player, world, pos);
             }
 
             return ActionResult.CONSUME;

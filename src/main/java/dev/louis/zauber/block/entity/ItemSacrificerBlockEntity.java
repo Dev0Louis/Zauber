@@ -1,5 +1,6 @@
 package dev.louis.zauber.block.entity;
 
+import dev.louis.zauber.block.ZauberBlocks;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;

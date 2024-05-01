@@ -1,8 +1,9 @@
 package dev.louis.zauber.block.entity;
 
-import com.google.common.collect.ImmutableList;
 import dev.louis.zauber.block.ZauberBlocks;
+import dev.louis.zauber.items.RitualItem;
 import dev.louis.zauber.particle.ZauberParticleTypes;
+import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.ritual.Ritual;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
@@ -11,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
@@ -18,17 +20,15 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
 import net.minecraft.world.explosion.ExplosionBehavior;
 import net.minecraft.world.poi.PointOfInterest;
+import net.minecraft.world.poi.PointOfInterestStorage;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class RitualStoneBlockEntity extends BlockEntity {
@@ -36,15 +36,10 @@ public class RitualStoneBlockEntity extends BlockEntity {
     private final ElementHolder holder;
     @Nullable
     private Ritual ritual;
-    private Collection<BlockPos> itemSacrificers = new ArrayList<>();
-    private final HashMap<ItemStack, ItemDisplayElement> collectedItems = new HashMap<>();
-    protected final Random random = Random.create();
-    private int age = 0;
-    boolean hasInitialised = false;
-    private State state;
-    private int ticksTillRitual = 0;
-    private int ticksTillFail = 0;
-    private int itemCooldown = 0;
+
+    private ItemStack ritualItem = ItemStack.EMPTY;
+    private State state = State.INACTIVE;
+    private boolean firstTick = true;
 
     public RitualStoneBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
@@ -54,97 +49,47 @@ public class RitualStoneBlockEntity extends BlockEntity {
 
     public void init() {
         ChunkAttachment.ofTicking(holder, (ServerWorld) world, pos.up());
+        var element = new ItemDisplayElement(ritualItem);
+        element.setScale(new Vector3f(0.5f));
+        element.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
+        this.holder.addElement(element);
+
+
+        this.firstTick = false;
     }
 
     public void tick(World world, BlockPos blockPos, BlockState state) {
-        final double PI2 = 2 * Math.PI;
-
-        if(!this.hasInitialised) this.init();
-        age++;
+        if (firstTick) this.init();
+        this.holder.getElements().forEach(virtualElement -> {
+            ((ItemDisplayElement) virtualElement).setItem(ritualItem);
+            virtualElement.setOffset(new Vec3d(0, 0.2 * (Math.sin(world.getTime() / 30f) + 1), 0));
+        });
         this.spawnConnectionParticle();
-        var elements = holder.getElements();
-        for (int i = 0; i < elements.size(); i++) {
-            float size = elements.size();
-            var x = Math.sin((i / size) * PI2 + (age / 30f)) * 1;
-            var z = Math.cos((i / size) * PI2 + (age / 30f)) * 1;
-            var element = (ItemDisplayElement) elements.get(i);
-            element.setRightRotation(RotationAxis.POSITIVE_Y.rotation(age / 30f));
-            double yMult = this.state == State.ACTIVE ? Math.sin(age * i) : 1;
-            element.setOffset(new Vec3d(x, -0.25 * yMult, z));
+        switch (this.state) {
+            case READY -> tickReady(world);
+            case ACTIVE -> tickActive(world);
         }
-        if(this.state == State.COLLECTING) {
-            if (this.age % 20 == 0) {
-                var optional = this.itemSacrificers.stream().unordered()
-                        .map(pos1 -> world.getBlockEntity(pos1, ItemSacrificerBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get).filter(itemSacrificerBlockEntity -> !itemSacrificerBlockEntity.storedStack.isEmpty()).findAny();
-                optional.ifPresentOrElse(itemSacrificerBlockEntity -> {
-                    this.collectItem(itemSacrificerBlockEntity.storedStack);
-                    itemSacrificerBlockEntity.setStoredStack(ItemStack.EMPTY);
-                    world.playSound(
-                            null,
-                            itemSacrificerBlockEntity.getPos().up(),
-                            SoundEvents.ENTITY_ENDER_EYE_DEATH,
-                            SoundCategory.BLOCKS
-                    );
-                    world.syncWorldEvent(WorldEvents.EYE_OF_ENDER_BREAKS, itemSacrificerBlockEntity.getPos().up(), 0);
-                }, () -> this.state = State.INACTIVE);
-            }
-        } else if (this.state == State.READY) {
-            if (ritual == null) {
-                Ritual.RITUALS.forEach(ritualStarter -> {
-                    if (this.ritual != null) return;
-                    this.ritual = ritualStarter.tryStart(world, this);
-                });
-                if (ritual == null) {
-                    fail(false);
-                    return;
-                }
-            }
+    }
 
-            /*if (ticksTillFail <= 0) {
-                Ritual.RITUALS.forEach(ritualStarter -> {
-                    if (this.ritual != null) return;
-                    this.ritual = ritualStarter.tryStart(world, this);
-                });
-                if (this.ritual == null) {
-                    ticksTillFail = 20 * 5;
-                } else {
-                    this.state = State.ACTIVE;
-                    ticksTillRitual = 40;
-                }
-            } else {
-                for (int i = 0; i < elements.size(); i++) {
-                    var element = (ItemDisplayElement) elements.get(i);
-                    element.setGlowing((ticksTillFail + i) % 8 < 4);
-                }
-                ticksTillFail--;
-                if (ticksTillFail <= 0) fail();
-            }*/
-        } else if (this.state == State.ACTIVE) {
-
-            if (ritual == null) {
-                fail(true);
-                return;
-            };
-            ritual.baseTick();
-            var list = new ArrayList<>(this.collectedItems.keySet());
-            Collections.shuffle(list);
-            var optionalItemStack = list.stream().findAny();
-            optionalItemStack.ifPresent(itemStack -> {
-                if (ritual.offer(itemStack)) {
-                    elements.remove(this.collectedItems.remove(itemStack));
-                } else {
-                    fail(true);
-                }
-            });
-
-            if(ritual.shouldStop()) {
-                this.state = State.INACTIVE;
-                ritual.finish();
-                ritual = null;
-                return;
-            }
-
+    private void tickActive(World world) {
+        if (ritual == null) {
+            fail(true);
+            return;
         }
+
+        ritual.age++;
+        ritual.tick();
+
+        if(ritual.shouldStop()) {
+            this.state = State.INACTIVE;
+            ritual.finish();
+            ritualItem = ItemStack.EMPTY;
+            ritual = null;
+        }
+    }
+
+    private void tickReady(World world) {
+        spawnConnectionParticle();
     }
 
     private void fail(boolean hardFail) {
@@ -167,45 +112,36 @@ public class RitualStoneBlockEntity extends BlockEntity {
                 3,
                 -40
         );
-        dropCollectedItems();
+        if (ritualItem != ItemStack.EMPTY) {
+            world.spawnEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), ritualItem.copy()));
+            ritualItem = ItemStack.EMPTY;
+        }
         this.state = State.INACTIVE;
     }
 
-    public void onBlockClicked(PlayerEntity player) {
-        if (this.state == State.ACTIVE) return;
+    public void onBlockClicked(PlayerEntity player, World world, BlockPos pos) {
+        System.out.println("CLICKED " + player.getNameForScoreboard() + " state " + this.state);
 
-        if (player.isSneaking()) {
-            dropCollectedItems();
-            this.state = State.INACTIVE;
-            return;
+        switch (this.state) {
+            case READY -> {
+                if (player.isSneaking()) {
+                    this.fail(false);
+                    return;
+                }
+                this.ritual = ((RitualItem)ritualItem.getItem()).getRitualType().starter().tryStart(world, this);
+                this.state = State.ACTIVE;
+            }
+            case INACTIVE -> {
+                if (this.ritualItem == ItemStack.EMPTY && player.getMainHandStack().getItem() instanceof RitualItem) {
+                    this.ritualItem = player.getMainHandStack().copyWithCount(1);
+                    player.getMainHandStack().decrement(1);
+                    this.state = State.READY;
+                }
+            }
         }
-
-        this.itemSacrificers = getItemSacrificersPos().toList();
-        this.state = this.collectedItems.isEmpty() ? State.COLLECTING : State.READY;
-    }
-
-    private void collectItem(ItemStack itemStack) {
-        var itemDisplayElement = new ItemDisplayElement();
-        itemDisplayElement.setScale(new Vector3f(0.4f, 0.4f, 0.4f));
-        itemDisplayElement.setItem(itemStack);
-        holder.addElement(itemDisplayElement);
-        this.collectedItems.put(itemStack, itemDisplayElement);
     }
 
 
-    private void dropCollectedItems() {
-        Vec3d vec3d = this.getPos().up().toCenterPos();
-        this.collectedItems.forEach((itemStack, element) -> {
-            double velocityX = MathHelper.nextBetween(this.random, -0.2F, 0.2F);
-            double velocityY = MathHelper.nextBetween(this.random, 0.3F, 0.7F);
-            double velocityZ = MathHelper.nextBetween(this.random, -0.2F, 0.2F);
-            ItemEntity itemEntity = new ItemEntity(this.getWorld(), vec3d.getX(), vec3d.getY(), vec3d.getZ(), itemStack, velocityX, velocityY, velocityZ);
-            this.getWorld().spawnEntity(itemEntity);
-            this.holder.removeElement(element);
-        });
-        this.collectedItems.clear();
-        //List.copyOf(this.holder.getElements()).forEach(this.holder::removeElement);
-    }
 
     protected void spawnConnectionParticle() {
         final Vec3d ritualPos = pos.toCenterPos();
@@ -236,21 +172,9 @@ public class RitualStoneBlockEntity extends BlockEntity {
         }
     }
 
-    public Collection<ItemStack> getCollectedItems() {
-        return ImmutableList.copyOf(collectedItems.keySet());
-    }
-
-    public boolean removeCollectedItem(ItemStack itemStack) {
-        var removed = this.collectedItems.remove(itemStack);
-        if (removed != null) {
-            this.holder.removeElement(removed);
-            return true;
-        }
-        return false;
-    }
 
     public Stream<PointOfInterest> getRitualBlockPos() {
-        /*if (world instanceof ServerWorld serverWorld) {
+        if (world instanceof ServerWorld serverWorld) {
             return serverWorld.getPointOfInterestStorage()
                     .getInSquare(
                             poiType -> poiType.matchesKey(ZauberPointOfInterestTypes.RITUAL_BLOCKS_KEY),
@@ -258,7 +182,7 @@ public class RitualStoneBlockEntity extends BlockEntity {
                             20,
                             PointOfInterestStorage.OccupationStatus.ANY
                     );
-        }*/
+        }
         return Stream.empty();
     }
 
@@ -276,9 +200,19 @@ public class RitualStoneBlockEntity extends BlockEntity {
         return Stream.empty();
     }
 
+    public Stream<ItemStack> getAvailableItemStacks() {
+        return this.getItemSacrificers().map(itemSacrificerBlockEntity -> itemSacrificerBlockEntity.storedStack);
+    }
+
+
+    @Override
+    public void markRemoved() {
+        this.holder.destroy();
+        super.markRemoved();
+    }
+
     public enum State {
         INACTIVE,
-        COLLECTING,
         READY,
         ACTIVE
     }

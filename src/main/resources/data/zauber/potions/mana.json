@@ -1,0 +1,8 @@
+{
+  "values": [
+    "zauber:instant_mana",
+    "zauber:strong_instant_mana",
+    "zauber:mana_regeneration",
+    "zauber:strong_mana_regeneration"
+  ]
+}
