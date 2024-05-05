@@ -31,16 +31,15 @@ public class RitualStoneBlock extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.isClient) {
-            return ActionResult.SUCCESS;
-        } else {
+        if (!world.isClient && hand == Hand.MAIN_HAND) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
                 ritualStoneBlockEntity.onBlockClicked(player, world, pos);
             }
 
-            return ActionResult.CONSUME;
         }
+        return ActionResult.CONSUME;
+
     }
 
     @Override

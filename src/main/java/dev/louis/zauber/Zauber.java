@@ -19,6 +19,7 @@ import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.spell.*;
+import dev.louis.zauber.tag.ZauberPotionTags;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
@@ -46,6 +47,7 @@ public class Zauber implements ModInitializer {
     @Override
     public void onInitialize() {
         ConfigManager.loadServerConfig();
+        ZauberPotionTags.init();
 
         ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
             if (ServerConfigurationNetworking.canSend(handler, OptionSyncPacket.TYPE.getId())) {

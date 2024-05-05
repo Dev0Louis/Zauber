@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "zauber:instant_mana",
+      "required":false
+    },
+    {
+      "id": "zauber:strong_instant_mana",
+      "required": false
+    },
+    {
+      "id": "zauber:mana_regeneration",
+      "required": false
+    },
+    {
+      "id":"zauber:strong_mana_regeneration",
+      "required": false
+    }
+  ]
+}

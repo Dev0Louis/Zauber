@@ -14,13 +14,13 @@ public abstract class Ritual {
 
     protected final World world;
     protected final BlockPos pos;
-    protected final RitualStoneBlockEntity blockEntity;
+    protected final RitualStoneBlockEntity ritualStoneBlockEntity;
     public int age;
 
-    public Ritual(World world, RitualStoneBlockEntity blockEntity) {
+    public Ritual(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         this.world = world;
-        this.pos = blockEntity.getPos();
-        this.blockEntity = blockEntity;
+        this.pos = ritualStoneBlockEntity.getPos();
+        this.ritualStoneBlockEntity = ritualStoneBlockEntity;
     }
 
     public static void init() {

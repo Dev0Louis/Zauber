@@ -13,6 +13,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +36,16 @@ public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock
         }
 
         return ActionResult.SUCCESS;
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        float l = 8.0F - 4;
+        float m = 8.0F + 4;
+        float n = 8.0F - 3;
+        float o = 8.0F + 3;
+        VoxelShape voxelShape = Block.createCuboidShape(l, 0.0, l, m, 24.0F, m);
+        return voxelShape;
     }
 
     @Override
@@ -60,6 +72,6 @@ public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock
 
     @Override
     public Block getPolymerBlock(BlockState state) {
-        return Blocks.RESPAWN_ANCHOR;
+        return Blocks.STONE_BRICK_WALL;
     }
 }

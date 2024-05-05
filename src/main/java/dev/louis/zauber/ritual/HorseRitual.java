@@ -1,6 +1,6 @@
 package dev.louis.zauber.ritual;
 
-import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
+import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.items.ZauberItems;
 import dev.louis.zauber.particle.ZauberParticleTypes;
@@ -34,13 +34,13 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class HorseRitual extends Ritual {
-    private final ItemSacrificerBlockEntity sacrificerWithGoatHorn;
+    private final BlockPos manaStorageBlockPos;
     private final HorseEntity horse;
 
     //TODO: Make goat horn only consume while the ritual is running.
-    protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, ItemSacrificerBlockEntity sacrificerWithGoatHorn, HorseEntity horse) {
+    protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, BlockPos manaStorageBlockPos, HorseEntity horse) {
         super(world, blockEntity);
-        this.sacrificerWithGoatHorn = sacrificerWithGoatHorn;
+        this.manaStorageBlockPos = manaStorageBlockPos;
         this.horse = horse;
     }
 
@@ -86,9 +86,11 @@ public class HorseRitual extends Ritual {
     @Override
     public void finish() {
         //ItemSacrificerBlockEntity with a call goat horn.
-
-        if (horse.isAlive() && HorseRitual.isCallGoatHorn(sacrificerWithGoatHorn.storedStack)) {
-            sacrificerWithGoatHorn.setStoredStack(ItemStack.EMPTY);
+        var manaStorageState = world.getBlockState(manaStorageBlockPos);
+        int manaLevel = manaStorageState.get(ManaCauldron.MANA_LEVEL);
+        if (horse.isAlive() && manaLevel >= 1 && HorseRitual.isCallGoatHorn(ritualStoneBlockEntity.getStoredStack())) {
+            ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);
+            world.setBlockState(manaStorageBlockPos, manaStorageState.with(ManaCauldron.MANA_LEVEL, manaLevel - 1));
             horse.discard();
             world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 4);
             world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, ZauberItems.SOUL_HORN.getDefaultStack(), 0, 0.3f, 0));
@@ -111,10 +113,12 @@ public class HorseRitual extends Ritual {
 
         //var availableItemStacks = ritualStoneBlockEntity.getAvailableItemStacks();
         //if (availableItemStacks.count() != 1) return null;
-        var blockEntityWithGoatHorn = ritualStoneBlockEntity.getItemSacrificers().filter(blockEntity -> HorseRitual.isCallGoatHorn(blockEntity.storedStack)).findAny();
+        var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
+
+        var fullManaStorage = ritualStoneBlockEntity.getFilledManaStorages().findAny();
         var horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        if(blockEntityWithGoatHorn.isEmpty() || horse.isEmpty()) return null;
-        return new HorseRitual(world, ritualStoneBlockEntity, blockEntityWithGoatHorn.get(), horse.get());
+        if(!HorseRitual.isCallGoatHorn(ritualItemStack) || fullManaStorage.isEmpty() || horse.isEmpty()) return null;
+        return new HorseRitual(world, ritualStoneBlockEntity, fullManaStorage.get(), horse.get());
     }
 
 
