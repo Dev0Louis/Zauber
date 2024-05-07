@@ -1,22 +1,39 @@
 package dev.louis.zauber.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.louis.zauber.block.entity.BlockEntityWithItemStack;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
+import dev.louis.zauber.block.entity.RitualStoneBlockEntity.State;
+import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
-public class RitualStoneBlock extends BlockWithEntity {
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class RitualStoneBlock extends BlockWithEntity implements BlockWithElementHolder {
     public static final MapCodec<RitualStoneBlock> CODEC = createCodec(RitualStoneBlock::new);
 
     public RitualStoneBlock(Settings settings) {
@@ -56,5 +73,95 @@ public class RitualStoneBlock extends BlockWithEntity {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return world.isClient() ? null : validateTicker(type, RitualStoneBlockEntity.TYPE, ((world1, pos1, state1, blockEntity1) -> blockEntity1.tick(world1, pos1, state1)));
+    }
+
+    @Override
+    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return true;
+    }
+
+    @Override
+    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return new CustomHolder(world, pos, initialBlockState);
+    }
+
+    private static class CustomHolder extends ElementHolder {
+        private static final BlockState INACTIVE_STATE = Blocks.OBSIDIAN.getDefaultState();
+        private static final BlockState ACTIVE_STATE = Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
+        private static final BlockState WARNING_STATE = Blocks.REDSTONE_BLOCK.getDefaultState();
+        private static final BlockState PLATE_STATE = Blocks.SMOOTH_STONE.getDefaultState();
+
+        private final Collection<BlockDisplayElement> indicators = new ArrayList<>();
+        private ItemDisplayElement itemDisplay;
+        private int age;
+
+
+        public CustomHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+            BlockDisplayElement ritualPlate = new BlockDisplayElement(this.getState(world, initialBlockState));
+            final float xSize = 0.8f;
+            final float ySize = 1f;
+            ritualPlate.setBlockState(PLATE_STATE);
+            ritualPlate.setScale(new Vector3f(xSize, ySize, xSize));
+            ritualPlate.setOffset(new Vec3d(-xSize / 2f, -.4, -xSize / 2f));
+            ritualPlate.setBrightness(new Brightness(0, 15));
+            this.addElement(ritualPlate);
+
+            this.indicators.add(createBlockDisplayElement(-0.5, -0.5));
+            this.indicators.add(createBlockDisplayElement(-0.5, 0.4));
+
+            this.indicators.add(createBlockDisplayElement(0.4, -0.5));
+            this.indicators.add(createBlockDisplayElement(0.4, 0.4));
+            this.indicators.forEach(this::addElement);
+
+            this.itemDisplay = new ItemDisplayElement();
+            itemDisplay.setScale(new Vector3f(0.25f));
+            itemDisplay.setOffset(new Vec3d(0, 1, 0));
+
+            this.addElement(itemDisplay);
+        }
+
+        public BlockDisplayElement createBlockDisplayElement(double x, double z) {
+            var blockDisplayElement = new BlockDisplayElement(INACTIVE_STATE);
+            blockDisplayElement.setScale(new Vector3f(0.1f));
+            blockDisplayElement.setOffset(new Vec3d(x, .5, z));
+            return blockDisplayElement;
+        }
+
+        @Override
+        protected void onTick() {
+            this.age++;
+            itemDisplay.setScale(new Vector3f(0.375f));
+            itemDisplay.setOffset(new Vec3d(0, 0.8, 0));
+
+            this.itemDisplay.setRightRotation(RotationAxis.POSITIVE_Y.rotationDegrees(this.age / 5f));
+            BlockAwareAttachment attachment = (BlockAwareAttachment) this.getAttachment();
+            if (attachment == null) throw new IllegalStateException("Attachment is null");
+            this.itemDisplay.setItem(this.getStack(attachment.getWorld(), attachment.getBlockPos()));
+            var optionalRitualStoneBlock = attachment.getWorld().getBlockEntity(attachment.getBlockPos(), RitualStoneBlockEntity.TYPE);
+            optionalRitualStoneBlock.ifPresent(ritualStoneBlockEntity -> {
+                BlockState blockState;
+                State state = ritualStoneBlockEntity.getState();
+                if (ritualStoneBlockEntity.getInteractionTimes() > 6) {
+                    blockState = WARNING_STATE;
+                } else if (state == State.ACTIVE) {
+                    blockState = ACTIVE_STATE;
+                } else {
+                    blockState = INACTIVE_STATE;
+                }
+
+                indicators.forEach(blockDisplayElement -> {
+                    blockDisplayElement.setBlockState(blockState);
+                });
+            });
+
+        }
+
+        public BlockState getState(ServerWorld world, BlockState state) {
+            return INACTIVE_STATE;
+        }
+
+        public ItemStack getStack(ServerWorld world, BlockPos pos) {
+            return world.getBlockEntity(pos, RitualStoneBlockEntity.TYPE).map(BlockEntityWithItemStack::getStoredStack).orElse(ItemStack.EMPTY);
+        }
     }
 }

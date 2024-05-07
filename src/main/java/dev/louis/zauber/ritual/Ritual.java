@@ -4,10 +4,12 @@ import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public abstract class Ritual {
     public static final List<Starter> RITUAL_STARTERS = new ArrayList<>();
@@ -48,6 +50,8 @@ public abstract class Ritual {
     public float getVolume() {
         return 1;
     }
+
+    public abstract Stream<Position> getConnections();
 
     public interface Starter {
         Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity);

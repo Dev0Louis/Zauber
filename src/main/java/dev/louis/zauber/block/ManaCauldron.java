@@ -50,10 +50,9 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         var manaLevel = state.get(MANA_LEVEL);
-        if (!world.isClient && PotionUtil.getPotion(player.getStackInHand(hand)).getRegistryEntry().isIn(ZauberPotionTags.MANA) && manaLevel < 2) {
+        if (!world.isClient && player.getStackInHand(hand).isOf(Items.POTION) && PotionUtil.getPotion(player.getStackInHand(hand)).getRegistryEntry().isIn(ZauberPotionTags.MANA) && manaLevel < 2) {
             int newManaLevel = Math.max(Math.min(manaLevel + 1, 2), 0);
             world.setBlockState(pos, state.with(MANA_LEVEL, newManaLevel));
-            player.clearActiveItem();
             player.getStackInHand(hand).decrement(1);
             player.getInventory().offerOrDrop(Items.GLASS_BOTTLE.getDefaultStack());
             SoundHelper.playBlockSound((ServerWorld) world, pos, SoundEvents.ITEM_BOTTLE_EMPTY);
@@ -101,8 +100,11 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
         private final Collection<BlockDisplayElementWithVelocity> manaBubbles = new ArrayList<>();
         private final Random random = Random.create();
         private int age;
+        private ConnectionElement connection;
 
         public CustomHolder(BlockState initialBlockState) {
+            connection = new ConnectionElement(new Vec3d(0, 10, 0));
+            connection.setHolder(this);
             this.manaFill = this.addElement(new BlockDisplayElement(this.getState(initialBlockState)));
             this.manaFill.setOffset(new Vec3d(-0.375, 0, -0.375));
             this.manaFill.setScale(new Vector3f(0.75f, 0.2f * initialBlockState.get(MANA_LEVEL) + (float)Math.sin(age / 50f) * 0.05f, 0.75f));
@@ -111,7 +113,9 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
 
         @Override
         public void onTick() {
-             this.age++;
+            //connection.tick();
+            //connection.setGlowing(true);
+            this.age++;
             this.manaFill.setOffset(new Vec3d(-0.375, 0, -0.375));
             var attachment = this.getAttachment();
             if (attachment == null) throw new IllegalStateException("Attachment is null");
@@ -136,6 +140,7 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
                 }
             }
 
+            manaBubbles.forEach(BlockDisplayElementWithVelocity::tick);
             manaBubbles.removeIf(element -> {
                 var remove = element.getOffset().getY() > 3 * manaLevel || random.nextFloat() > 0.93f;
                 if (remove) {
@@ -166,10 +171,6 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
                 return remove;
             });
 
-            //element.setGlowing(true);
-            //element.setOffset(element.getOffset().add(element.getVelocity()));
-            manaBubbles.forEach(BlockDisplayElementWithVelocity::tick);
-
         }
 
         public BlockState getState(ServerWorld world, BlockPos pos) {
@@ -198,13 +199,34 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
 
         @Override
         public void tick() {
+            super.tick();
             velocity = velocity.multiply(0.9, 1, 0.9);
             this.setOffset(this.getOffset().add(velocity));
-            super.tick();
+        }
+    }
+
+    public static class ConnectionElement extends BlockDisplayElement {
+        private static final BlockState DEFAULT_STATE = Blocks.BEDROCK.getDefaultState();
+        private final Vec3d endOffset;
+        private int age;
+
+        public ConnectionElement(Vec3d startPos, Vec3d endPos) {
+            this(endPos.subtract(startPos));
         }
 
-        public Vec3d getVelocity() {
-            return velocity;
+        public ConnectionElement(Vec3d endOffset) {
+            super(DEFAULT_STATE);
+            this.endOffset = endOffset;
+        }
+
+        @Override
+        public void tick() {
+            this.age++;
+            this.setOffset(Vec3d.ZERO.lerp(endOffset, age / 200f));
+            if (age > 200) {
+                this.age = 0;
+            }
+            super.tick();
         }
     }
 }

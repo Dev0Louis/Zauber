@@ -102,7 +102,6 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
             player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
             player.playSound(sound, volume, pitch);
             player.getItemCooldownManager().set(offeredStack.getItem(), 5);
-            return ActionResult.FAIL;
         }
 
         if (offeredStack.isEmpty()) return ActionResult.FAIL;

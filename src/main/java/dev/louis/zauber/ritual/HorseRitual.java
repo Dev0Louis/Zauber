@@ -3,7 +3,6 @@ package dev.louis.zauber.ritual;
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.items.ZauberItems;
-import dev.louis.zauber.particle.ZauberParticleTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.HorseEntity;
@@ -18,20 +17,19 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.InstrumentTags;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class HorseRitual extends Ritual {
     private final BlockPos manaStorageBlockPos;
@@ -49,7 +47,7 @@ public class HorseRitual extends Ritual {
         if(age % 5 == 0) {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
 
-            final int steps = 10;
+            /*final int steps = 10;
             final Vec3d horsePos = horse.getPos();
             final Vec3d ritualPos = pos.toCenterPos();
 
@@ -69,7 +67,7 @@ public class HorseRitual extends Ritual {
                         0.3,
                         0.01
                 );
-            }
+            }*/
         }
     }
 
@@ -103,6 +101,14 @@ public class HorseRitual extends Ritual {
     }
 
     @Override
+    public Stream<Position> getConnections() {
+        return Stream.of(
+                this.manaStorageBlockPos.toCenterPos(),
+                horse.getPos()
+        );
+    }
+
+    @Override
     public float getPitch() {
         return -2;
     }
@@ -115,10 +121,10 @@ public class HorseRitual extends Ritual {
         //if (availableItemStacks.count() != 1) return null;
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
-        var fullManaStorage = ritualStoneBlockEntity.getFilledManaStorages().findAny();
+        var filledManaStorage = ritualStoneBlockEntity.getFilledManaStorages().findAny();
         var horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        if(!HorseRitual.isCallGoatHorn(ritualItemStack) || fullManaStorage.isEmpty() || horse.isEmpty()) return null;
-        return new HorseRitual(world, ritualStoneBlockEntity, fullManaStorage.get(), horse.get());
+        if(!HorseRitual.isCallGoatHorn(ritualItemStack) || filledManaStorage.isEmpty() || horse.isEmpty()) return null;
+        return new HorseRitual(world, ritualStoneBlockEntity, filledManaStorage.get(), horse.get());
     }
 
 

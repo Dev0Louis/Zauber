@@ -2,112 +2,67 @@ package dev.louis.zauber.block.entity;
 
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.ZauberBlocks;
+import dev.louis.zauber.helper.ParticleHelper;
+import dev.louis.zauber.helper.SoundHelper;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.ritual.Ritual;
-import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
-import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.ExplosionBehavior;
 import net.minecraft.world.poi.PointOfInterest;
 import net.minecraft.world.poi.PointOfInterestStorage;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
+    private static final String[] RAI_NAMES = {"rai", "enjarai", "silliestpersonalive"};
+
     public static final BlockEntityType<RitualStoneBlockEntity> TYPE = BlockEntityType.Builder.create(RitualStoneBlockEntity::new, ZauberBlocks.RITUAL_STONE).build(null);
     private static final boolean EXPLOSION_CHAINS = true;
     private static final BlockState INACTIVE_STATE = Blocks.OBSIDIAN.getDefaultState();
     private static final BlockState ACTIVE_STATE = Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
     private static final BlockState WARNING_STATE = Blocks.REDSTONE_BLOCK.getDefaultState();
 
-    private final ElementHolder holder;
     @Nullable
     private Ritual ritual;
     private State state = State.INACTIVE;
-    private boolean firstTick = true;
-    private ItemDisplayElement itemDisplayElement;
-    private Collection<BlockDisplayElement> blockDisplayElements = new ArrayList<>();
     private int interactionTimes;
 
     public RitualStoneBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
-        this.holder = new ElementHolder();
-    }
-
-    public void init() {
-        ChunkAttachment.ofTicking(holder, (ServerWorld) world, pos.up());
-        this.itemDisplayElement = new ItemDisplayElement(storedStack);
-        itemDisplayElement.setScale(new Vector3f(0.5f));
-        //element.setBillboardMode(DisplayEntity.BillboardMode.VERTICAL);
-        this.holder.addElement(itemDisplayElement);
-
-        this.blockDisplayElements.add(createBlockDisplayElement(-0.5, -0.5));
-        this.blockDisplayElements.add(createBlockDisplayElement(-0.5, 0.4));
-
-        this.blockDisplayElements.add(createBlockDisplayElement(0.4, -0.5));
-        this.blockDisplayElements.add(createBlockDisplayElement(0.4, 0.4));
-        this.blockDisplayElements.forEach(this.holder::addElement);
-
-        this.firstTick = false;
-    }
-
-    public BlockDisplayElement createBlockDisplayElement(double x, double z) {
-        var blockDisplayElement = new BlockDisplayElement(INACTIVE_STATE);
-        blockDisplayElement.setScale(new Vector3f(0.1f));
-        blockDisplayElement.setOffset(new Vec3d(x, -0.5, z));
-        return blockDisplayElement;
     }
 
     public void tick(World world, BlockPos blockPos, BlockState state) {
-        if (firstTick) this.init();
-        itemDisplayElement.setOffset(new Vec3d(0, -0.25, 0));
-        this.itemDisplayElement.setRightRotation(
-                RotationAxis.POSITIVE_Y.rotationDegrees(world.getTime() / 5f)
-        );
-
         this.spawnConnectionParticle();
 
         if (world.getTime() % 100 == 0) {
             this.interactionTimes = 0;
-            this.blockDisplayElements.forEach(blockDisplayElement -> {
-                blockDisplayElement.getDataTracker().set(DisplayTrackedData.BRIGHTNESS, -1);
-            });
         }
-
-        this.blockDisplayElements.forEach(blockDisplayElement -> {
-            if (interactionTimes > 6) {
-                blockDisplayElement.setBlockState(WARNING_STATE);
-                blockDisplayElement.setBrightness(new Brightness(15, 15));
-            } else if (this.state == State.ACTIVE) {
-                blockDisplayElement.setBlockState(ACTIVE_STATE);
-            } else if (this.state == State.INACTIVE) {
-                blockDisplayElement.setBlockState(INACTIVE_STATE);
-            }
-        });
 
         switch (this.state) {
             //case READY -> tickReady(world);
@@ -193,6 +148,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                 if (!handStack.isEmpty()) {
                     player.getMainHandStack().decrement(1);
                     this.giveBackRitualItem(player);
+                    this.tryEasterEgg(player, handStack);
                     this.setStoredStack(handStack);
                     return;
                 } else if (player.isSneaking()) {
@@ -209,7 +165,17 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                 }
                 interactionTimes++;
                 if (interactionTimes > 10) {
-                    this.fail(true, true);
+                    this.getRandomItemSacrificer().ifPresentOrElse(itemSacrificerBlockEntity -> {
+                        this.makeBreakItemEffect((ServerWorld) world, itemSacrificerBlockEntity.getPos().toCenterPos().add(0, 1, 0), itemSacrificerBlockEntity.getStoredStack());
+                        itemSacrificerBlockEntity.setStoredStack(ItemStack.EMPTY);
+                    }, () -> {
+                        //if not present
+                        if (!this.storedStack.isEmpty()) {
+                            this.makeBreakItemEffect((ServerWorld) world, this.getPos().toCenterPos().add(0, 1, 0), this.getStoredStack());
+                            this.setStoredStack(ItemStack.EMPTY);
+                        }
+                    });
+                    //this.fail(true, true);
                 } else {
                     world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_LODESTONE_BREAK, SoundCategory.BLOCKS);
                     //world.playSound();
@@ -220,6 +186,37 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                 this.fail(true, false);
             }
         }
+    }
+
+
+
+    private void tryEasterEgg(PlayerEntity player, ItemStack itemStack) {
+        if (itemStack.isOf(Items.NETHER_WART) && ArrayUtils.contains(RAI_NAMES, itemStack.getName().getString())) {
+            player.sendMessage(Text.literal("Zauber is not a rites ripoff...").setStyle(Style.EMPTY.withColor(Formatting.GRAY)), false);
+        }
+    }
+
+    private void makeBreakItemEffect(ServerWorld world, Position pos, ItemStack itemStack) {
+        ParticleHelper.spawnParticle(
+                world,
+                new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack),
+                pos
+        );
+        SoundHelper.playSound(
+                world,
+                this.getPos(),
+                SoundEvents.ITEM_SHIELD_BREAK,
+                SoundCategory.AMBIENT,
+                1,
+                1
+        );
+    }
+
+    public Optional<ItemSacrificerBlockEntity> getRandomItemSacrificer() {
+        return this.getItemSacrificers().collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
+            Collections.shuffle(collected);
+            return collected.stream();
+        })).findAny();
     }
 
     @Nullable
@@ -233,8 +230,12 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
 
     protected void spawnConnectionParticle() {
         final Vec3d ritualPos = pos.toCenterPos();
-        if(world.getTime() % 15 == 0) {
-            this.getItemSacrificers().forEach(blockEntity -> {
+        if(world.getTime() % 15 == 0 && ritual != null) {
+
+            ritual.getConnections().forEach(position -> {
+                spawnConnectionParticles(position, ritualPos);
+            });
+            /*this.getItemSacrificers().forEach(blockEntity -> {
                 Vec3d blockPos = blockEntity.getPos().toCenterPos();
                 blockPos = blockPos.add(0, 1 + ItemSacrificerBlockEntity.getItemOffset(blockEntity), 0);
 
@@ -242,18 +243,18 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
             });
             this.getFilledManaStorages().forEach(blockPos -> {
                 spawnConnectionParticles(blockPos.toCenterPos(), ritualPos);
-            });
+            });*/
         }
     }
 
-    private void spawnConnectionParticles(Vec3d blockPos, Vec3d ritualPos) {
+    private void spawnConnectionParticles(Position endPos, Position ritualPos) {
         final int steps = 10;
         for (int i = 0; i < steps; i++) {
             var delta = (double) i / steps;
             delta = (delta * 0.9) + 0.1;
-            var x = MathHelper.lerp(delta, blockPos.x, ritualPos.x);
-            var y = MathHelper.lerp(delta, blockPos.y, ritualPos.y);
-            var z = MathHelper.lerp(delta, blockPos.z, ritualPos.z);
+            var x = MathHelper.lerp(delta, endPos.getX(), ritualPos.getX());
+            var y = MathHelper.lerp(delta, endPos.getY(), ritualPos.getY());
+            var z = MathHelper.lerp(delta, endPos.getZ(), ritualPos.getZ());
             Vec3d pos = new Vec3d(x, y, z);
 
 
@@ -297,7 +298,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
             return getRitualBlockPoses().filter(poi -> {
                 var blockState = world.getBlockState(poi.getPos());
                 return blockState.isOf(ZauberBlocks.MANA_STORAGE) && blockState.get(ManaCauldron.MANA_LEVEL) > 0;
-            }).map(pointOfInterest -> pointOfInterest.getPos());
+            }).map(PointOfInterest::getPos);
         }
         return Stream.empty();
     }
@@ -306,16 +307,17 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
         return this.getItemSacrificers().map(itemSacrificerBlockEntity -> itemSacrificerBlockEntity.storedStack);
     }
 
-    @Override
-    public void setStoredStack(ItemStack storedStack) {
-        super.setStoredStack(storedStack);
-        if (itemDisplayElement != null) itemDisplayElement.setItem(storedStack);
+    public State getState() {
+        return state;
+    }
+
+    public int getInteractionTimes() {
+        return interactionTimes;
     }
 
     @Override
-    public void markRemoved() {
-        this.holder.destroy();
-        super.markRemoved();
+    public void setStoredStack(ItemStack storedStack) {
+        super.setStoredStack(storedStack);
     }
 
     public enum State {

@@ -42,8 +42,6 @@ public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock
     public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         float l = 8.0F - 4;
         float m = 8.0F + 4;
-        float n = 8.0F - 3;
-        float o = 8.0F + 3;
         VoxelShape voxelShape = Block.createCuboidShape(l, 0.0, l, m, 24.0F, m);
         return voxelShape;
     }
