@@ -32,6 +32,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 public class RitualStoneBlock extends BlockWithEntity implements BlockWithElementHolder {
     public static final MapCodec<RitualStoneBlock> CODEC = createCodec(RitualStoneBlock::new);
@@ -93,7 +94,9 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
 
         private final Collection<BlockDisplayElement> indicators = new ArrayList<>();
         private ItemDisplayElement itemDisplay;
+        private ConnectionElement connection;
         private int age;
+
 
 
         public CustomHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
@@ -118,6 +121,14 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
             itemDisplay.setOffset(new Vec3d(0, 1, 0));
 
             this.addElement(itemDisplay);
+
+            connection = new ConnectionElement(new Vec3d(0, 10, 0), connectionElement -> {
+                var optionalItemSacrificer = world.getBlockEntity(pos, RitualStoneBlockEntity.TYPE).get().getRandomItemSacrificer();
+                optionalItemSacrificer.ifPresent(itemSacrificer -> {
+                    connectionElement.setEndOffset(pos.toCenterPos(), itemSacrificer.getPos().toCenterPos());
+                });
+            });
+            this.addElement(connection);
         }
 
         public BlockDisplayElement createBlockDisplayElement(double x, double z) {
@@ -130,6 +141,7 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
         @Override
         protected void onTick() {
             this.age++;
+            this.connection.tick();
             itemDisplay.setScale(new Vector3f(0.375f));
             itemDisplay.setOffset(new Vec3d(0, 0.8, 0));
 
@@ -162,6 +174,43 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
 
         public ItemStack getStack(ServerWorld world, BlockPos pos) {
             return world.getBlockEntity(pos, RitualStoneBlockEntity.TYPE).map(BlockEntityWithItemStack::getStoredStack).orElse(ItemStack.EMPTY);
+        }
+    }
+
+    public static class ConnectionElement extends BlockDisplayElement {
+        private static final BlockState DEFAULT_STATE = Blocks.BEDROCK.getDefaultState();
+        private final Consumer<ConnectionElement> consumer;
+        private Vec3d endOffset;
+        private int age;
+
+        public ConnectionElement(Vec3d startPos, Vec3d endPos, Consumer<ConnectionElement> consumer) {
+            this(startPos.relativize(endPos), consumer);
+        }
+
+        public ConnectionElement(Vec3d endOffset, Consumer<ConnectionElement> consumer) {
+            super(DEFAULT_STATE);
+            this.endOffset = endOffset;
+            this.consumer = consumer;
+        }
+
+        public void setEndOffset(Vec3d endOffset) {
+            this.endOffset = endOffset;
+        }
+
+        public void setEndOffset(Vec3d startPos, Vec3d endPos) {
+            this.endOffset = startPos.relativize(endPos);
+        }
+
+        @Override
+        public void tick() {
+            this.age++;
+            this.setScale(new Vector3f(0.1f));
+            this.setOffset(Vec3d.ZERO.lerp(endOffset, age / 200f));
+            if (age > 200) {
+                this.age = 0;
+                consumer.accept(this);
+            }
+            super.tick();
         }
     }
 }

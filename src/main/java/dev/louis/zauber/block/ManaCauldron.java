@@ -100,11 +100,8 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
         private final Collection<BlockDisplayElementWithVelocity> manaBubbles = new ArrayList<>();
         private final Random random = Random.create();
         private int age;
-        private ConnectionElement connection;
 
         public CustomHolder(BlockState initialBlockState) {
-            connection = new ConnectionElement(new Vec3d(0, 10, 0));
-            connection.setHolder(this);
             this.manaFill = this.addElement(new BlockDisplayElement(this.getState(initialBlockState)));
             this.manaFill.setOffset(new Vec3d(-0.375, 0, -0.375));
             this.manaFill.setScale(new Vector3f(0.75f, 0.2f * initialBlockState.get(MANA_LEVEL) + (float)Math.sin(age / 50f) * 0.05f, 0.75f));
@@ -122,14 +119,14 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
             var blockBoundAttachment = ((BlockBoundAttachment)attachment);
             var blockPos = blockBoundAttachment.getBlockPos();
             var manaLevel = blockBoundAttachment.getBlockState().get(MANA_LEVEL);
-            var offset = (float)Math.sin(age / 50f) * 0.05f;
-            this.manaFill.setScale(new Vector3f(0.75f, 0.2f * manaLevel + offset, 0.75f));
+            var yOffset = (float)Math.sin(age / 50f) * 0.05f;
+            this.manaFill.setScale(new Vector3f(0.75f, 0.2f * manaLevel + yOffset, 0.75f));
             this.manaFill.setBlockState(this.getState(this.getAttachment().getWorld(), blockPos));
 
             var world = attachment.getWorld();
             if (manaLevel > 0) {
                 if (age % (4 - manaLevel) == 0) {
-                    world.spawnParticles(ParticleTypes.UNDERWATER, blockPos.getX() + 0.5, blockPos.getY() + 0.75 + offset, blockPos.getZ() + 0.5, 10, 0.15, 0.15, 0.15, 1);
+                    world.spawnParticles(ParticleTypes.UNDERWATER, blockPos.getX() + 0.5, blockPos.getY() + 0.75 + yOffset, blockPos.getZ() + 0.5, 10, 0.15, 0.15, 0.15, 1);
                 }
                 if (manaBubbles.size() < manaLevel * 10) {
                     Vec3d velocity = new Vec3d((random.nextFloat() - 0.5) * 0.2, 0.05f * manaLevel, (random.nextFloat() - 0.5) * 0.2);
@@ -202,31 +199,6 @@ public class ManaCauldron extends Block implements PolymerBlock, BlockWithMoving
             super.tick();
             velocity = velocity.multiply(0.9, 1, 0.9);
             this.setOffset(this.getOffset().add(velocity));
-        }
-    }
-
-    public static class ConnectionElement extends BlockDisplayElement {
-        private static final BlockState DEFAULT_STATE = Blocks.BEDROCK.getDefaultState();
-        private final Vec3d endOffset;
-        private int age;
-
-        public ConnectionElement(Vec3d startPos, Vec3d endPos) {
-            this(endPos.subtract(startPos));
-        }
-
-        public ConnectionElement(Vec3d endOffset) {
-            super(DEFAULT_STATE);
-            this.endOffset = endOffset;
-        }
-
-        @Override
-        public void tick() {
-            this.age++;
-            this.setOffset(Vec3d.ZERO.lerp(endOffset, age / 200f));
-            if (age > 200) {
-                this.age = 0;
-            }
-            super.tick();
         }
     }
 }
