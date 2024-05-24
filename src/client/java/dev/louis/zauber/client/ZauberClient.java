@@ -3,6 +3,7 @@ package dev.louis.zauber.client;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
+import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.client.keybind.SpellKeyBinding;
 import dev.louis.zauber.client.keybind.SpellKeybindManager;
 import dev.louis.zauber.client.render.entity.ManaHorseEntityRenderer;
@@ -16,6 +17,7 @@ import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
@@ -26,6 +28,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.particle.DragonBreathParticle;
 import net.minecraft.client.particle.ExplosionLargeParticle;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -80,6 +83,9 @@ public class ZauberClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION, ExplosionLargeParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION_EMITTER, ExplosionLargeParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_RUNE, DragonBreathParticle.Factory::new);
+
+        BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_TORCH, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_WALL_TORCH, RenderLayer.getCutout());
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides){

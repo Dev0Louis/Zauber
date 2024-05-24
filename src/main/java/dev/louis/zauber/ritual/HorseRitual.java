@@ -2,7 +2,7 @@ package dev.louis.zauber.ritual;
 
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
-import dev.louis.zauber.items.ZauberItems;
+import dev.louis.zauber.item.ZauberItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.HorseEntity;
@@ -46,28 +46,6 @@ public class HorseRitual extends Ritual {
     public void tick() {
         if(age % 5 == 0) {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
-
-            /*final int steps = 10;
-            final Vec3d horsePos = horse.getPos();
-            final Vec3d ritualPos = pos.toCenterPos();
-
-            for (int i = 0; i < (steps + 1); i++) {
-                var x = MathHelper.lerp((double) i / steps, horsePos.x, ritualPos.x);
-                var y = MathHelper.lerp((double) i / steps, horsePos.y, ritualPos.y);
-                var z = MathHelper.lerp((double) i / steps, horsePos.z, ritualPos.z);
-                Vec3d pos = new Vec3d(x, y + 0.6, z);
-                ((ServerWorld)world).spawnParticles(
-                        ZauberParticleTypes.MANA_RUNE,
-                        pos.getX(),
-                        pos.getY(),
-                        pos.getZ(),
-                        1,
-                        0.3,
-                        0.3,
-                        0.3,
-                        0.01
-                );
-            }*/
         }
     }
 

@@ -1,10 +1,10 @@
 package dev.louis.zauber.block.entity;
 
+import dev.louis.zauber.block.DarknessAccumulatorBlock;
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
-import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.ritual.Ritual;
 import net.minecraft.block.BlockState;
@@ -14,6 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -23,7 +24,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -32,6 +32,7 @@ import net.minecraft.world.poi.PointOfInterest;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     private static final String[] RAI_NAMES = {"rai", "enjarai", "silliestpersonalive"};
 
     public static final BlockEntityType<RitualStoneBlockEntity> TYPE = BlockEntityType.Builder.create(RitualStoneBlockEntity::new, ZauberBlocks.RITUAL_STONE).build(null);
+    private static final Vector3f PARTICLE_COLOR = new Vector3f(0, 0, 1);
     private static final boolean EXPLOSION_CHAINS = true;
     private static final BlockState INACTIVE_STATE = Blocks.OBSIDIAN.getDefaultState();
     private static final BlockState ACTIVE_STATE = Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
@@ -124,8 +126,6 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     }
 
     public void onBlockClicked(PlayerEntity player, World world, BlockPos pos) {
-        System.out.println("CLICKED " + player.getNameForScoreboard() + " state " + this.state + " storedStack " + this.storedStack);
-
         switch (this.state) {
             case INACTIVE -> {
 
@@ -184,8 +184,8 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     private void makeBreakItemEffect(ServerWorld world, Position pos, ItemStack itemStack) {
         ParticleHelper.spawnParticle(
                 world,
-                new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack),
-                pos
+                pos,
+                new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack)
         );
         SoundHelper.playSound(
                 world,
@@ -241,28 +241,13 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     }
 
     private void spawnConnectionParticles(Position endPos, Position ritualPos) {
-        final int steps = 10;
-        for (int i = 0; i < steps; i++) {
-            var delta = (double) i / steps;
-            delta = (delta * 0.9) + 0.1;
-            var x = MathHelper.lerp(delta, endPos.getX(), ritualPos.getX());
-            var y = MathHelper.lerp(delta, endPos.getY(), ritualPos.getY());
-            var z = MathHelper.lerp(delta, endPos.getZ(), ritualPos.getZ());
-            Vec3d pos = new Vec3d(x, y, z);
-
-
-            ((ServerWorld)world).spawnParticles(
-                    ZauberParticleTypes.MANA_RUNE,
-                    pos.getX(),
-                    pos.getY(),
-                    pos.getZ(),
-                    1,
-                    0,
-                    0,
-                    0,
-                    0.0
-            );
-        }
+        ParticleHelper.spawnParticleLine(
+                (ServerWorld) world,
+                ritualPos,
+                endPos,
+                new DustParticleEffect(PARTICLE_COLOR, 1),
+                10
+        );
     }
 
     public Stream<PointOfInterest> getRitualBlockPoses() {
@@ -289,8 +274,25 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     public Stream<BlockPos> getFilledManaStorages() {
         return getRitualBlockPoses().filter(poi -> {
             var blockState = world.getBlockState(poi.getPos());
-            return blockState.isOf(ZauberBlocks.MANA_STORAGE) && blockState.get(ManaCauldron.MANA_LEVEL) > 0;
+            return blockState.isOf(ZauberBlocks.MANA_CAULDRON) && blockState.get(ManaCauldron.MANA_LEVEL) > 0;
         }).map(PointOfInterest::getPos);
+    }
+
+    public Stream<BlockPos> getFilledDarknessAccumulators() {
+        if (world instanceof ServerWorld serverWorld) {
+            var a = serverWorld.getPointOfInterestStorage()
+                    .getInSquare(
+                            poiType -> poiType.matchesKey(ZauberPointOfInterestTypes.DARKNESS_ACCUMULATOR_KEY),
+                            this.pos,
+                            20,
+                            PointOfInterestStorage.OccupationStatus.ANY
+                    ).toList();
+            System.out.println(a.size());
+            var b = a.stream().filter(poi -> world.getBlockState(poi.getPos()).get(DarknessAccumulatorBlock.HAS_DARKNESS)).map(PointOfInterest::getPos).toList();
+            System.out.println("2: " + b.size());
+            return b.stream();
+        }
+        return Stream.empty();
     }
 
     public Stream<ItemStack> getAvailableItemStacks() {

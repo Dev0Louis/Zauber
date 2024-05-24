@@ -28,6 +28,7 @@ public abstract class Ritual {
     public static void init() {
         //The order is important as the Rituals are checked in order.
         RITUAL_STARTERS.add(HorseRitual::tryStart);
+        RITUAL_STARTERS.add(HeartOfDarknessRitual::tryStart);
     }
 
 

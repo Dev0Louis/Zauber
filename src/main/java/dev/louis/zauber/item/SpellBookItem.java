@@ -1,7 +1,7 @@
-package dev.louis.zauber.items;
+package dev.louis.zauber.item;
 
+import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
-import dev.louis.nebula.api.spell.SpellType;;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
@@ -20,6 +20,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+
+;
 
 public class SpellBookItem extends Item implements PolymerItem, PolymerKeepModel, PolymerClientDecoded {
     public SpellBookItem(Settings settings) {

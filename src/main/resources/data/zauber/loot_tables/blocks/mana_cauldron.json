@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "zauber:mana_storage"
+          "name": "minecraft:cauldron"
         }
       ]
     }

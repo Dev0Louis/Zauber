@@ -1,8 +1,12 @@
 package dev.louis.zauber.entity;
 
 import dev.louis.nebula.api.NebulaPlayer;
+import dev.louis.zauber.Zauber;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.spell.ManaHorseSpell;
+import eu.pb4.polymer.core.api.entity.PolymerEntity;
+import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
+import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -13,6 +17,7 @@ import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.random.Random;
@@ -23,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 /*
 TODO: Making it item bound, making it shake before it returns in the item. Better death sound and effect.
  */
-public class ManaHorseEntity extends HorseEntity implements Ownable {
+public class ManaHorseEntity extends HorseEntity implements PolymerEntity, PolymerClientDecoded, PolymerKeepModel, Ownable {
     public static final EntityType<ManaHorseEntity> TYPE =
             EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).setDimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
     private ManaHorseSpell spell;
@@ -176,6 +181,7 @@ public class ManaHorseEntity extends HorseEntity implements Ownable {
 
     @Override
     public void setJumpStrength(int strength) {
+        //remove hasSaddle check
         if (strength < 0) {
             strength = 0;
         } else {
@@ -188,5 +194,11 @@ public class ManaHorseEntity extends HorseEntity implements Ownable {
         } else {
             this.jumpStrength = 0.4F + 0.4F * (float)strength / 90.0F;
         }
+    }
+
+    @Override
+    public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
+        if (Zauber.isClientModded(player)) return TYPE;
+        return EntityType.HORSE;
     }
 }

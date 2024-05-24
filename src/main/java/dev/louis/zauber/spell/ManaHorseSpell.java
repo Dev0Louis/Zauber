@@ -15,6 +15,7 @@ import net.minecraft.world.event.GameEvent;
 
 public class ManaHorseSpell extends Spell {
     private static final Identifier GOAT_HORN_ID = Identifier.tryParse("call_goat_horn");
+    private static final int LIFETIME = 100;
 
     public ManaHorseSpell(SpellType<?> spellType, PlayerEntity caster) {
         super(spellType, caster);
@@ -34,17 +35,6 @@ public class ManaHorseSpell extends Spell {
     }
 
     @Override
-    public void tick() {
-        if(this.getCaster().getManaManager().hasEnoughMana(1)) {
-            if(this.age % 60 == 0) {
-                this.getCaster().getManaManager().drainMana(1);
-            }
-        } else {
-            this.stop();
-        }
-    }
-
-    @Override
     public boolean isCastable() {
         return super.isCastable() && !caster.hasVehicle();
     }
@@ -56,7 +46,7 @@ public class ManaHorseSpell extends Spell {
 
     @Override
     public int getDuration() {
-        return 20 * 100;
+        return 20 * 30;
     }
 
     private static void playSound(World world, PlayerEntity player) {

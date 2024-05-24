@@ -2,9 +2,9 @@ package dev.louis.zauber.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.items.SpellBookItem;
-import dev.louis.nebula.api.spell.SpellType;;
+import dev.louis.zauber.item.SpellBookItem;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -18,6 +18,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+
+;
 
 public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, PolymerRecipe {
     public static final SpellRecipe EMPTY = new SpellRecipe(new ItemStack(Items.AIR));

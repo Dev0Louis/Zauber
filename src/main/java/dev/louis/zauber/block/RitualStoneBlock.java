@@ -26,6 +26,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -86,6 +87,7 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
         return new CustomHolder(world, pos, initialBlockState);
     }
 
+    @SuppressWarnings("UnreachableCode")
     private static class CustomHolder extends ElementHolder {
         private static final BlockState INACTIVE_STATE = Blocks.OBSIDIAN.getDefaultState();
         private static final BlockState ACTIVE_STATE = Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
@@ -93,14 +95,14 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
         private static final BlockState PLATE_STATE = Blocks.SMOOTH_STONE.getDefaultState();
 
         private final Collection<BlockDisplayElement> indicators = new ArrayList<>();
+        private final BlockDisplayElement ritualPlate;
         private ItemDisplayElement itemDisplay;
-        private ConnectionElement connection;
         private int age;
 
 
 
         public CustomHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-            BlockDisplayElement ritualPlate = new BlockDisplayElement(this.getState(world, initialBlockState));
+            this.ritualPlate = new BlockDisplayElement(this.getState(world, initialBlockState));
             final float xSize = 0.8f;
             final float ySize = 1f;
             ritualPlate.setBlockState(PLATE_STATE);
@@ -122,13 +124,7 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
 
             this.addElement(itemDisplay);
 
-            connection = new ConnectionElement(new Vec3d(0, 10, 0), connectionElement -> {
-                var optionalItemSacrificer = world.getBlockEntity(pos, RitualStoneBlockEntity.TYPE).get().getRandomItemSacrificer();
-                optionalItemSacrificer.ifPresent(itemSacrificer -> {
-                    connectionElement.setEndOffset(pos.toCenterPos(), itemSacrificer.getPos().toCenterPos());
-                });
-            });
-            this.addElement(connection);
+
         }
 
         public BlockDisplayElement createBlockDisplayElement(double x, double z) {
@@ -141,13 +137,18 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
         @Override
         protected void onTick() {
             this.age++;
-            this.connection.tick();
             itemDisplay.setScale(new Vector3f(0.375f));
             itemDisplay.setOffset(new Vec3d(0, 0.8, 0));
 
             this.itemDisplay.setRightRotation(RotationAxis.POSITIVE_Y.rotationDegrees(this.age / 5f));
             BlockAwareAttachment attachment = (BlockAwareAttachment) this.getAttachment();
             if (attachment == null) throw new IllegalStateException("Attachment is null");
+            this.ritualPlate.setBrightness(
+                    new Brightness(
+                            attachment.getWorld().getLightLevel(LightType.BLOCK, attachment.getBlockPos().up()),
+                            attachment.getWorld().getLightLevel(LightType.SKY, attachment.getBlockPos().up())
+                    )
+            );
             this.itemDisplay.setItem(this.getStack(attachment.getWorld(), attachment.getBlockPos()));
             var optionalRitualStoneBlock = attachment.getWorld().getBlockEntity(attachment.getBlockPos(), RitualStoneBlockEntity.TYPE);
             optionalRitualStoneBlock.ifPresent(ritualStoneBlockEntity -> {
@@ -177,6 +178,7 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
         }
     }
 
+    @SuppressWarnings("UnreachableCode")
     public static class ConnectionElement extends BlockDisplayElement {
         private static final BlockState DEFAULT_STATE = Blocks.BEDROCK.getDefaultState();
         private final Consumer<ConnectionElement> consumer;

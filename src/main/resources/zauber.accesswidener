@@ -10,3 +10,4 @@ accessible method net/minecraft/entity/LivingEntity applyDamage (Lnet/minecraft/
 accessible method net/minecraft/entity/damage/DamageSource <init> (Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;)V
 accessible field net/minecraft/block/AbstractCauldronBlock OUTLINE_SHAPE Lnet/minecraft/util/shape/VoxelShape;
 accessible field net/minecraft/block/AbstractCauldronBlock RAYCAST_SHAPE Lnet/minecraft/util/shape/VoxelShape;
+accessible method net/minecraft/block/cauldron/CauldronBehavior createMap (Ljava/lang/String;)Lnet/minecraft/block/cauldron/CauldronBehavior$CauldronBehaviorMap;

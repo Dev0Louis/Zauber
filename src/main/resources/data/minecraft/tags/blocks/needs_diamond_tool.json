@@ -4,7 +4,6 @@
     "zauber:spell_table",
     "zauber:ritual_stone",
     "zauber:item_sacrificer",
-    "zauber:ritual_stone",
-    "zauber:mana_storage"
+    "zauber:ritual_stone"
   ]
 }

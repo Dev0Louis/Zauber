@@ -3,13 +3,14 @@ package dev.louis.zauber;
 import com.mojang.logging.LogUtils;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.block.TrappingBedBlock;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.HauntingDamageEntity;
 import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.entity.SpellArrowEntity;
-import dev.louis.zauber.items.ZauberItems;
-import dev.louis.zauber.mana.effect.ManaEffects;
+import dev.louis.zauber.item.ZauberItems;
+import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.networking.ICanHasZauberPayload;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
@@ -24,20 +25,27 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.block.BedBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.List;
 
+@SuppressWarnings("UnreachableCode")
 public class Zauber implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "zauber";
@@ -68,9 +76,22 @@ public class Zauber implements ModInitializer {
         ZauberBlocks.init();
         ZauberPointOfInterestTypes.init();
 
+        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            if (world.isClient) return ActionResult.PASS;
+            var state =  world.getBlockState(hitResult.getBlockPos());
+            if (player.getStackInHand(hand).isOf(ZauberItems.HEART_OF_THE_DARKNESS) && state.isOf(Blocks.BLACK_BED)) {
+                world.setBlockState(hitResult.getBlockPos(), TrappingBedBlock.getStateFor(state), Block.FORCE_STATE);
+                var offsetBlockPos = hitResult.getBlockPos().offset(TrappingBedBlock.getDirectionTowardsOtherPart(state.get(BedBlock.PART), state.get(BedBlock.FACING)));
+                var otherState = world.getBlockState(offsetBlockPos);
+                world.setBlockState(offsetBlockPos, TrappingBedBlock.getStateFor(otherState), Block.FORCE_STATE);
+                return ActionResult.SUCCESS;
+            }
+            return ActionResult.PASS;
+        });
+
         registerEntity("spell_arrow", SpellArrowEntity.TYPE);
         registerEntity("haunting_damage", HauntingDamageEntity.TYPE);
-        registerEntity("mana_horse", ManaHorseEntity.TYPE);
+        registerEntity1("mana_horse", ManaHorseEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
         //FabricDefaultAttributeRegistry.register(HauntingSword.TYPE, HauntingSword.createBaseAttributes());
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
@@ -78,7 +99,11 @@ public class Zauber implements ModInitializer {
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
 
         Ritual.init();
-        ManaEffects.init();
+        ZauberPotionEffects.init();
+    }
+
+    public static <T extends Entity> void registerEntity1(String path, EntityType<T> type) {
+        Registry.register(Registries.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, path), type);
     }
 
     public static <T extends Entity> void registerEntity(String path, EntityType<T> type) {
@@ -129,4 +154,11 @@ public class Zauber implements ModInitializer {
         return false;
     }
 
+    public static boolean isInTrappingBed(PlayerEntity player) {
+        return player.getSleepingPosition().map(blockPos -> player.getWorld().getBlockState(blockPos).isOf(ZauberBlocks.TRAPPING_BED)).orElse(false);
+    }
+
+    public static boolean isNotInTrappingBed(PlayerEntity player) {
+        return !isInTrappingBed(player);
+    }
 }

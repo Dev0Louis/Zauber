@@ -12,14 +12,14 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-public class ManaEffects {
+public class ZauberPotionEffects {
 
-    private static Potion MANA_INSTANT;
-    private static Potion STRONG_MANA_INSTANT;
-    private static Potion MANA_REGENERATION;
-    private static Potion STRONG_MANA_REGENERATION;
-    private static InstantStatusEffect MANA_INSTANT_EFFECT = new InstantManaStatusEffect();
-    private static StatusEffect MANA_REGENERATION_EFFECT = new ManaRegenerationStatusEffect();
+    public static Potion MANA_INSTANT;
+    public static Potion STRONG_MANA_INSTANT;
+    public static Potion MANA_REGENERATION;
+    public static Potion STRONG_MANA_REGENERATION;
+    public static InstantStatusEffect MANA_INSTANT_EFFECT = new InstantManaStatusEffect();
+    public static StatusEffect MANA_REGENERATION_EFFECT = new ManaRegenerationStatusEffect();
 
 
     public static void init() {

@@ -1,5 +1,7 @@
 package dev.louis.zauber.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import dev.louis.zauber.Zauber;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -40,5 +42,14 @@ public class ServerPlayNetworkHandlerMixin {
             ci.cancel();
             player.currentScreenHandler.syncState();
         }
+    }
+
+    @ModifyExpressionValue(
+            method = "onClientCommand",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;isSleeping()Z")
+    )
+    public boolean a(boolean isSleeping) {
+        return isSleeping && !Zauber.isInTrappingBed(player);
+
     }
 }

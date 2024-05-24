@@ -1,8 +1,11 @@
 package dev.louis.zauber.mixin;
 
+import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.BlockEvent;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -13,20 +16,25 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import static dev.louis.zauber.block.SpellTableBlock.CHARGE;
 import static dev.louis.zauber.block.SpellTableBlock.MAX_CHARGE;
 
 @Mixin(ServerWorld.class)
-public class ServerWorldMixin {
+public abstract class ServerWorldMixin {
+    @Shadow protected abstract boolean processBlockEvent(BlockEvent event);
+
     @Inject(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LightningEntity;setCosmetic(Z)V"), locals = LocalCapture.CAPTURE_FAILHARD)
     public void onNaturalLightningImpact(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci, ChunkPos chunkPos, boolean bl, int i, int j, Profiler profiler, BlockPos blockPos, LocalDifficulty localDifficulty, boolean bl2, LightningEntity lightningEntity) {
         Vec3i vec3i = new Vec3i(1, 1, 1);
@@ -50,5 +58,13 @@ public class ServerWorldMixin {
             world.setBlockState(pos, blockState);
         });
         //new Box(blockPos.getX() - 3.0, blockPos.getY() - 3.0, blockPos.getZ() - 3.0, this.getX() + 3.0, this.getY() + 6.0 + 3.0, this.getZ() + 3.0)
+    }
+
+    @ModifyArg(
+            method = "wakeSleepingPlayers",
+            at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;")
+    )
+    public Predicate<PlayerEntity> playerEntityPredicate(Predicate<PlayerEntity> predicate) {
+        return predicate.and(Zauber::isNotInTrappingBed);
     }
 }

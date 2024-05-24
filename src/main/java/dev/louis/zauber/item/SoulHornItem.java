@@ -1,4 +1,4 @@
-package dev.louis.zauber.items;
+package dev.louis.zauber.item;
 
 import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.item.PolymerItem;

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "zauber:block/extinguished_wall_torch"
+    },
+    "facing=north": {
+      "model": "zauber:block/extinguished_wall_torch",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "zauber:block/extinguished_wall_torch",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "zauber:block/extinguished_wall_torch",
+      "y": 180
+    }
+  }
+}
