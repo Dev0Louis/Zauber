@@ -26,6 +26,7 @@ public class SoulHornItem extends Item implements PolymerItem, PolymerKeepModel,
             if(!Zauber.isClientModded(serverUser)) return TypedActionResult.fail(user.getStackInHand(hand));
             boolean casted = serverUser.getSpellManager().cast(Zauber.Spells.MANA_HORSE);
             if (casted) {
+                user.getStackInHand(hand).decrement(1);
                 return TypedActionResult.consume(user.getStackInHand(hand));
             }
         }

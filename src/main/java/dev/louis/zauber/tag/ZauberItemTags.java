@@ -7,7 +7,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class ZauberItemTags {
-    public static final TagKey<Item> MANA_CONTAINING = of("mana_containing");
+    public static final TagKey<Item> BLOOD_CONTAINING = of("blood_containing");
 
     private static TagKey<Item> of(String id) {
         return TagKey.of(RegistryKeys.ITEM, Identifier.of(Zauber.MOD_ID, id));

@@ -48,7 +48,7 @@ public class DarknessAccumulatorBlock extends TransparentBlock implements Polyme
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (!state.get(HAS_DARKNESS) && world.getBaseLightLevel(pos, 0) < 9) {
+        if (!state.get(HAS_DARKNESS) && world.getBaseLightLevel(pos, 0) == 0) {
             if (random.nextFloat() > 0.9) world.setBlockState(pos, state.with(HAS_DARKNESS, true));
         }
     }
@@ -87,6 +87,7 @@ public class DarknessAccumulatorBlock extends TransparentBlock implements Polyme
         public static BlockState DARKNESS = Blocks.BLACK_CONCRETE.getDefaultState();
         public static BlockState AIR = Blocks.AIR.getDefaultState();
         private final BlockDisplayElement darkness;
+        private final BlockDisplayElement sculkFloor;
 
         @SuppressWarnings("UnreachableCode")
         public CustomHolder(BlockState blockState) {
@@ -101,6 +102,8 @@ public class DarknessAccumulatorBlock extends TransparentBlock implements Polyme
 
             darkness = this.addElement(new BlockDisplayElement(this.getDarknessState(blockState)));
             darkness.setBrightness(new Brightness(Integer.MIN_VALUE, Integer.MIN_VALUE));
+
+            this.sculkFloor = this.addElement(new BlockDisplayElement(Blocks.SCULK.getDefaultState()));
         }
 
         private BlockState getDarknessState(BlockState state) {
@@ -112,7 +115,10 @@ public class DarknessAccumulatorBlock extends TransparentBlock implements Polyme
             darkness.setBlockState(this.getDarknessState(((BlockBoundAttachment)this.getAttachment()).getBlockState()));
             var size = 0.97f;
             darkness.setScale(new Vector3f(size));
-            darkness.setOffset(new Vec3d(-size / 2f , -0.5, -size / 2f));
+            darkness.setOffset(new Vec3d(-size / 2f , -0.48, -size / 2f));
+            size = 0.9f;
+            this.sculkFloor.setScale(new Vector3f(0.9f, 0.1f, 0.9f));
+            this.sculkFloor.setOffset(new Vec3d(-size / 2, -0.49, -size / 2));
         }
     }
 }

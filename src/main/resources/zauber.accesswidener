@@ -11,3 +11,4 @@ accessible method net/minecraft/entity/damage/DamageSource <init> (Lnet/minecraf
 accessible field net/minecraft/block/AbstractCauldronBlock OUTLINE_SHAPE Lnet/minecraft/util/shape/VoxelShape;
 accessible field net/minecraft/block/AbstractCauldronBlock RAYCAST_SHAPE Lnet/minecraft/util/shape/VoxelShape;
 accessible method net/minecraft/block/cauldron/CauldronBehavior createMap (Ljava/lang/String;)Lnet/minecraft/block/cauldron/CauldronBehavior$CauldronBehaviorMap;
+accessible method net/minecraft/item/CompassItem getLodestoneDimension (Lnet/minecraft/nbt/NbtCompound;)Ljava/util/Optional;

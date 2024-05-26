@@ -4,15 +4,13 @@ import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.block.entity.BlockEntityWithItemStack;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity.State;
+import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -35,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class RitualStoneBlock extends BlockWithEntity implements BlockWithElementHolder {
+public class RitualStoneBlock extends BlockWithEntity implements BlockWithElementHolder, PolymerBlock {
     public static final MapCodec<RitualStoneBlock> CODEC = createCodec(RitualStoneBlock::new);
 
     public RitualStoneBlock(Settings settings) {
@@ -85,6 +83,11 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new CustomHolder(world, pos, initialBlockState);
+    }
+
+    @Override
+    public Block getPolymerBlock(BlockState state) {
+        return Blocks.LODESTONE;
     }
 
     @SuppressWarnings("UnreachableCode")

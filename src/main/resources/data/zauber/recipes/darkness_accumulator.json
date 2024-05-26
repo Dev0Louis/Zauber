@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "IGI",
+    "SIS"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "minecraft:iron_bars"
+    },
+    "S": {
+      "item": "minecraft:sculk"
+    }
+  },
+  "result": {
+    "item": "zauber:item_sacrificer",
+    "count": 1
+  }
+}
+

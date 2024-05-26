@@ -50,7 +50,7 @@ public class HeartOfTheDarknessItem extends Item implements PolymerItem, Polymer
                 1,
                 1
         );
-        ParticleHelper.spawnParticle(
+        ParticleHelper.spawn50Particles(
                 world,
                 pos,
                 new DustParticleEffect(new Vector3f(), 1f)

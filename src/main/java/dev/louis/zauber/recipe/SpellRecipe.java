@@ -19,8 +19,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-;
-
 public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, PolymerRecipe {
     public static final SpellRecipe EMPTY = new SpellRecipe(new ItemStack(Items.AIR));
 

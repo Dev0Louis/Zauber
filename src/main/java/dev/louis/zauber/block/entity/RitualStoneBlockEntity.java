@@ -3,8 +3,8 @@ package dev.louis.zauber.block.entity;
 import dev.louis.zauber.block.DarknessAccumulatorBlock;
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.ZauberBlocks;
+import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.helper.ParticleHelper;
-import dev.louis.zauber.helper.SoundHelper;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.ritual.Ritual;
 import net.minecraft.block.BlockState;
@@ -15,8 +15,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -76,15 +74,15 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
             this.fail();
             return;
         }
-
-        ritual.age++;
-        ritual.tick();
-
         if(ritual.shouldStop()) {
             this.state = State.INACTIVE;
             ritual.finish();
             ritual = null;
+            return;
         }
+
+        ritual.age++;
+        ritual.tick();
     }
 
     private void fail() {
@@ -151,12 +149,12 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                 interactionTimes++;
                 if (interactionTimes > 10) {
                     this.getRandomNonEmptyItemSacrificer().ifPresentOrElse(itemSacrificerBlockEntity -> {
-                        this.makeBreakItemEffect((ServerWorld) world, itemSacrificerBlockEntity.getPos().toCenterPos().add(0, 1, 0), itemSacrificerBlockEntity.getStoredStack());
+                        EffectHelper.playBreakItemEffect((ServerWorld) world, itemSacrificerBlockEntity.getPos().toCenterPos().add(0, 1, 0), itemSacrificerBlockEntity.getStoredStack());
                         itemSacrificerBlockEntity.setStoredStack(ItemStack.EMPTY);
                     }, () -> {
                         //if not present
                         if (!this.storedStack.isEmpty()) {
-                            this.makeBreakItemEffect((ServerWorld) world, this.getPos().toCenterPos().add(0, 1, 0), this.getStoredStack());
+                            EffectHelper.playBreakItemEffect((ServerWorld) world, this.getPos().toCenterPos().add(0, 1, 0), this.getStoredStack());
                             this.setStoredStack(ItemStack.EMPTY);
                         }
                     });
@@ -179,22 +177,6 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
         if (itemStack.isOf(Items.NETHER_WART) && ArrayUtils.contains(RAI_NAMES, itemStack.getName().getString())) {
             player.sendMessage(Text.literal("Zauber is not a rites ripoff...").setStyle(Style.EMPTY.withColor(Formatting.GRAY)), false);
         }
-    }
-
-    private void makeBreakItemEffect(ServerWorld world, Position pos, ItemStack itemStack) {
-        ParticleHelper.spawnParticle(
-                world,
-                pos,
-                new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack)
-        );
-        SoundHelper.playSound(
-                world,
-                this.getPos(),
-                SoundEvents.ITEM_SHIELD_BREAK,
-                SoundCategory.AMBIENT,
-                1,
-                1
-        );
     }
 
     public Optional<ItemSacrificerBlockEntity> getRandomNonEmptyItemSacrificer() {
@@ -268,13 +250,20 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     }
 
     public Stream<ItemSacrificerBlockEntity> getNonEmptyItemSacrificers() {
-        return this.getItemSacrificers().filter(blockEntity -> blockEntity.storedStack.isEmpty());
+        return this.getItemSacrificers().filter(blockEntity -> !blockEntity.storedStack.isEmpty());
     }
 
     public Stream<BlockPos> getFilledManaStorages() {
         return getRitualBlockPoses().filter(poi -> {
             var blockState = world.getBlockState(poi.getPos());
             return blockState.isOf(ZauberBlocks.MANA_CAULDRON) && blockState.get(ManaCauldron.MANA_LEVEL) > 0;
+        }).map(PointOfInterest::getPos);
+    }
+
+    public Stream<BlockPos> getFullManaStorages() {
+        return getRitualBlockPoses().filter(poi -> {
+            BlockState blockState = world.getBlockState(poi.getPos());
+            return blockState.isOf(ZauberBlocks.MANA_CAULDRON) && blockState.get(ManaCauldron.MANA_LEVEL) == 2;
         }).map(PointOfInterest::getPos);
     }
 
@@ -287,9 +276,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                             20,
                             PointOfInterestStorage.OccupationStatus.ANY
                     ).toList();
-            System.out.println(a.size());
             var b = a.stream().filter(poi -> world.getBlockState(poi.getPos()).get(DarknessAccumulatorBlock.HAS_DARKNESS)).map(PointOfInterest::getPos).toList();
-            System.out.println("2: " + b.size());
             return b.stream();
         }
         return Stream.empty();

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "   ",
+    " S ",
+    "QQQ"
+  ],
+  "key": {
+    "Q": {
+      "item": "minecraft:quartz_slab"
+    },
+    "S": {
+      "item": "minecraft:stone_brick_wall"
+    }
+  },
+  "result": {
+    "item": "zauber:item_sacrificer",
+    "count": 1
+  }
+}
+

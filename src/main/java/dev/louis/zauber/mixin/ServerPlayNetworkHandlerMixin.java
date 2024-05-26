@@ -48,8 +48,7 @@ public class ServerPlayNetworkHandlerMixin {
             method = "onClientCommand",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;isSleeping()Z")
     )
-    public boolean a(boolean isSleeping) {
+    public boolean dontWakeupPlayerIfInTrappingBed(boolean isSleeping) {
         return isSleeping && !Zauber.isInTrappingBed(player);
-
     }
 }

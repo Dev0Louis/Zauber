@@ -1,6 +1,7 @@
 package dev.louis.zauber.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
 import net.minecraft.entity.Entity;
@@ -12,6 +13,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityMixin extends Entity {
@@ -32,5 +34,20 @@ public abstract class ItemEntityMixin extends Entity {
             return isEmpty || willDisappearByLight;
         }
         return isEmpty;
+    }
+
+    @WrapWithCondition(
+            method = "tick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/ItemEntity;discard()V"
+            ),
+            slice = @Slice(
+                    from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ItemEntity;updateWaterState()Z")
+            )
+    )
+    public boolean a(ItemEntity instance) {
+        //if (instance)
+        return true;
     }
 }

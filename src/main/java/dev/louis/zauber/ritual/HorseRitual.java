@@ -3,6 +3,7 @@ package dev.louis.zauber.ritual;
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.item.ZauberItems;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.HorseEntity;
@@ -35,7 +36,6 @@ public class HorseRitual extends Ritual {
     private final BlockPos manaStorageBlockPos;
     private final HorseEntity horse;
 
-    //TODO: Make goat horn only consume while the ritual is running.
     protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, BlockPos manaStorageBlockPos, HorseEntity horse) {
         super(world, blockEntity);
         this.manaStorageBlockPos = manaStorageBlockPos;
@@ -65,8 +65,13 @@ public class HorseRitual extends Ritual {
         var manaStorageState = world.getBlockState(manaStorageBlockPos);
         int manaLevel = manaStorageState.get(ManaCauldron.MANA_LEVEL);
         if (horse.isAlive() && manaLevel >= 1 && HorseRitual.isCallGoatHorn(ritualStoneBlockEntity.getStoredStack())) {
+            manaLevel--;
             ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);
-            world.setBlockState(manaStorageBlockPos, manaStorageState.with(ManaCauldron.MANA_LEVEL, manaLevel - 1));
+            if (manaLevel == 0) {
+                world.setBlockState(manaStorageBlockPos, Blocks.CAULDRON.getDefaultState());
+            } else {
+                world.setBlockState(manaStorageBlockPos, manaStorageState.with(ManaCauldron.MANA_LEVEL, manaLevel));
+            }
             horse.discard();
             world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 4);
             world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, ZauberItems.SOUL_HORN.getDefaultStack(), 0, 0.3f, 0));

@@ -14,14 +14,12 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class HeartOfDarknessRitual extends Ritual {
     private static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
@@ -59,7 +57,7 @@ public class HeartOfDarknessRitual extends Ritual {
             }
 
             if (this.collectedDarkness >= 1) {
-                ParticleHelper.spawnParticle(
+                ParticleHelper.spawn50Particles(
                         (ServerWorld) world,
                         pos.toCenterPos().add(0, 0.9, 0),
                         new DustParticleEffect(BLACK_PARTICLE_COLOR, 0.3f)
@@ -67,7 +65,7 @@ public class HeartOfDarknessRitual extends Ritual {
             }
         }
         if (this.intenseParticleSpawnTicks-- > 0) {
-            ParticleHelper.spawnParticle(
+            ParticleHelper.spawn50Particles(
                     (ServerWorld) world,
                     pos.toCenterPos().add(0, 0.9, 0),
                     new DustParticleEffect(BLACK_PARTICLE_COLOR, 0.7f)
@@ -81,12 +79,12 @@ public class HeartOfDarknessRitual extends Ritual {
             var pos = nextAccumulatorPos;
             var state = world.getBlockState(pos);
 
-            if (state.get(DarknessAccumulatorBlock.HAS_DARKNESS)) {
-                this.nextAccumulatorPos = null;
+            if (state.contains(DarknessAccumulatorBlock.HAS_DARKNESS) && state.get(DarknessAccumulatorBlock.HAS_DARKNESS)) {
                 this.collectedDarkness++;
                 this.intenseParticleSpawnTicks = 5;
                 this.world.setBlockState(pos, state.with(DarknessAccumulatorBlock.HAS_DARKNESS, false));
             }
+            this.nextAccumulatorPos = null;
 
             SoundHelper.playSound(
                     (ServerWorld) world,
@@ -122,11 +120,6 @@ public class HeartOfDarknessRitual extends Ritual {
     @Override
     public boolean shouldStop() {
         return this.age > 200;
-    }
-
-    @Override
-    public Stream<Position> getConnections() {
-        return Stream.empty();
     }
 
     public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {

@@ -9,6 +9,7 @@ import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.HauntingDamageEntity;
 import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.entity.SpellArrowEntity;
+import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.networking.ICanHasZauberPayload;
@@ -35,12 +36,15 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -51,6 +55,7 @@ public class Zauber implements ModInitializer {
     public static final String MOD_ID = "zauber";
     public static final int POLYMER_NETWORK_VERSION = 2;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
+    public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
 
     @Override
     public void onInitialize() {
@@ -84,6 +89,25 @@ public class Zauber implements ModInitializer {
                 var offsetBlockPos = hitResult.getBlockPos().offset(TrappingBedBlock.getDirectionTowardsOtherPart(state.get(BedBlock.PART), state.get(BedBlock.FACING)));
                 var otherState = world.getBlockState(offsetBlockPos);
                 world.setBlockState(offsetBlockPos, TrappingBedBlock.getStateFor(otherState), Block.FORCE_STATE);
+
+                ParticleHelper.spawnParticles(
+                        (ServerWorld) world,
+                        hitResult.getBlockPos().toCenterPos(),
+                        new DustParticleEffect(BLACK_PARTICLE_COLOR, 1),
+                        5,
+                        0.5f,
+                        0.1f
+                );
+
+                ParticleHelper.spawnParticles(
+                        (ServerWorld) world,
+                        offsetBlockPos.toCenterPos(),
+                        new DustParticleEffect(BLACK_PARTICLE_COLOR, 1),
+                        5,
+                        0.5f,
+                        0.1f
+                );
+
                 return ActionResult.SUCCESS;
             }
             return ActionResult.PASS;
