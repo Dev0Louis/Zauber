@@ -6,9 +6,7 @@ import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.block.TrappingBedBlock;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.entity.HauntingDamageEntity;
-import dev.louis.zauber.entity.ManaHorseEntity;
-import dev.louis.zauber.entity.SpellArrowEntity;
+import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.mana.effect.ZauberPotionEffects;
@@ -19,6 +17,7 @@ import dev.louis.zauber.networking.OptionSyncTask;
 import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
+import dev.louis.zauber.resource.SpellStructureResourceReloadListener;
 import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.spell.*;
 import dev.louis.zauber.tag.ZauberPotionTags;
@@ -26,19 +25,24 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
@@ -115,7 +119,9 @@ public class Zauber implements ModInitializer {
 
         registerEntity("spell_arrow", SpellArrowEntity.TYPE);
         registerEntity("haunting_damage", HauntingDamageEntity.TYPE);
+        registerEntity("ice_peak", IcePeakEntity.TYPE);
         registerEntity1("mana_horse", ManaHorseEntity.TYPE);
+        registerEntity1("thrown_heart_of_the_ice", ThrownHeartOfTheIceEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
         //FabricDefaultAttributeRegistry.register(HauntingSword.TYPE, HauntingSword.createBaseAttributes());
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
@@ -124,6 +130,16 @@ public class Zauber implements ModInitializer {
 
         Ritual.init();
         ZauberPotionEffects.init();
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(CommandManager.literal("dadadada").executes(context -> {
+                var player = context.getSource().getPlayer();
+                IcePeakEntity.TYPE.spawn(player.getServerWorld(), player.getBlockPos(), SpawnReason.COMMAND);
+                return 1;
+            }));
+        });
+
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SpellStructureResourceReloadListener());
     }
 
     public static <T extends Entity> void registerEntity1(String path, EntityType<T> type) {

@@ -15,6 +15,8 @@ public class ZauberItems {
             Items.register(Identifier.of(Zauber.MOD_ID, "soul_horn"), new SoulHornItem(new Item.Settings().rarity(Rarity.RARE)));
     public static final Item SPELL_TABLE =
             Items.register(Identifier.of(Zauber.MOD_ID, "spell_table"), new SpellTableItem(ZauberBlocks.SPELL_TABLE, new Item.Settings().rarity(Rarity.EPIC)));
+    public static final Item HEART_OF_THE_ICE =
+            Items.register(Identifier.of(Zauber.MOD_ID, "heart_of_the_ice"), new HeartOfTheIceItem(new Item.Settings().rarity(Rarity.UNCOMMON)));
     public static final Item HEART_OF_THE_DARKNESS =
             Items.register(Identifier.of(Zauber.MOD_ID, "heart_of_the_darkness"), new HeartOfTheDarknessItem(new Item.Settings().rarity(Rarity.UNCOMMON)));
     public static final Item RITUAL_STONE =

@@ -12,6 +12,7 @@ import dev.louis.zauber.client.screen.SpellTableScreen;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.entity.SpellArrowEntity;
+import dev.louis.zauber.entity.ThrownHeartOfTheIceEntity;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.particle.ZauberParticleTypes;
@@ -29,6 +30,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.particle.DragonBreathParticle;
 import net.minecraft.client.particle.ExplosionLargeParticle;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -86,6 +88,30 @@ public class ZauberClient implements ClientModInitializer {
 
         BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_TORCH, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_WALL_TORCH, RenderLayer.getCutout());
+        EntityRendererRegistry.register(ThrownHeartOfTheIceEntity.TYPE, FlyingItemEntityRenderer::new);
+        // DEBUG CODE
+        /*if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            ClientTickEvents.START_CLIENT_TICK.register(client -> {
+                Debugger.check(client.world != null);
+            });
+            WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+                Debugger.getBoxList().forEach(list -> {
+                    list.forEach(pair -> {
+                        var box1 = pair.getLeft().offset(context.camera().getPos().negate());
+                        var color = pair.getRight();
+                        DebugRenderer.drawBox(
+                                context.matrixStack(),
+                                context.consumers(),
+                                box1,
+                                color.getRed() / 255f,
+                                color.getGreen() / 255f,
+                                color.getBlue() / 255f,
+                                0.7f
+                        );
+                    });
+                });
+            });
+        }*/
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides){

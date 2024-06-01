@@ -125,7 +125,7 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
 
     @Override
     public void markRemoved() {
-        this.holder.destroy();
+        if (holder != null) this.holder.destroy();
         super.markRemoved();
     }
 }
