@@ -36,11 +36,20 @@ public abstract class Ritual {
         RITUAL_STARTERS.add(MudifyRitual::tryStart);
         RITUAL_STARTERS.add(HeartOfTheSeaRitual::tryStart);
         RITUAL_STARTERS.add(TeleportToLodestoneRitual::tryStart);
+
+        //TODO: Data drive this
+        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.COW, Ingredient.ofItems(Items.PORKCHOP)));
         RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.PIG, Ingredient.ofItems(Items.PORKCHOP)));
         RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.RABBIT, Ingredient.ofItems(Items.RABBIT)));
         RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.SHEEP, Ingredient.ofItems(Items.MUTTON)));
         RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.ZOMBIE_HORSE, Ingredient.ofItems(Items.ROTTEN_FLESH)));
         RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.SPIDER, Ingredient.ofItems(Items.SPIDER_EYE)));
+        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.SQUID, Ingredient.ofItems(Items.INK_SAC)));
+        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.GLOW_SQUID, Ingredient.ofItems(Items.GLOW_INK_SAC)));
+
+        RITUAL_STARTERS.add(SmeltingRitual::tryStart);
+
+
     }
 
 

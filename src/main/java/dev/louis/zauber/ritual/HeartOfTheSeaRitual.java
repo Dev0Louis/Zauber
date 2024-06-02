@@ -20,7 +20,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class HeartOfTheSeaRitual extends Ritual {
-    private Vector3f BLUE_COLOR = new Vector3f(0, 0, 0.5f);
+    private final Vector3f BLUE_COLOR = new Vector3f(0, 0, 0.5f);
     private boolean finished;
     @Nullable
     private BlockPos nextItemSacrificerPos;
@@ -62,8 +62,9 @@ public class HeartOfTheSeaRitual extends Ritual {
                         1
                 );
             }
+
+
             connectionTime++;
-            System.out.println(connectionTime);
             if (connectionTime > 80) {
                 world.getBlockEntity(nextItemSacrificerPos, ItemSacrificerBlockEntity.TYPE)
                         .filter(itemSacrificer -> itemSacrificer.getStoredStack().isOf(Items.PRISMARINE_CRYSTALS))

@@ -75,6 +75,11 @@ public class ParticleHelper {
         spawnParticles(world, pos, particleEffect, 50, 0.1f, 0.1f);
     }
 
+    //TODO: Make Path Finding a
+    public static void spawnConnection(ServerWorld world, Position startPos, Position endPos, ParticleEffect particleEffect, int steps) {
+        spawnParticleLine(world, startPos, endPos, particleEffect, steps);
+    }
+
     public static void spawnParticleLine(ServerWorld world, Position startPos, Position endPos, ParticleEffect particleEffect, int steps) {
         for (int i = 0; i < steps; i++) {
             var delta = (double) i / steps;
