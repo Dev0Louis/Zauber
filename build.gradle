@@ -28,6 +28,10 @@ repositories {
     maven {url "https://maven.terraformersmc.com/releases/"}
     maven {url "https://oss.sonatype.org/content/repositories/snapshots/"}
     maven {
+        name = "Ladysnake Libs"
+        url = 'https://maven.ladysnake.org/releases'
+    }
+    maven {
         name 'Xander Maven'
         url 'https://maven.isxander.dev/releases'
     }
@@ -63,6 +67,7 @@ dependencies {
 
     include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
     modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
+    modImplementation "dev.emi:trinkets:${trinkets_version}"
 }
 
 remapJar {
