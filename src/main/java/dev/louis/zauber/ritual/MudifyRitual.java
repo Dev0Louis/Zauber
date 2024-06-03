@@ -54,13 +54,11 @@ public class MudifyRitual extends Ritual {
                     );*/
                     if (transformableBlocks % 15 == 0) manaDue++;
                     transformableBlocks--;
-                    System.out.println("Transformed block at "+ mutablePos + " this is the " + transformableBlocks);
                 } else {
                     mutablePos.move(direction.getOpposite());
                 }
             }
         }
-        System.out.println("Removing " + manaDue);
 
         if (manaDue <= 0) return;
         for (BlockPos blockPos : ritualStoneBlockEntity.getFilledManaStorages().toList()) {
@@ -70,10 +68,8 @@ public class MudifyRitual extends Ritual {
                 manaLevel--;
                 manaDue--;
                 if (manaLevel == 0) {
-                    System.out.println("TURNING INTO CAULDRON. " + blockPos);
                     world.setBlockState(blockPos, Blocks.CAULDRON.getDefaultState());
                 } else {
-                    System.out.println("TURNING INTO lesser Mana Level. " + blockPos);
                     world.setBlockState(blockPos, state.with(ManaCauldron.MANA_LEVEL, manaLevel));
                 }
             }

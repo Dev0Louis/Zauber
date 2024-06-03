@@ -3,13 +3,10 @@
   "id": "zauber",
   "version": "${version}",
   "name": "Zauber",
-  "description": "Cool Spells",
+  "description": "A Mod about discovering the power of Spells and Rituals.",
   "authors": [
     "Louis"
   ],
-  "contact": {
-    "website": "smpmc.eu"
-  },
   "license": "MIT",
   "icon": "assets/zauber/icon.png",
   "environment": "*",

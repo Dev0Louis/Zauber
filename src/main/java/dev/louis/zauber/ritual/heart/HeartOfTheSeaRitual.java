@@ -1,10 +1,11 @@
-package dev.louis.zauber.ritual;
+package dev.louis.zauber.ritual.heart;
 
 import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
+import dev.louis.zauber.ritual.Ritual;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -21,7 +22,6 @@ import java.util.List;
 
 public class HeartOfTheSeaRitual extends Ritual {
     private final Vector3f BLUE_COLOR = new Vector3f(0, 0, 0.5f);
-    private boolean finished;
     @Nullable
     private BlockPos nextItemSacrificerPos;
     private int connectionTime;

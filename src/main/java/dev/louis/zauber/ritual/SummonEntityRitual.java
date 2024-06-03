@@ -1,11 +1,10 @@
-package dev.louis.zauber.ritual.entity;
+package dev.louis.zauber.ritual;
 
 import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
-import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.tag.ZauberItemTags;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
@@ -22,18 +21,19 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class SummonEntityRitual extends Ritual {
     public static final Vector3f RED_COLOR = new Vector3f(0.9f, 0, 0);
-    private final Function<World, Entity> entityFunction;
+    private final BiFunction<World, ItemStack, Entity> entityFunction;
     private final Ingredient mainIngredient;
 
     @Nullable
     private BlockPos itemSacrificerPos;
     private int blood;
 
-    public SummonEntityRitual(World world, RitualStoneBlockEntity ritualStoneBlockEntity, Function<World, Entity> entityFunction, Ingredient mainIngredient) {
+    public SummonEntityRitual(World world, RitualStoneBlockEntity ritualStoneBlockEntity, BiFunction<World, ItemStack, Entity> entityFunction, Ingredient mainIngredient) {
         super(world, ritualStoneBlockEntity);
         this.entityFunction = entityFunction;
         this.mainIngredient = mainIngredient;
@@ -105,7 +105,7 @@ public class SummonEntityRitual extends Ritual {
     @Override
     public void finish() {
         if (this.mainIngredient.test(this.ritualStoneBlockEntity.getStoredStack()) && blood >= 10) {
-            Entity entity = entityFunction.apply(world);
+            Entity entity = entityFunction.apply(world, this.ritualStoneBlockEntity.getStoredStack());
             entity.setPosition(pos.up().toCenterPos());
             world.spawnEntity(entity);
 
@@ -132,7 +132,7 @@ public class SummonEntityRitual extends Ritual {
     }
 
     public static class Starter implements Ritual.Starter {
-        private final Function<World, Entity> entityFunction;
+        private final BiFunction<World, ItemStack, Entity> entityFunction;
         private final Ingredient mainIngredient;
 
         public Starter(EntityType<?> entityType, Ingredient mainIngredient) {
@@ -140,6 +140,10 @@ public class SummonEntityRitual extends Ritual {
         }
 
         public Starter(Function<World, Entity> entityFunction, Ingredient mainIngredient) {
+            this((world1, ingredient) -> entityFunction.apply(world1), mainIngredient);
+        }
+
+        public Starter(BiFunction<World, ItemStack, Entity> entityFunction, Ingredient mainIngredient) {
             this.entityFunction = entityFunction;
             this.mainIngredient = mainIngredient;
         }

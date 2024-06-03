@@ -16,7 +16,6 @@
     "ServerWorldAccessor",
     "ServerWorldMixin"
   ],
-  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

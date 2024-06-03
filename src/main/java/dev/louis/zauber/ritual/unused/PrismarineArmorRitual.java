@@ -1,6 +1,7 @@
-package dev.louis.zauber.ritual;
+package dev.louis.zauber.ritual.unused;
 
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
+import dev.louis.zauber.ritual.Ritual;
 import net.minecraft.world.World;
 
 public class PrismarineArmorRitual extends Ritual {

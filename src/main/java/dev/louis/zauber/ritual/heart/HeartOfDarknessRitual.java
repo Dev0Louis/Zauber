@@ -1,4 +1,4 @@
-package dev.louis.zauber.ritual;
+package dev.louis.zauber.ritual.heart;
 
 import dev.louis.zauber.block.DarknessAccumulatorBlock;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
@@ -6,6 +6,7 @@ import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
+import dev.louis.zauber.ritual.Ritual;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
