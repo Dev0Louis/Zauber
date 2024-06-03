@@ -72,6 +72,7 @@ public class ZauberClient implements ClientModInitializer {
         createSpellKeyBind(Zauber.Spells.TELEPORT, false);
         createSpellKeyBind(Zauber.Spells.FIRE, false);
         createSpellKeyBind(Zauber.Spells.ICE, false);
+        createSpellKeyBind(Zauber.Spells.HAIL_STONE, false);
         createSpellKeyBind(Zauber.Spells.SUPERNOVA, true);
         createSpellKeyBind(Zauber.Spells.JUGGERNAUT, true);
         createSpellKeyBind(Zauber.Spells.WIND_EXPEL, false);

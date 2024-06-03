@@ -117,6 +117,7 @@ public class Zauber implements ModInitializer {
         registerEntity("spell_arrow", SpellArrowEntity.TYPE);
         registerEntity("haunting_damage", HauntingDamageEntity.TYPE);
         registerEntity("ice_peak", IcePeakEntity.TYPE);
+        registerEntity("hail_stone", HailStoneEntity.TYPE);
         registerEntity1("mana_horse", ManaHorseEntity.TYPE);
         registerEntity1("thrown_heart_of_the_ice", ThrownHeartOfTheIceEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
@@ -151,7 +152,10 @@ public class Zauber implements ModInitializer {
         public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 5);
         public static SpellType<SupernovaSpell> SUPERNOVA = register("supernova", SupernovaSpell::new, 20);
         public static SpellType<FireSpell> FIRE = register("fire", FireSpell::new, 2);
+
         public static SpellType<IceSpell> ICE = register("ice", IceSpell::new, 2);
+        public static SpellType<HailStoneSpell> HAIL_STONE = register("hail_stone", HailStoneSpell::new, 3);
+
         public static SpellType<WindExpelSpell> WIND_EXPEL = register("wind_expel", WindExpelSpell::new, 4);
         public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
         public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);

@@ -6,7 +6,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 
-public class TeleportSpell extends TargetingSpell {
+public class TeleportSpell extends EntitiyTargetingSpell {
     public TeleportSpell(SpellType<?> spellType, PlayerEntity caster) {
         super(spellType, caster);
     }

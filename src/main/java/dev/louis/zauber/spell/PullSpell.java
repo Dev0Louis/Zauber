@@ -4,7 +4,7 @@ import dev.louis.nebula.api.spell.SpellType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
-public class PullSpell extends TargetingSpell {
+public class PullSpell extends EntitiyTargetingSpell {
     public PullSpell(SpellType<?> spellType, PlayerEntity caster) {
         super(spellType, caster);
     }

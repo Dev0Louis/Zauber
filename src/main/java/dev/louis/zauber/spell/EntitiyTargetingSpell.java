@@ -6,10 +6,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
 
-public abstract class TargetingSpell extends Spell {
+public abstract class EntitiyTargetingSpell extends Spell {
     private Entity entity;
 
-    public TargetingSpell(SpellType<?> spellType, PlayerEntity caster) {
+    public EntitiyTargetingSpell(SpellType<?> spellType, PlayerEntity caster) {
         super(spellType, caster);
         if (caster.raycast(24, 0, false) instanceof EntityHitResult entityHitResult) entity = entityHitResult.getEntity();
     }
