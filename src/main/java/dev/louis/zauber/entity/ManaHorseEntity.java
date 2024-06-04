@@ -2,7 +2,6 @@ package dev.louis.zauber.entity;
 
 import dev.louis.nebula.api.NebulaPlayer;
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.spell.ManaHorseSpell;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
@@ -16,6 +15,8 @@ import net.minecraft.entity.passive.HorseColor;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
@@ -24,6 +25,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.EntityView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 /*
 TODO: Making it item bound, making it shake before it returns in the item. Better death sound and effect.
@@ -31,6 +33,7 @@ TODO: Making it item bound, making it shake before it returns in the item. Bette
 public class ManaHorseEntity extends HorseEntity implements PolymerEntity, PolymerClientDecoded, PolymerKeepModel, Ownable {
     public static final EntityType<ManaHorseEntity> TYPE =
             EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).setDimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
+    private static final ParticleEffect PARTICLE_EFFECT = new DustParticleEffect(new Vector3f(0, 0, 0.8f), 1f);
     private ManaHorseSpell spell;
 
     public ManaHorseEntity(EntityType<? extends ManaHorseEntity> entityType, World world) {
@@ -73,7 +76,7 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
         var y = (this.random.nextFloat() - 0.5) * 2;
         var z = (this.random.nextFloat() - 0.5) * 2;
         var velocity = this.getVelocity();
-        this.getWorld().addParticle(ZauberParticleTypes.MANA_RUNE, this.getX() + x, this.getEyeY() + y, this.getZ() + z, velocity.getX() * 1.1, velocity.getY(), velocity.getZ() * 1.1);
+        this.getWorld().addParticle(PARTICLE_EFFECT, this.getX() + x, this.getEyeY() + y, this.getZ() + z, velocity.getX() * 1.1, velocity.getY(), velocity.getZ() * 1.1);
     }
 
     @Override

@@ -1,11 +1,13 @@
 package dev.louis.zauber.client.keybind;
 
-import dev.louis.nebula.api.spell.SpellType;;
+import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
+
+;
 
 public class SpellKeyBinding extends KeyBinding {
     private final SpellType<?> spellType;
@@ -24,9 +26,9 @@ public class SpellKeyBinding extends KeyBinding {
     }
 
     public boolean shouldShow() {
-        if(!hides)return true;
+        if (!hides) return true;
         var player = MinecraftClient.getInstance().player;
-        if(player == null)return false;
+        if (player == null) return false;
         return player.getSpellManager().hasLearned(spellType);
     }
 }

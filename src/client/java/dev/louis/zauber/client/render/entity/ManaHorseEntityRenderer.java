@@ -50,7 +50,6 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
                 //Lerp between the ticks
                 (float) (3 + Math.sin(mobEntity.age / 40f) * 0.2),
                 0.1f,
-                true,
                 this.spell4
         );
 
@@ -58,7 +57,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
         super.render(mobEntity, f, tickDelta, matrixStack, vertexConsumerProvider, light);
     }
 
-    private void renderSymbol(HorseEntity mobEntity, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, float tickDelta, int height, float size, float frontOffset, boolean inverse, Identifier texture) {
+    private void renderSymbol(HorseEntity mobEntity, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, float tickDelta, int height, float size, float frontOffset, Identifier texture) {
         final float offset = size / 2;
 
         var mutable = new BlockPos.Mutable(mobEntity.getX(), mobEntity.getY(), mobEntity.getZ());
@@ -84,7 +83,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90));
         matrixStack.translate(0, 0, -distanceToGround + 1.01f);
 
-        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(inverse ? -mobEntity.age :  mobEntity.age));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mobEntity.age));
         matrixStack.translate(-offset, -offset, 0);
         matrixStack.scale(size, size, size);
 
