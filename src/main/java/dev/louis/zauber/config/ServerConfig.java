@@ -3,22 +3,27 @@ package dev.louis.zauber.config;
 import java.util.Objects;
 
 public class ServerConfig {
-    private int targetingDistance;
-    private int spellCooldown;
-    private float supernovaExplosionPower;
-    private float dashVelocityMultiplier;
-    private int dashSpellDuration;
-    private int sproutSpellDuration;
-    private int fireSpellDuration;
-    private int iceSpellDuration;
-    private int juggernautSpellDuration;
-    private int rewindSpellDuration;
-    private double windExpelSpellAcceleration;
-    private int windExpelSpellDuration;
-    private boolean convertOldNamespace;
+    private int entityTargetingDistance = 24;
+    private int blockTargetingDistance = 64;
+    private int spellCooldown = 10;
+    private float supernovaExplosionPower = 16.0F;
+    private float dashVelocityMultiplier = 1.3F;
+    private int dashSpellDuration = 5;
+    private int sproutSpellDuration = 20 * 10;
+    private int fireSpellDuration = 20;
+    private int iceSpellDuration = 20;
+    private int juggernautSpellDuration = 120 * 20;
+    private int rewindSpellDuration = 6 * 20;
+    private double windExpelSpellAcceleration = 0.1;
+    private int windExpelSpellDuration = 20;
+    private boolean convertOldNamespace = false;
+
+    protected ServerConfig() {
+
+    }
 
     public ServerConfig(
-            int targetingDistance,
+            int entityTargetingDistance,
             int spellCooldown,
             float supernovaExplosionPower,
             float dashVelocityMultiplier,
@@ -32,7 +37,7 @@ public class ServerConfig {
             int windExpelSpellDuration,
             boolean convertOldNamespace
     ) {
-        this.targetingDistance = targetingDistance;
+        this.entityTargetingDistance = entityTargetingDistance;
         this.spellCooldown = spellCooldown;
         this.supernovaExplosionPower = supernovaExplosionPower;
         this.dashVelocityMultiplier = dashVelocityMultiplier;
@@ -47,30 +52,20 @@ public class ServerConfig {
         this.convertOldNamespace = convertOldNamespace;
     }
 
-    public ServerConfig() {
-        this(
-                20,
-                10,
-                16.0F,
-                1.3F,
-                5,
-                20 * 10,
-                20,
-                20,
-                120 * 20,
-                6 * 20,
-                0.1,
-                20,
-                false
-        );
+    public void entityTargetingDistance(int entityTargetingDistance) {
+        this.entityTargetingDistance = entityTargetingDistance;
     }
 
-    public void targetingDistance(int targetingDistance) {
-        this.targetingDistance = targetingDistance;
+    public int entityTargetingDistance() {
+        return entityTargetingDistance;
     }
 
-    public int targetingDistance() {
-        return targetingDistance;
+    public void blockTargetingDistance(int blockTargetingDistance) {
+        this.blockTargetingDistance = blockTargetingDistance;
+    }
+
+    public int blockTargetingDistance() {
+        return blockTargetingDistance;
     }
 
     public void spellCooldown(int spellCooldown) {
@@ -174,7 +169,7 @@ public class ServerConfig {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (ServerConfig) obj;
-        return this.targetingDistance == that.targetingDistance &&
+        return this.entityTargetingDistance == that.entityTargetingDistance &&
                 Float.floatToIntBits(this.supernovaExplosionPower) == Float.floatToIntBits(that.supernovaExplosionPower) &&
                 this.dashSpellDuration == that.dashSpellDuration &&
                 this.sproutSpellDuration == that.sproutSpellDuration &&
@@ -188,13 +183,13 @@ public class ServerConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(targetingDistance, supernovaExplosionPower, dashSpellDuration, sproutSpellDuration, fireSpellDuration, iceSpellDuration, juggernautSpellDuration, rewindSpellDuration, windExpelSpellDuration, convertOldNamespace);
+        return Objects.hash(entityTargetingDistance, supernovaExplosionPower, dashSpellDuration, sproutSpellDuration, fireSpellDuration, iceSpellDuration, juggernautSpellDuration, rewindSpellDuration, windExpelSpellDuration, convertOldNamespace);
     }
 
     @Override
     public String toString() {
         return "ServerConfig[" +
-                "targetingDistance=" + targetingDistance + ", " +
+                "entityTargetingDistance=" + entityTargetingDistance + ", " +
                 "spellCooldown=" + spellCooldown + ", " +
                 "supernovaExplosionPower=" + supernovaExplosionPower + ", " +
                 "dashSpellDuration=" + dashSpellDuration + ", " +

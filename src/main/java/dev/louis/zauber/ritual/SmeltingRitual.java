@@ -7,15 +7,12 @@ import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -27,9 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class SmeltingRitual extends Ritual {
-
-    private final RecipeManager.MatchGetter<Inventory, SmeltingRecipe> matchGetter = RecipeManager.createCachedMatchGetter(RecipeType.SMELTING);;
-
     @Nullable
     private BlockPos itemSacrificerPos;
     private int fuelTicks;

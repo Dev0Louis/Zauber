@@ -4,7 +4,7 @@ import dev.louis.nebula.api.NebulaPlayer;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.spell.RefusalOfDeathSpell;
+import dev.louis.zauber.spell.VengeanceSpell;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -46,9 +46,9 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Override
     public void applyDamage(DamageSource source, float amount) {
         var activeSpells = ((NebulaPlayer) this).getSpellManager().getActiveSpells();
-        var refusalOfDeathSpells = activeSpells.stream().filter(spell -> spell instanceof RefusalOfDeathSpell).map(spell -> (RefusalOfDeathSpell) spell).toList();
+        var refusalOfDeathSpells = activeSpells.stream().filter(spell -> spell instanceof VengeanceSpell).map(spell -> (VengeanceSpell) spell).toList();
         if (!refusalOfDeathSpells.isEmpty()) {
-            refusalOfDeathSpells.forEach(refusalOfDeathSpell -> refusalOfDeathSpell.onDamage(source, amount));
+            refusalOfDeathSpells.forEach(vengeanceSpell -> vengeanceSpell.onDamage(source, amount));
             return;
         }
         super.applyDamage(source, amount);

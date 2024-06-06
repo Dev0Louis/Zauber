@@ -154,7 +154,7 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
 
     public Vec3d getOffset() {
         var owner = this.getOwner();
-        if (age < TICKS_TILL_IMPACT && owner instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(Zauber.Spells.REFUSAL_OF_DEATH)) {
+        if (age < TICKS_TILL_IMPACT && owner instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(Zauber.Spells.VENGEANCE)) {
             var i = age / 10f;
             return new Vec3d(Math.sin(i) * 10, (Math.cos(i / 5f) + Math.sin(i / 5f)) / 2, Math.cos(i) * 10);
         } else {

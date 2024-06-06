@@ -71,7 +71,7 @@ public class ConfigManager {
     public static void writeOverrideConfig(PacketByteBuf buf, ServerConfig serverConfig) {
         buf.writeInt(VERSION);
 
-        buf.writeInt(serverConfig.targetingDistance());
+        buf.writeInt(serverConfig.entityTargetingDistance());
         buf.writeInt(serverConfig.spellCooldown());
         buf.writeFloat(serverConfig.supernovaExplosionPower());
         buf.writeFloat(serverConfig.dashVelocityMultiplier());
@@ -144,18 +144,8 @@ public class ConfigManager {
                         )
                 )
                 .option(
-                        intSlideOption(
-                                "raycast_scan_precision",
-                                2,
-                                1,
-                                10,
-                                () -> getClientConfig().raycastScanPrecision(),
-                                (value) -> getClientConfig().raycastScanPrecision(value)
-                        )
-                )
-                .option(
                         colorOption(
-                                "targeting_color",
+                                "entity_targeting_color",
                                 Color.RED,
                                 () -> getClientConfig().targetingColor(),
                                 (value) -> getClientConfig().targetingColor(value)
@@ -167,12 +157,22 @@ public class ConfigManager {
                 .tooltip(tooltip("server"))
                 .option(
                         intSlideOptionServer(
-                                "targeting_distance",
+                                "entity_targeting_distance",
                                 20,
                                 5,
                                 128,
-                                () -> getServerConfig().targetingDistance(),
-                                (value) -> getRealServerConfig().targetingDistance(value)
+                                () -> getServerConfig().entityTargetingDistance(),
+                                (value) -> getRealServerConfig().entityTargetingDistance(value)
+                        )
+                )
+                .option(
+                        intSlideOptionServer(
+                                "block_targeting_distance",
+                                64,
+                                5,
+                                128,
+                                () -> getServerConfig().blockTargetingDistance(),
+                                (value) -> getRealServerConfig().blockTargetingDistance(value)
                         )
                 )
                 .option(

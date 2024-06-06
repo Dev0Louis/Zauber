@@ -8,6 +8,7 @@ import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
+import dev.louis.zauber.item.SpellBookItem;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.networking.ICanHasZauberPayload;
@@ -26,6 +27,8 @@ import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -36,18 +39,23 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("UnreachableCode")
@@ -57,6 +65,9 @@ public class Zauber implements ModInitializer {
     public static final int POLYMER_NETWORK_VERSION = 2;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
     public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
+    private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
+
+    private static final ItemStack ITEM_GROUP_LOGO = SpellBookItem.createSpellBook(Spells.SUPERNOVA);
 
     @Override
     public void onInitialize() {
@@ -94,7 +105,7 @@ public class Zauber implements ModInitializer {
                 ParticleHelper.spawnParticles(
                         (ServerWorld) world,
                         hitResult.getBlockPos().toCenterPos(),
-                        new DustParticleEffect(BLACK_PARTICLE_COLOR, 1),
+                        BLACK_PARTICLE,
                         5,
                         0.5f,
                         0.1f
@@ -103,7 +114,7 @@ public class Zauber implements ModInitializer {
                 ParticleHelper.spawnParticles(
                         (ServerWorld) world,
                         offsetBlockPos.toCenterPos(),
-                        new DustParticleEffect(BLACK_PARTICLE_COLOR, 1),
+                        BLACK_PARTICLE,
                         5,
                         0.5f,
                         0.1f
@@ -130,6 +141,12 @@ public class Zauber implements ModInitializer {
         ZauberPotionEffects.init();
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SpellStructureResourceReloadListener());
+        ItemGroup itemGroup = Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> ITEM_GROUP_LOGO).displayName(Text.of("Zauber")).build());
+
+        ItemGroupEvents.modifyEntriesEvent(Registries.ITEM_GROUP.getKey(itemGroup).get()).register(content -> {
+            ZauberItems.IN_CREATIVE_INVENTORY.forEach(content::add);
+            Spells.SPELLBOOKS.forEach(content::add);
+        });
     }
 
     public static <T extends Entity> void registerEntity1(String path, EntityType<T> type) {
@@ -142,24 +159,24 @@ public class Zauber implements ModInitializer {
     }
 
     public static class Spells {
+        public static List<ItemStack> SPELLBOOKS = new ArrayList<>();
         public static List<SpellType<?>> targetingSpells;
+
         public static SpellType<ArrowSpell> ARROW = register("arrow", ArrowSpell::new, 2);
         public static SpellType<JuggernautSpell> JUGGERNAUT = register("juggernaut", JuggernautSpell::new, 20);
         public static SpellType<PullSpell> PULL = register("pull", PullSpell::new, 2);
         public static SpellType<PushSpell> PUSH = register("push", PushSpell::new, 2);
-        public static SpellType<RewindSpell> REWIND = register("rewind", RewindSpell::new, 5);
+        public static SpellType<RewindSpell> REWIND = register("rewind", RewindSpell::new, 3);
         public static SpellType<SuicideSpell> SUICIDE = register("suicide", SuicideSpell::new, 1);
-        public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 5);
+        public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 2);
         public static SpellType<SupernovaSpell> SUPERNOVA = register("supernova", SupernovaSpell::new, 20);
         public static SpellType<FireSpell> FIRE = register("fire", FireSpell::new, 2);
-
         public static SpellType<IceSpell> ICE = register("ice", IceSpell::new, 2);
-        public static SpellType<HailStoneSpell> HAIL_STONE = register("hail_stone", HailStoneSpell::new, 3);
-
-        public static SpellType<WindExpelSpell> WIND_EXPEL = register("wind_expel", WindExpelSpell::new, 4);
+        public static SpellType<HailStormSpell> HAIL_STORM = registerParallelCasting("hail_storm", HailStormSpell::new, 3);
+        public static SpellType<WindExpelSpell> WIND_EXPEL = register("wind_expel", WindExpelSpell::new, 5);
         public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
         public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);
-        public static SpellType<RefusalOfDeathSpell> REFUSAL_OF_DEATH = register("refusal_of_death", RefusalOfDeathSpell::new, 2);
+        public static SpellType<VengeanceSpell> VENGEANCE = register("vengeance", VengeanceSpell::new, 2);
         public static SpellType<ManaHorseSpell> MANA_HORSE = registerNoLearning("mana_horse", ManaHorseSpell::new, 4);
 
 
@@ -170,8 +187,16 @@ public class Zauber implements ModInitializer {
             );
         }
 
+        public static <T extends Spell> SpellType<T> registerParallelCasting(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
+            SpellType<T> spellType = SpellType.register(Identifier.of(MOD_ID, spellName), SpellType.Builder.create(spellFactory, mana).parallelCast());
+            SPELLBOOKS.add(SpellBookItem.createSpellBook(spellType));
+            return spellType;
+        }
+
         public static <T extends Spell> SpellType<T> register(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
-            return SpellType.register(Identifier.of(MOD_ID, spellName),SpellType.Builder.create(spellFactory, mana));
+            SpellType<T> spellType = SpellType.register(Identifier.of(MOD_ID, spellName), SpellType.Builder.create(spellFactory, mana));
+            SPELLBOOKS.add(SpellBookItem.createSpellBook(spellType));
+            return spellType;
         }
 
         public static void init() {

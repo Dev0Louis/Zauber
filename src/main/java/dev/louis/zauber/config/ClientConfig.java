@@ -11,9 +11,6 @@ import java.awt.*;
  */
 public class ClientConfig {
     private ManaDirection manaDirection = ManaDirection.RIGHT;
-
-    private int raycastScanPrecision = 2;
-
     public int targetingColor = Color.RED.getRGB();
 
     public ManaDirection manaDirection() {
@@ -22,14 +19,6 @@ public class ClientConfig {
 
     public void manaDirection(ManaDirection manaDirection) {
         this.manaDirection = manaDirection;
-    }
-
-    public int raycastScanPrecision() {
-        return raycastScanPrecision;
-    }
-
-    public void raycastScanPrecision(int raycastScanPrecision) {
-        this.raycastScanPrecision = raycastScanPrecision;
     }
 
     public Color targetingColor() {

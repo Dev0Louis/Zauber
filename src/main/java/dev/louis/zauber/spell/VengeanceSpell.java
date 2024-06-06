@@ -9,8 +9,8 @@ import net.minecraft.entity.player.PlayerEntity;
 /**
  * The logic for this spell spawns {@link HauntingDamageEntity} which do the actual "logic".
  */
-public class RefusalOfDeathSpell extends Spell {
-    public RefusalOfDeathSpell(SpellType<?> spellType, PlayerEntity caster) {
+public class VengeanceSpell extends Spell {
+    public VengeanceSpell(SpellType<?> spellType, PlayerEntity caster) {
         super(spellType, caster);
     }
 
