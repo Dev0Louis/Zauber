@@ -16,6 +16,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -53,6 +54,10 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
         } else {
             makeBreakEffect();
             this.discard();
+        }
+        if (hitResult.getType() == HitResult.Type.ENTITY &&
+                hitResult instanceof EntityHitResult && ((EntityHitResult) hitResult).getEntity() instanceof LivingEntity livingEntity) {
+            damageEntity(livingEntity);
         }
         this.getWorld().getOtherEntities(null, this.getBoundingBox()).stream().filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast).forEach(this::damageEntity);
     }
