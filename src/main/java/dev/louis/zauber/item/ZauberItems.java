@@ -39,7 +39,6 @@ public class ZauberItems {
     }
 
     private static Item registerNoCreativeTab(String path, Item item) {
-        IN_CREATIVE_INVENTORY.add(item);
         return Registry.register(Registries.ITEM, Identifier.of(Zauber.MOD_ID, path), item);
     }
 
