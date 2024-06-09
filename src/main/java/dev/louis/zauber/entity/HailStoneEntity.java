@@ -27,7 +27,7 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
     public static final EntityType<HailStoneEntity> TYPE = FabricEntityTypeBuilder
             .create(SpawnGroup.MISC, HailStoneEntity::new)
             .build();
-    private int damage = 3;
+    private int damage = 4;
     private boolean bounce = this.random.nextBoolean();
 
     public HailStoneEntity(EntityType<? extends ThrownItemEntity> type, World world) {
@@ -55,8 +55,7 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
             makeBreakEffect();
             this.discard();
         }
-        if (hitResult.getType() == HitResult.Type.ENTITY &&
-                hitResult instanceof EntityHitResult && ((EntityHitResult) hitResult).getEntity() instanceof LivingEntity livingEntity) {
+        if (hitResult.getType() == HitResult.Type.ENTITY && ((EntityHitResult) hitResult).getEntity() instanceof LivingEntity livingEntity) {
             damageEntity(livingEntity);
         }
         this.getWorld().getOtherEntities(null, this.getBoundingBox()).stream().filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast).forEach(this::damageEntity);
@@ -79,8 +78,7 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
 
     private void damageEntity(LivingEntity entity) {
         var damageSource = entity.getDamageSources().freeze();
-        double speedLength = this.getVelocity().length();
-        int damage = MathHelper.ceil(MathHelper.clamp(speedLength * this.damage, 2.0, 100));
+        int damage = MathHelper.ceil(MathHelper.clamp(this.damage, 2.0, 100));
 
         if(entity.getWorld().getBiome(entity.getBlockPos()).value().isCold(entity.getBlockPos())) {
             damage = damage * 2;
