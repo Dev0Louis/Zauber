@@ -41,6 +41,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.registry.Registries;
@@ -129,6 +130,7 @@ public class Zauber implements ModInitializer {
         registerEntity("haunting_damage", HauntingDamageEntity.TYPE);
         registerEntity("ice_peak", IcePeakEntity.TYPE);
         registerEntity("hail_stone", HailStoneEntity.TYPE);
+        //registerEntity("player_following", PlayerFollowingEntity.TYPE);
         registerEntity1("mana_horse", ManaHorseEntity.TYPE);
         registerEntity1("thrown_heart_of_the_ice", ThrownHeartOfTheIceEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
@@ -144,6 +146,12 @@ public class Zauber implements ModInitializer {
         ItemGroup itemGroup = Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> ITEM_GROUP_LOGO).displayName(Text.of("Zauber")).build());
 
         ItemGroupEvents.modifyEntriesEvent(Registries.ITEM_GROUP.getKey(itemGroup).get()).register(content -> {
+            ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
+            NbtCompound subNbt = itemStack.getOrCreateSubNbt("stored_entity");
+            subNbt.putString("id", Registries.ENTITY_TYPE.getId(ManaHorseEntity.TYPE).toString());
+            itemStack.setSubNbt("id", subNbt);
+            content.add(itemStack);
+
             ZauberItems.IN_CREATIVE_INVENTORY.forEach(content::add);
             Spells.SPELLBOOKS.forEach(content::add);
         });
@@ -177,7 +185,6 @@ public class Zauber implements ModInitializer {
         public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
         public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);
         public static SpellType<VengeanceSpell> VENGEANCE = register("vengeance", VengeanceSpell::new, 2);
-        public static SpellType<ManaHorseSpell> MANA_HORSE = registerNoLearning("mana_horse", ManaHorseSpell::new, 4);
 
 
         public static <T extends Spell> SpellType<T> registerNoLearning(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {

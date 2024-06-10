@@ -24,6 +24,7 @@ public class HailStormSpell extends BlockTargetingSpell {
             for (int z = -size; z < size; z+=2) {
                 if (world.getRandom().nextFloat() < 0.75f) continue;
                 HailStoneEntity hailStoneEntity = HailStoneEntity.TYPE.create(world);
+                hailStoneEntity.setOwner(this.getCaster());
                 hailStoneEntity.setPosition(pos.toCenterPos().add(x, 30 + world.getRandom().nextDouble(), z));
                 Vec3d randomVelocity = new Vec3d(world.getRandom().nextDouble() - .5, world.getRandom().nextDouble() - .5, world.getRandom().nextDouble() - .5).multiply(0.5);
                 Vec3d velocity = pos.toCenterPos().subtract(hailStoneEntity.getPos()).normalize().add(randomVelocity);

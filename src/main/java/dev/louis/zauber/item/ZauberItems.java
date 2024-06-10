@@ -19,7 +19,7 @@ public class ZauberItems {
     public static final Item SPELL_BOOK =
             registerNoCreativeTab("spell_book", new SpellBookItem(new Item.Settings().fireproof().rarity(Rarity.RARE)));
     public static final Item SOUL_HORN =
-            register("soul_horn", new SoulHornItem(new Item.Settings().rarity(Rarity.RARE)));
+            registerNoCreativeTab("soul_horn", new SoulHornItem(new Item.Settings().rarity(Rarity.RARE)));
     public static final Item SPELL_TABLE =
             register("spell_table", new SpellTableItem(ZauberBlocks.SPELL_TABLE, new Item.Settings().rarity(Rarity.EPIC)));
     public static final Item HEART_OF_THE_ICE =

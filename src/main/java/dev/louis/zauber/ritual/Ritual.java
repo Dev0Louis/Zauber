@@ -5,6 +5,7 @@ import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.ritual.heart.HeartOfDarknessRitual;
 import dev.louis.zauber.ritual.heart.HeartOfTheIceRitual;
 import dev.louis.zauber.ritual.heart.HeartOfTheSeaRitual;
+import dev.louis.zauber.ritual.spell.HailSpellRitual;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatVariant;
 import net.minecraft.item.Items;
@@ -40,6 +41,7 @@ public abstract class Ritual {
         RITUAL_STARTERS.add(HorseRitual::tryStart);
         RITUAL_STARTERS.add(HeartOfDarknessRitual::tryStart);
         RITUAL_STARTERS.add(MudifyRitual::tryStart);
+        RITUAL_STARTERS.add(HailSpellRitual::tryStart);
         RITUAL_STARTERS.add(HeartOfTheIceRitual::tryStart);
         RITUAL_STARTERS.add(HeartOfTheSeaRitual::tryStart);
         RITUAL_STARTERS.add(TeleportToLodestoneRitual::tryStart);

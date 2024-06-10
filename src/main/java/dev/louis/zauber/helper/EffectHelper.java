@@ -1,5 +1,6 @@
 package dev.louis.zauber.helper;
 
+import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -14,6 +15,9 @@ public class EffectHelper {
         playBreakItemEffect(world, pos.toCenterPos(), itemStack);
     }
 
+    public static void playBreakItemEffect(ItemSacrificerBlockEntity itemSacrificer) {
+        playBreakItemEffect((ServerWorld) itemSacrificer.getWorld(), itemSacrificer.getPos(), itemSacrificer.getStoredStack());
+    }
 
     public static void playBreakItemEffect(ServerWorld world, Position pos, ItemStack itemStack) {
         ParticleHelper.spawn50Particles(

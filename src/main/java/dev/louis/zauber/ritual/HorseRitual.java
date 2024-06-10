@@ -2,6 +2,7 @@ package dev.louis.zauber.ritual;
 
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
+import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.item.ZauberItems;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -74,7 +75,11 @@ public class HorseRitual extends Ritual {
             }
             horse.discard();
             world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 4);
-            world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, ZauberItems.SOUL_HORN.getDefaultStack(), 0, 0.3f, 0));
+            ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
+            NbtCompound subNbt = itemStack.getOrCreateSubNbt("stored_entity");
+            subNbt.putString("id", Registries.ENTITY_TYPE.getId(ManaHorseEntity.TYPE).toString());
+            itemStack.setSubNbt("id", subNbt);
+            world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, itemStack, 0, 0.3f, 0));
         }
     }
 

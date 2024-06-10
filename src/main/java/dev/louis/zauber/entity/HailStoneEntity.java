@@ -18,7 +18,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
     public static final EntityType<HailStoneEntity> TYPE = FabricEntityTypeBuilder
             .create(SpawnGroup.MISC, HailStoneEntity::new)
             .build();
-    private int damage = 4;
+    private static final int DAMAGE = 4;
     private boolean bounce = this.random.nextBoolean();
 
     public HailStoneEntity(EntityType<? extends ThrownItemEntity> type, World world) {
@@ -77,8 +76,8 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
     }
 
     private void damageEntity(LivingEntity entity) {
-        var damageSource = entity.getDamageSources().freeze();
-        int damage = MathHelper.ceil(MathHelper.clamp(this.damage, 2.0, 100));
+        var damageSource = entity.getDamageSources().create(entity.getDamageSources().freeze().getTypeRegistryEntry().getKey().get(), this.getOwner());
+        float damage = DAMAGE;
 
         if(entity.getWorld().getBiome(entity.getBlockPos()).value().isCold(entity.getBlockPos())) {
             damage = damage * 2;

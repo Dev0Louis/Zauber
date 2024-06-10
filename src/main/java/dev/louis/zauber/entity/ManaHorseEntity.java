@@ -2,7 +2,6 @@ package dev.louis.zauber.entity;
 
 import dev.louis.nebula.api.NebulaPlayer;
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.spell.ManaHorseSpell;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
@@ -34,15 +33,15 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     public static final EntityType<ManaHorseEntity> TYPE =
             EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).setDimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
     private static final ParticleEffect PARTICLE_EFFECT = new DustParticleEffect(new Vector3f(0, 0, 0.8f), 1f);
-    private ManaHorseSpell spell;
+    private LivingEntity owner;
 
     public ManaHorseEntity(EntityType<? extends ManaHorseEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    public ManaHorseEntity(World world, ManaHorseSpell spell) {
+    public ManaHorseEntity(World world, LivingEntity owner) {
         super(TYPE, world);
-        this.spell = spell;
+        this.owner = owner;
     }
 
     @Override
@@ -55,17 +54,14 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     public static DefaultAttributeContainer.Builder createBaseHorseAttributes() {
         return MobEntity.createMobAttributes()
                 .add(EntityAttributes.HORSE_JUMP_STRENGTH)
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 12)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 0.01)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.6);
     }
 
     @Override
     public void tick() {
-        if (!this.getWorld().isClient()) {
-            if (spell == null || spell.shouldStop()) {
-                this.discard();
-            }
-        } else {
+        if (this.age > 20 * 30) this.discard();
+        if (this.getWorld().isClient()) {
             spawnManaParticles();
         }
         super.tick();
@@ -94,7 +90,6 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
             this.playSound(SoundEvents.ENTITY_ENDER_EYE_DEATH, 3, 2);
         }
 
-        if (spell != null) spell.interrupt();
         super.remove(reason);
     }
 
@@ -128,7 +123,7 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     @Nullable
     @Override
     public LivingEntity getOwner() {
-        return this.spell.getCaster();
+        return this.owner;
     }
 
     @Override
