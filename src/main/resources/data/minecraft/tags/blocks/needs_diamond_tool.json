@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "zauber:darkness_accumulator",
     "zauber:spell_table",
     "zauber:ritual_stone",
     "zauber:item_sacrificer",

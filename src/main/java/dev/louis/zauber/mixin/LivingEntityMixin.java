@@ -27,11 +27,14 @@ public class LivingEntityMixin {
             cancellable = true
     )
     public void storedAppliedDamageForLater(DamageSource source, float amount, CallbackInfo ci) {
-        var activeSpells = ((NebulaPlayer) this).getSpellManager().getActiveSpells();
-        var refusalOfDeathSpells = activeSpells.stream().filter(spell -> spell instanceof VengeanceSpell).map(spell -> (VengeanceSpell) spell).toList();
-        if (!refusalOfDeathSpells.isEmpty()) {
-            refusalOfDeathSpells.forEach(vengeanceSpell -> vengeanceSpell.onDamage(source, amount));
-            ci.cancel();
+        if (this instanceof NebulaPlayer nebulaPlayer) {
+            var activeSpells = nebulaPlayer.getSpellManager().getActiveSpells();
+            var refusalOfDeathSpells = activeSpells.stream().filter(spell -> spell instanceof VengeanceSpell).map(spell -> (VengeanceSpell) spell).toList();
+            if (!refusalOfDeathSpells.isEmpty()) {
+                refusalOfDeathSpells.forEach(vengeanceSpell -> vengeanceSpell.onDamage(source, amount));
+                ci.cancel();
+            }
+
         }
     }
 }
