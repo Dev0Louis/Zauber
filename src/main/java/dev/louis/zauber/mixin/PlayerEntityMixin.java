@@ -1,13 +1,10 @@
 package dev.louis.zauber.mixin;
 
-import dev.louis.nebula.api.NebulaPlayer;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.spell.VengeanceSpell;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,16 +38,5 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                 }
             }
         }
-    }
-
-    @Override
-    protected void applyDamage(DamageSource source, float amount) {
-        var activeSpells = ((NebulaPlayer) this).getSpellManager().getActiveSpells();
-        var refusalOfDeathSpells = activeSpells.stream().filter(spell -> spell instanceof VengeanceSpell).map(spell -> (VengeanceSpell) spell).toList();
-        if (!refusalOfDeathSpells.isEmpty()) {
-            refusalOfDeathSpells.forEach(vengeanceSpell -> vengeanceSpell.onDamage(source, amount));
-            return;
-        }
-        super.applyDamage(source, amount);
     }
 }
