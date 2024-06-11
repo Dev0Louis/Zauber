@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("UnreachableCode")
-@Mixin(PlayerEntity.class)
+@Mixin(value = PlayerEntity.class, priority = 900)
 public abstract class PlayerEntityMixin extends LivingEntity {
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -44,7 +44,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     }
 
     @Override
-    public void applyDamage(DamageSource source, float amount) {
+    protected void applyDamage(DamageSource source, float amount) {
         var activeSpells = ((NebulaPlayer) this).getSpellManager().getActiveSpells();
         var refusalOfDeathSpells = activeSpells.stream().filter(spell -> spell instanceof VengeanceSpell).map(spell -> (VengeanceSpell) spell).toList();
         if (!refusalOfDeathSpells.isEmpty()) {
