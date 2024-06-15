@@ -6,6 +6,7 @@ import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.block.TrappingBedBlock;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.data.DarkTotemAttachment;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.item.SpellBookItem;
@@ -26,6 +27,8 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -66,8 +69,14 @@ public class Zauber implements ModInitializer {
     public static final int POLYMER_NETWORK_VERSION = 2;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
     public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
-    private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
+    @SuppressWarnings("UnstableApiUsage")
+    public static final AttachmentType<DarkTotemAttachment> DARK_TOTEM_ATTACHMENT_TYPE = AttachmentRegistry.<DarkTotemAttachment>builder()
+            .persistent(DarkTotemAttachment.CODEC)
+            .copyOnDeath()
+            .initializer(() -> new DarkTotemAttachment(false))
+            .buildAndRegister(Identifier.of(Zauber.MOD_ID, "dark_totem"));
 
+    private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
     private static final ItemStack ITEM_GROUP_LOGO = SpellBookItem.createSpellBook(Spells.SUPERNOVA);
 
     @Override
