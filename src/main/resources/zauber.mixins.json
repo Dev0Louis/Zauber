@@ -4,6 +4,7 @@
   "package": "dev.louis.zauber.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "BowItemMixin",
     "CauldronBehaviorMixin",
     "IdentifierMixin",
     "ItemEntityMixin",

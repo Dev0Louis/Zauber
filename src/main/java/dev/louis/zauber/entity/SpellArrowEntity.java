@@ -1,6 +1,7 @@
 package dev.louis.zauber.entity;
 
 import dev.louis.nebula.api.spell.Spell;
+import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
@@ -28,7 +29,10 @@ public class SpellArrowEntity extends ArrowEntity implements PolymerClientDecode
     }
 
     public SpellArrowEntity(World world, LivingEntity owner, ItemStack stack, @NotNull Spell spell) {
-        super(world, owner, stack);
+        super(TYPE, world);
+        this.setOwner(owner);
+        this.setPos(owner.getX(), owner.getEyeY() - 0.1F, owner.getZ());
+        this.stack = stack;
         this.spell = spell;
     }
 
@@ -45,8 +49,7 @@ public class SpellArrowEntity extends ArrowEntity implements PolymerClientDecode
     }
 
     public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        return TYPE;
-        //if(Zauber.isClientModded(player)) return ZauberEntityType.SPELL_ARROW;
-        //return EntityType.ARROW;
+        if(Zauber.isClientModded(player)) return TYPE;
+        return EntityType.ARROW;
     }
 }

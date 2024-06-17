@@ -1,0 +1,6 @@
+{
+    "parent": "zauber:item/mana_bow",
+    "textures": {
+        "layer0": "zauber:item/mana_bow_pulling_1"
+    }
+}

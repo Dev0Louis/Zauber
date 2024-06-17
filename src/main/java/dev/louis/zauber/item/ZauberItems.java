@@ -32,6 +32,8 @@ public class ZauberItems {
             register("item_sacrificer", new PolymerBlockItem(ZauberBlocks.ITEM_SACRIFICER, new Item.Settings().rarity(Rarity.RARE), Items.STONE_BRICK_WALL));
     public static final Item DARKNESS_ACCUMULATOR =
             register("darkness_accumulator", new PolymerBlockItem(ZauberBlocks.DARKNESS_ACCUMULATOR, new Item.Settings().rarity(Rarity.RARE), Items.GLASS));
+    public static final Item MANA_BOW =
+            register("mana_bow", new ManaBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxDamage(384)));
 
     private static Item register(String path, Item item) {
         IN_CREATIVE_INVENTORY.add(item);

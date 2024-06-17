@@ -6,13 +6,15 @@ import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.client.keybind.SpellKeyBinding;
 import dev.louis.zauber.client.keybind.SpellKeybindManager;
+import dev.louis.zauber.client.render.entity.BlueArrowEntityRenderer;
 import dev.louis.zauber.client.render.entity.ManaHorseEntityRenderer;
-import dev.louis.zauber.client.render.entity.SpellArrowEntityRenderer;
 import dev.louis.zauber.client.screen.SpellTableScreen;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.entity.ManaArrowEntity;
 import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.entity.SpellArrowEntity;
 import dev.louis.zauber.entity.ThrownHeartOfTheIceEntity;
+import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.particle.ZauberParticleTypes;
@@ -27,11 +29,13 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.particle.DragonBreathParticle;
 import net.minecraft.client.particle.ExplosionLargeParticle;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,7 +85,8 @@ public class ZauberClient implements ClientModInitializer {
         createSpellKeyBind(Zauber.Spells.DASH, false);
         HandledScreens.register(ZauberRecipes.SPELL_TABLE, SpellTableScreen::new);
 
-        EntityRendererRegistry.register(SpellArrowEntity.TYPE, SpellArrowEntityRenderer::new);
+        EntityRendererRegistry.register(SpellArrowEntity.TYPE, BlueArrowEntityRenderer::new);
+        EntityRendererRegistry.register(ManaArrowEntity.TYPE, BlueArrowEntityRenderer::new);
         EntityRendererRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntityRenderer::new);
         ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION, ExplosionLargeParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION_EMITTER, ExplosionLargeParticle.Factory::new);
@@ -90,6 +95,18 @@ public class ZauberClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_TORCH, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_WALL_TORCH, RenderLayer.getCutout());
         EntityRendererRegistry.register(ThrownHeartOfTheIceEntity.TYPE, FlyingItemEntityRenderer::new);
+        ModelPredicateProviderRegistry.register(ZauberItems.MANA_BOW, new Identifier("pull"), (stack, world, entity, seed) -> {
+            if (entity == null) {
+                return 0.0F;
+            } else {
+                return entity.getActiveItem() != stack ? 0.0F : (float)(stack.getMaxUseTime() - entity.getItemUseTimeLeft()) / 20.0F;
+            }
+        });
+        ModelPredicateProviderRegistry.register(
+                ZauberItems.MANA_BOW,
+                new Identifier("pulling"),
+                (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
+        );
         // DEBUG CODE
         /*if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
             ClientTickEvents.START_CLIENT_TICK.register(client -> {
