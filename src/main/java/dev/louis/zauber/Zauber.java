@@ -170,7 +170,6 @@ public class Zauber implements ModInitializer {
                         nbtCompound.putString("lostBookId", String.valueOf(lostBookType.id()));
                         tableBuilder1.
                                 with(ItemEntry.builder(ZauberItems.LOST_BOOK)
-                                        .quality()
                                         .apply(SetNbtLootFunction.builder(nbtCompound))
                                 );
                     });
