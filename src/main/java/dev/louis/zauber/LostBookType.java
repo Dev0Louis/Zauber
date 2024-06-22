@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record LostBookType(Identifier id, List<Text> pages) implements NamedScreenHandlerFactory {
-    public static List<LostBookType> PAGES = new ArrayList<>();
+    public static List<LostBookType> LOST_BOOKS = new ArrayList<>();
 
     public static void init() {
         registerBook(Identifier.of(Zauber.MOD_ID, "dark_sleep"), 2);
@@ -37,12 +37,12 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
     }
 
     public static Optional<LostBookType> getById(Identifier id) {
-        return PAGES.stream().filter(lostBookType -> lostBookType.id.equals(id)).findAny();
+        return LOST_BOOKS.stream().filter(lostBookType -> lostBookType.id.equals(id)).findAny();
     }
 
 
     public static void registerBook(Identifier id, int pageCount) {
-        if (PAGES.stream().anyMatch(lostBookType -> id.equals(lostBookType.id))) {
+        if (LOST_BOOKS.stream().anyMatch(lostBookType -> id.equals(lostBookType.id))) {
             throw new IllegalStateException("Tried registering " + id + " while that id was already registered.");
         }
         List<Text> pages = new ArrayList<>();
@@ -51,31 +51,31 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
             pages.add(Text.translatable("lost_book." + id.getNamespace() + "." + id.getPath() + "." + i));
         }
 
-        PAGES.add(new LostBookType(id, pages));
+        LOST_BOOKS.add(new LostBookType(id, pages));
     }
 
 
     public static void registerBook(Identifier id, Text... pages) {
-        if (PAGES.stream().anyMatch(lostBookType -> id.equals(lostBookType.id))) {
+        if (LOST_BOOKS.stream().anyMatch(lostBookType -> id.equals(lostBookType.id))) {
             throw new IllegalStateException("Tried registering " + id + " while that id was already registered.");
         }
-        PAGES.add(new LostBookType(id, List.of(pages)));
+        LOST_BOOKS.add(new LostBookType(id, List.of(pages)));
     }
     
     public static LostBookType getRandom(Random random) {
-        return PAGES.get(random.nextInt(PAGES.size()));
+        return LOST_BOOKS.get(random.nextInt(LOST_BOOKS.size()));
     }
 
     private ItemStack createFakeBook() {
         ItemStack itemStack = Items.WRITTEN_BOOK.getDefaultStack();
-        if (!PAGES.isEmpty()) {
+        if (!LOST_BOOKS.isEmpty()) {
             NbtList nbtList = new NbtList();
             this.pages().forEach(text -> nbtList.add(NbtString.of(text.getString())));
             itemStack.setSubNbt("pages", nbtList);
         }
 
         itemStack.setSubNbt("author", NbtString.of("Unknown Magician"));
-        itemStack.setSubNbt("title", NbtString.of("AHH"));
+        itemStack.setSubNbt("title", NbtString.of(this.id.getPath()));
         return itemStack;
     }
 
@@ -95,14 +95,20 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
                     player.getWorld().syncWorldEvent(WorldEvents.LECTERN_BOOK_PAGE_TURNED, player.getBlockPos(), 0);
                     page = value;
                 }
-
             }
 
             @Override
             public int size() {
                 return 1;
             }
-        });
+        }) {
+
+            @Override
+            public boolean onButtonClick(PlayerEntity player, int id) {
+                if (id == 3) return false;
+                return super.onButtonClick(player, id);
+            }
+        };
 }
 
     @Override

@@ -28,6 +28,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -40,6 +41,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.function.SetNbtLootFunction;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
@@ -156,8 +159,24 @@ public class Zauber implements ModInitializer {
             ZauberItems.IN_CREATIVE_INVENTORY.forEach(content::add);
             Spells.SPELLBOOKS.forEach(content::add);
         });
-
         LostBookType.init();
+
+        LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+            Identifier gameplayFishingId = Identifier.of("minecraft", "gameplay/fishing");
+            if (id.equals(gameplayFishingId)) {
+                tableBuilder.modifyPools(tableBuilder1 -> {
+                    LostBookType.LOST_BOOKS.forEach(lostBookType -> {
+                        NbtCompound nbtCompound = new NbtCompound();
+                        nbtCompound.putString("lostBookId", String.valueOf(lostBookType.id()));
+                        tableBuilder1.
+                                with(ItemEntry.builder(ZauberItems.LOST_BOOK)
+                                        .quality()
+                                        .apply(SetNbtLootFunction.builder(nbtCompound))
+                                );
+                    });
+                });
+            }
+        });
     }
 
     public static <T extends ParticleEffect> void registerParticle(String path, ParticleType<T> type) {
