@@ -20,7 +20,7 @@ public class ManaBowItem extends BowItem {
 
     public PersistentProjectileEntity createArrow(ArrowItem item, World world, ItemStack stack, LivingEntity shooter) {
         ManaArrowEntity arrowEntity = new ManaArrowEntity(world, shooter, stack.copyWithCount(1));
-        arrowEntity.initFromStack(stack);
+        //arrowEntity.initFromStack(stack);
         return arrowEntity;
     }
 }

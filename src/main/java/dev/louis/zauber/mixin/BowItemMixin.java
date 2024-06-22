@@ -23,7 +23,6 @@ public class BowItemMixin {
         if (((Object) this) instanceof ManaBowItem manaBowItem) {
             return manaBowItem.createArrow(item, world, stack, shooter);
         }
-        System.out.println("ORIGINAL????");
         return original.call(item, world, stack, shooter);
     }
 }

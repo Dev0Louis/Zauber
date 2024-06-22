@@ -15,7 +15,6 @@ import dev.louis.zauber.networking.ICanHasZauberPayload;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.networking.OptionSyncTask;
-import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.resource.SpellStructureResourceReloadListener;
@@ -48,6 +47,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.SetCameraEntityS2CPacket;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
@@ -142,9 +142,9 @@ public class Zauber implements ModInitializer {
         registerEntity("mana_arrow", ManaArrowEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
         //FabricDefaultAttributeRegistry.register(HauntingSword.TYPE, HauntingSword.createBaseAttributes());
-        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
-        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
-        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
+        //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
+        //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
+        //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
 
         Ritual.init();
         ZauberPotionEffects.init();
@@ -178,10 +178,11 @@ public class Zauber implements ModInitializer {
                 return 1;
             }));
         });
+        LostBookType.init();
     }
 
-    public static <T extends Entity> void registerEntity1(String path, EntityType<T> type) {
-        Registry.register(Registries.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, path), type);
+    public static <T extends ParticleEffect> void registerParticle(String path, ParticleType<T> type) {
+        Registry.register(Registries.PARTICLE_TYPE, Identifier.of(Zauber.MOD_ID, path), type);
     }
 
     public static <T extends Entity> void registerEntity(String path, EntityType<T> type) {
