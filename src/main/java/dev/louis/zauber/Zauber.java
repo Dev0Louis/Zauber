@@ -66,7 +66,7 @@ import java.util.List;
 public class Zauber implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "zauber";
-    public static final int POLYMER_NETWORK_VERSION = 2;
+    public static final int POLYMER_NETWORK_VERSION = 3;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
     public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
     private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
