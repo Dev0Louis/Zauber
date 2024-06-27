@@ -182,7 +182,7 @@ public class ConfigManager {
                                 5,
                                 100,
                                 () -> getServerConfig().spellCooldown(),
-                                (value) -> getServerConfig().spellCooldown(value)
+                                (value) -> getRealServerConfig().spellCooldown(value)
                         )
                 )
                 .option(

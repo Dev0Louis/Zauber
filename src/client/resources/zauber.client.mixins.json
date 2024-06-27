@@ -5,12 +5,13 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [],
   "client": [
-    "LivingEntityRendererMixin",
     "ControlsListWidgetMixin",
     "InGameHudMixin",
     "ItemStackNameMixin",
+    "LivingEntityRendererMixin",
     "MinecraftClientMixin",
-    "PlayerEntityMixin"
+    "PlayerEntityMixin",
+    "ProjectileEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

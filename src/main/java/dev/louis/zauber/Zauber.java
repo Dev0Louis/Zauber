@@ -15,7 +15,6 @@ import dev.louis.zauber.networking.ICanHasZauberPayload;
 import dev.louis.zauber.networking.OptionSyncCompletePacket;
 import dev.louis.zauber.networking.OptionSyncPacket;
 import dev.louis.zauber.networking.OptionSyncTask;
-import dev.louis.zauber.particle.ZauberParticleTypes;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.resource.SpellStructureResourceReloadListener;
@@ -26,10 +25,10 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -39,25 +38,23 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.function.SetNbtLootFunction;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.s2c.play.SetCameraEntityS2CPacket;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -69,7 +66,7 @@ import java.util.List;
 public class Zauber implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "zauber";
-    public static final int POLYMER_NETWORK_VERSION = 2;
+    public static final int POLYMER_NETWORK_VERSION = 3;
     public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
     public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
     private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
@@ -142,9 +139,9 @@ public class Zauber implements ModInitializer {
         registerEntity("mana_arrow", ManaArrowEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
         //FabricDefaultAttributeRegistry.register(HauntingSword.TYPE, HauntingSword.createBaseAttributes());
-        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
-        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
-        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
+        //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
+        //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
+        //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
 
         Ritual.init();
         ZauberPotionEffects.init();
@@ -162,26 +159,27 @@ public class Zauber implements ModInitializer {
             ZauberItems.IN_CREATIVE_INVENTORY.forEach(content::add);
             Spells.SPELLBOOKS.forEach(content::add);
         });
+        LostBookType.init();
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            dispatcher.register(CommandManager.literal("BLABLA").executes(context -> {
-                try {
-                    var player = context.getSource().getPlayer();
-                    var world = player.getServerWorld();
-                    var entity = world.getClosestEntity(LivingEntity.class, TargetPredicate.DEFAULT, player, player.getX(), player.getY(), player.getZ(), Box.of(player.getPos(), 5, 5, 5));
-                    if (entity == null) return 0;
-                    player.networkHandler.sendPacket(new SetCameraEntityS2CPacket(entity));
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-
-                return 1;
-            }));
+        LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+            Identifier gameplayFishingId = Identifier.of("minecraft", "gameplay/fishing");
+            if (id.equals(gameplayFishingId)) {
+                tableBuilder.modifyPools(tableBuilder1 -> {
+                    LostBookType.LOST_BOOKS.forEach(lostBookType -> {
+                        NbtCompound nbtCompound = new NbtCompound();
+                        nbtCompound.putString("lostBookId", String.valueOf(lostBookType.id()));
+                        tableBuilder1.
+                                with(ItemEntry.builder(ZauberItems.LOST_BOOK)
+                                        .apply(SetNbtLootFunction.builder(nbtCompound))
+                                );
+                    });
+                });
+            }
         });
     }
 
-    public static <T extends Entity> void registerEntity1(String path, EntityType<T> type) {
-        Registry.register(Registries.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, path), type);
+    public static <T extends ParticleEffect> void registerParticle(String path, ParticleType<T> type) {
+        Registry.register(Registries.PARTICLE_TYPE, Identifier.of(Zauber.MOD_ID, path), type);
     }
 
     public static <T extends Entity> void registerEntity(String path, EntityType<T> type) {
