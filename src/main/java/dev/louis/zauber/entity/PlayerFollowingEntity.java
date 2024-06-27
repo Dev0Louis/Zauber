@@ -6,18 +6,25 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
+import org.joml.Vector3f;
+
+import java.util.List;
 
 public class PlayerFollowingEntity extends Entity implements PolymerEntity {
     public static final EntityType<PlayerFollowingEntity> TYPE = FabricEntityTypeBuilder
             .<PlayerFollowingEntity>create(SpawnGroup.MISC, PlayerFollowingEntity::new)
             .build();
-    private static final double HARD_TELEPORT_SQUARED_DISTANCE = Math.pow(12, 2);
-    private static final double STAND_STILL_SQUARED_DISTANCE = Math.pow(2.5, 2);
+    private static final double HARD_TELEPORT_SQUARED_DISTANCE = Math.pow(32, 2);
+    private static final double PUSH_AWAY_SQUARED_DISTANCE = 1;
     private static final double MOVE_TO_PLAYER_SQUARED_DISTANCE = Math.pow(3, 2);
+    private final double circleRotationSpeed;
 
     private final PlayerEntity player;
 
@@ -27,17 +34,22 @@ public class PlayerFollowingEntity extends Entity implements PolymerEntity {
 
     public PlayerFollowingEntity(EntityType<?> type, World world, PlayerEntity player) {
         super(type, world);
+        this.circleRotationSpeed = world.random.nextDouble() * 0.9 + 0.1;
         this.player = player;
     }
 
     @Override
     public void tick() {
         super.tick();
+
+        //drag
+        this.setVelocity(this.getVelocity().multiply(0.95));
+
         var target = player.getEyePos();
-        double x = Math.sin(this.age / 15f) * 1.5;
-        double z = Math.cos(this.age / 15f) * 1.5;
-        target = target.add(x, 0, z);
-        var vec = this.getPos().relativize(target);
+        double timer = 20f * circleRotationSpeed;
+        double x = Math.sin(this.age / timer) * 2;
+        double z = Math.cos(this.age / timer) * 2;
+        target = target.add(x, .8, z);
         var sqrtDistance = target.squaredDistanceTo(this.getPos());;
 
         if (sqrtDistance > HARD_TELEPORT_SQUARED_DISTANCE) {
@@ -45,10 +57,12 @@ public class PlayerFollowingEntity extends Entity implements PolymerEntity {
             return;
         }
 
-        if (sqrtDistance < STAND_STILL_SQUARED_DISTANCE && false) {
-            this.setVelocity(this.getVelocity().multiply(0.9));
+        var vec = this.getPos().relativize(target).normalize();
+
+        if (sqrtDistance < PUSH_AWAY_SQUARED_DISTANCE) {
+            this.addVelocity(vec.multiply(-0.3));
         } else {
-            this.addVelocity(vec.normalize().multiply(0.1));
+            this.addVelocity(vec.multiply(0.1));
         }
 
         this.velocityDirty = true;
@@ -83,7 +97,14 @@ public class PlayerFollowingEntity extends Entity implements PolymerEntity {
     }
 
     @Override
+    public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.getId(), DisplayEntity.ItemDisplayEntity.ITEM.getType(), Items.BEDROCK.getDefaultStack()));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.SCALE.getId(), DisplayEntity.SCALE.getType(), new Vector3f(.2f)));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.TELEPORT_DURATION.getId(), DisplayEntity.TELEPORT_DURATION.getType(), 10));
+    }
+
+    @Override
     public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        return EntityType.SHULKER_BULLET;
+        return EntityType.ITEM_DISPLAY;
     }
 }

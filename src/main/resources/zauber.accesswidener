@@ -15,3 +15,6 @@ accessible field net/minecraft/structure/StructureTemplate blockInfoLists Ljava/
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler lastTickY D
 accessible field net/minecraft/entity/projectile/thrown/ThrownItemEntity ITEM Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/projectile/PersistentProjectileEntity stack Lnet/minecraft/item/ItemStack;
+accessible field net/minecraft/entity/decoration/DisplayEntity$ItemDisplayEntity ITEM Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/entity/decoration/DisplayEntity INTERPOLATION_DURATION Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/entity/decoration/DisplayEntity TELEPORT_DURATION Lnet/minecraft/entity/data/TrackedData;

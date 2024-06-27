@@ -133,7 +133,7 @@ public class Zauber implements ModInitializer {
         registerEntity("haunting_damage", HauntingDamageEntity.TYPE);
         registerEntity("ice_peak", IcePeakEntity.TYPE);
         registerEntity("hail_stone", HailStoneEntity.TYPE);
-        //registerEntity("player_following", PlayerFollowingEntity.TYPE);
+        registerEntity("player_following", PlayerFollowingEntity.TYPE);
         registerEntity("mana_horse", ManaHorseEntity.TYPE);
         registerEntity("thrown_heart_of_the_ice", ThrownHeartOfTheIceEntity.TYPE);
         registerEntity("mana_arrow", ManaArrowEntity.TYPE);
