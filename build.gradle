@@ -25,13 +25,19 @@ repositories {
     }
     maven { url 'https://maven.nucleoid.xyz' } // You should have it
 
-    maven {url "https://maven.terraformersmc.com/releases/"}
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+    maven {
+        name = "Ladysnake Libs"
+        url = 'https://maven.ladysnake.org/releases'
+    }
     maven {url "https://oss.sonatype.org/content/repositories/snapshots/"}
     maven {
         name 'Xander Maven'
         url 'https://maven.isxander.dev/releases'
     }
-    mavenLocal()
 }
 
 loom {
@@ -63,6 +69,7 @@ dependencies {
 
     include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
     modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
+    modImplementation "dev.emi:trinkets:${project.trinkets_version}"
 }
 
 remapJar {

@@ -27,6 +27,7 @@ public class PlayerFollowingEntity extends Entity implements PolymerEntity {
     private final double circleRotationSpeed;
 
     private final PlayerEntity player;
+    private final double heightOffset;
 
     public PlayerFollowingEntity(EntityType<?> type, World world) {
         this(type, world, world.getPlayers().get(0));
@@ -34,22 +35,21 @@ public class PlayerFollowingEntity extends Entity implements PolymerEntity {
 
     public PlayerFollowingEntity(EntityType<?> type, World world, PlayerEntity player) {
         super(type, world);
-        this.circleRotationSpeed = world.random.nextDouble() * 0.9 + 0.1;
+        this.circleRotationSpeed = world.random.nextDouble() * 0.5 + 0.5;
+        this.heightOffset = world.random.nextDouble() * 0.5;
         this.player = player;
+        this.setVelocity(world.random.nextDouble() * 10, world.random.nextDouble() * 10, world.random.nextDouble() * 10);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        //drag
-        this.setVelocity(this.getVelocity().multiply(0.95));
-
         var target = player.getEyePos();
-        double timer = 20f * circleRotationSpeed;
+        double timer = 10f * circleRotationSpeed;
         double x = Math.sin(this.age / timer) * 2;
         double z = Math.cos(this.age / timer) * 2;
-        target = target.add(x, .8, z);
+        target = target.add(x, .8 + heightOffset, z);
         var sqrtDistance = target.squaredDistanceTo(this.getPos());;
 
         if (sqrtDistance > HARD_TELEPORT_SQUARED_DISTANCE) {
@@ -60,8 +60,14 @@ public class PlayerFollowingEntity extends Entity implements PolymerEntity {
         var vec = this.getPos().relativize(target).normalize();
 
         if (sqrtDistance < PUSH_AWAY_SQUARED_DISTANCE) {
+            //drag
+            this.setVelocity(this.getVelocity().multiply(0.96));
+
             this.addVelocity(vec.multiply(-0.3));
-        } else {
+        } else if (sqrtDistance > MOVE_TO_PLAYER_SQUARED_DISTANCE) {
+            //drag
+            this.setVelocity(this.getVelocity().multiply(0.96));
+
             this.addVelocity(vec.multiply(0.1));
         }
 
@@ -100,7 +106,7 @@ public class PlayerFollowingEntity extends Entity implements PolymerEntity {
     public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.getId(), DisplayEntity.ItemDisplayEntity.ITEM.getType(), Items.BEDROCK.getDefaultStack()));
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.SCALE.getId(), DisplayEntity.SCALE.getType(), new Vector3f(.2f)));
-        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.TELEPORT_DURATION.getId(), DisplayEntity.TELEPORT_DURATION.getType(), 10));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.TELEPORT_DURATION.getId(), DisplayEntity.TELEPORT_DURATION.getType(), 5));
     }
 
     @Override
