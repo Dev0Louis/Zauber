@@ -19,7 +19,7 @@ public abstract class EntitiyTargetingSpell extends Spell {
     public EntitiyTargetingSpell(SpellType<?> spellType, PlayerEntity caster) {
         super(spellType, caster);
 
-        var optionalEntity = getTargetedEntity(caster,);
+        var optionalEntity = getTargetedEntity(caster);
         optionalEntity.ifPresent(entity -> this.entity = entity);
     }
 
