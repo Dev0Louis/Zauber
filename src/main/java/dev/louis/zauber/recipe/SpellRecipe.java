@@ -10,6 +10,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
@@ -17,10 +18,11 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.world.World;
 
-public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, PolymerRecipe {
-    public static final SpellRecipe EMPTY = new SpellRecipe(new ItemStack(Items.AIR));
+public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Recipe<Inventory>, PolymerRecipe {
+    public static final SpellRecipe EMPTY = new SpellRecipe(Ingredient.empty(), ItemStack.EMPTY);
 
     @Override
     public ItemStack getResult(DynamicRegistryManager registryManager) {
@@ -33,7 +35,7 @@ public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, Polyme
 
     @Override
     public boolean matches(Inventory inventory, World world) {
-        return inventory.getStack(0).isOf(Items.BOOK);
+        return inventory.getStack(0).isOf(Items.BOOK) && ingredient.test(inventory.getStack(1));
     }
 
     @Override
@@ -63,13 +65,10 @@ public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, Polyme
 
 
         private SpellRecipeSerializer() {
-            this.codec = RecordCodecBuilder.create(
-                    instance -> instance.group(Identifier.CODEC.fieldOf("spell").forGetter(SpellRecipe::getSpellId))
-                            .apply(
-                                    instance,
-                                    identifier -> SpellType.get(identifier).map(type -> new SpellRecipe(SpellBookItem.createSpellBook(type))).orElse(SpellRecipe.EMPTY)
-                            )
-            );
+            this.codec = RecordCodecBuilder.create(instance -> instance.group(
+                    Identifier.CODEC.fieldOf("spell").forGetter(SpellRecipe::getSpellId),
+                    Codecs.createStrictOptionalFieldCodec(Ingredient.DISALLOW_EMPTY_CODEC, "ingredient", Ingredient.empty()).forGetter(SpellRecipe::ingredient)
+            ).apply(instance, (identifier, ingredient) -> SpellType.get(identifier).map(type -> new SpellRecipe(ingredient, SpellBookItem.createSpellBook(type))).orElse(SpellRecipe.EMPTY)));
         }
 
         @Override
@@ -79,16 +78,29 @@ public record SpellRecipe(ItemStack result) implements Recipe<Inventory>, Polyme
 
         @Override
         public SpellRecipe read(PacketByteBuf buf) {
-            if(!buf.readBoolean())return SpellRecipe.EMPTY;
+            if (!buf.readBoolean()) return SpellRecipe.EMPTY;
+
+            Ingredient ingredient;
+            if (buf.readBoolean()) ingredient = Ingredient.fromPacket(buf);
+            else ingredient = Ingredient.empty();
+
             var spellType = SpellType.get(buf.readIdentifier());
-            return spellType.map(type -> new SpellRecipe(SpellBookItem.createSpellBook(type))).orElse(SpellRecipe.EMPTY);
+            return spellType.map(type -> new SpellRecipe(ingredient, SpellBookItem.createSpellBook(type))).orElse(SpellRecipe.EMPTY);
         }
 
         @Override
         public void write(PacketByteBuf buf, SpellRecipe recipe) {
             var spellTypeOptional = SpellBookItem.getSpellType(recipe.result);
             buf.writeBoolean(spellTypeOptional.isPresent());
-            spellTypeOptional.ifPresent(spellType -> buf.writeIdentifier(spellType.getId()));
+
+            spellTypeOptional.ifPresent(spellType -> {
+                buf.writeBoolean(!recipe.ingredient.isEmpty());
+                if (!recipe.ingredient.isEmpty()) {
+                    recipe.ingredient.write(buf);
+                }
+
+                buf.writeIdentifier(spellType.getId());
+            });
         }
     }
 

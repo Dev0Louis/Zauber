@@ -1,6 +1,6 @@
 {
   "type": "zauber:spell_recipe",
-  "spell": "zauber:ice",
+  "spell": "zauber:hail_storm",
   "ingredient": {
     "item": "zauber:heart_of_the_ice"
   }

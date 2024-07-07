@@ -38,11 +38,11 @@ public class SpellTableScreenHandler extends ScreenHandler{
     private List<RecipeEntry<SpellRecipe>> availableRecipes = Lists.newArrayList();
     private ItemStack inputStack = ItemStack.EMPTY;
     long lastTakeTime;
-    final Slot inputSlot;
+    final Slot bookInputSlot;
+    final Slot heartInputSlot;
     final Slot outputSlot;
     Runnable contentsChangedListener = () -> {};
-    public final Inventory input = new SimpleInventory(1){
-
+    public final Inventory input = new SimpleInventory(2){
         @Override
         public void markDirty() {
             super.markDirty();
@@ -62,7 +62,8 @@ public class SpellTableScreenHandler extends ScreenHandler{
         this.context = context;
         this.charge = charge;
         this.world = playerInventory.player.getWorld();
-        this.inputSlot = this.addSlot(new Slot(this.input, 0, 20, 33));
+        this.bookInputSlot = this.addSlot(new Slot(this.input, 0, 20, 33));
+        this.heartInputSlot = this.addSlot(new Slot(this.input, 1, 20, 53));
         this.outputSlot = this.addSlot(new Slot(this.output, 1, 143, 33){
 
             @Override
@@ -78,13 +79,14 @@ public class SpellTableScreenHandler extends ScreenHandler{
             @Override
             public void onTakeItem(PlayerEntity player, ItemStack stack) {
                 if(!modifyCharge(-stack.getCount())) {
-                    if(player instanceof ServerPlayerEntity p)p.networkHandler.disconnect(Text.of("Please Contact Support"));
+                    if(player instanceof ServerPlayerEntity p)p.networkHandler.disconnect(Text.of("Please Contact Zauber Mod Dev"));
                     return;
                 }
 
                 stack.onCraftByPlayer(player.getWorld(), player, stack.getCount());
                 SpellTableScreenHandler.this.output.unlockLastRecipe(player, this.getInputStacks());
-                ItemStack itemStack = SpellTableScreenHandler.this.inputSlot.takeStack(1);
+                ItemStack itemStack = SpellTableScreenHandler.this.bookInputSlot.takeStack(1);
+                SpellTableScreenHandler.this.heartInputSlot.takeStack(1);
                 if (!itemStack.isEmpty()) {
                     SpellTableScreenHandler.this.populateResult();
                 }
@@ -98,7 +100,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
                 super.onTakeItem(player, stack);
             }
             private List<ItemStack> getInputStacks() {
-                return List.of(SpellTableScreenHandler.this.inputSlot.getStack());
+                return List.of(SpellTableScreenHandler.this.bookInputSlot.getStack());
             }
         });
         for (i = 0; i < 3; ++i) {
@@ -126,7 +128,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
     }
 
     public boolean canCraft() {
-        return (this.inputSlot.hasStack() && !this.availableRecipes.isEmpty());
+        return (this.bookInputSlot.hasStack() && !this.availableRecipes.isEmpty());
     }
 
     public boolean hasCharge() {
@@ -177,8 +179,9 @@ public class SpellTableScreenHandler extends ScreenHandler{
 
     @Override
     public void onContentChanged(Inventory inventory) {
-        ItemStack itemStack = this.inputSlot.getStack();
-        if (!itemStack.isOf(this.inputStack.getItem())) {
+        super.onContentChanged(inventory);
+        ItemStack itemStack = this.bookInputSlot.getStack();
+        if (inventory == this.input) {
             this.inputStack = itemStack.copy();
             this.updateInput(inventory, itemStack);
         }
@@ -234,16 +237,29 @@ public class SpellTableScreenHandler extends ScreenHandler{
             ItemStack itemStack2 = slot2.getStack();
             Item item = itemStack2.getItem();
             itemStack = itemStack2.copy();
-            if (slot == 1) {
+            if (slot == 2) {
                 if(!isChargeValid(this.charge.get()-itemStack2.getCount()))return ItemStack.EMPTY;
                 item.onCraftByPlayer(itemStack2, player.getWorld(), player);
                 if (!this.insertItem(itemStack2, 2, 38, true)) {
                     return ItemStack.EMPTY;
                 }
                 slot2.onQuickTransfer(itemStack2, itemStack);
-            } else if (slot == 0 ? !this.insertItem(itemStack2, 2, 38, false) : (this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, new SimpleInventory(itemStack2), this.world).isPresent() ? !this.insertItem(itemStack2, 0, 1, false) : (slot >= 2 && slot < 29 ? !this.insertItem(itemStack2, 29, 38, false) : slot >= 29 && slot < 38 && !this.insertItem(itemStack2, 2, 29, false)))) {
-                return ItemStack.EMPTY;
+            } else {
+                //WARNING AHEAD!!!
+                //DEAMONS MAY JUMP OUT OF THIS CODE AND ATTACK YOU THROUGH YOUR COMPUTER SCREEN PROCEED WITH CAUTION!
+                boolean moveIntoSpellTableSlots = slot == 0 || slot == 1 ? !this.insertItem(itemStack2, 3, 39, false) : (this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, new SimpleInventory(itemStack2, this.heartInputSlot.getStack()), this.world).isPresent() || this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, new SimpleInventory(this.bookInputSlot.getStack(), itemStack2), this.world).isPresent());
+                boolean b;
+                if (moveIntoSpellTableSlots) {
+                    b = !this.insertItem(itemStack2, 0, 2, false);
+                } else {
+                    b = (slot >= 3 && slot < 30 ? !this.insertItem(itemStack2, 30, 39, false) : slot >= 30 && slot < 39 && !this.insertItem(itemStack2, 3, 30, false));
+                }
+                System.out.println(b);
+                if (b) {
+                    return ItemStack.EMPTY;
+                }
             }
+
             if (itemStack2.isEmpty()) {
                 slot2.setStack(ItemStack.EMPTY);
             }

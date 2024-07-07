@@ -33,6 +33,7 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
         registerBook(Identifier.of(Zauber.MOD_ID, "smelting"), 3);
         registerBook(Identifier.of(Zauber.MOD_ID, "summoning"), 3);
         registerBook(Identifier.of(Zauber.MOD_ID, "heart_of_the_sea"), 3);
+        registerBook(Identifier.of(Zauber.MOD_ID, "mana_horse"), 3);
 
     }
 

@@ -27,7 +27,6 @@ public class LostBookItem extends Item {
         } else {
             if (user.isCreative()) {
                 itemStack.getOrCreateNbt().putString("lostBookId", String.valueOf(LostBookType.getRandom(user.getRandom()).id()));
-                /* recursion hehe */
                 user.sendMessage(Text.literal("Generating random book...").formatted(Formatting.BLUE));
                 return use(world, user, hand);
             }

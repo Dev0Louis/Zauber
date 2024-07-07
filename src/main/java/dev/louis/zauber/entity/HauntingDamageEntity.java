@@ -196,8 +196,7 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
         if (entity instanceof LivingEntity livingEntity && entity.equals(this.getOwner())) {
-            livingEntity.timeUntilRegen = 0;
-            livingEntity.damage(damageSource, damageAmount);
+            livingEntity.applyDamage(damageSource, damageAmount);
             this.discard();
         }
     }

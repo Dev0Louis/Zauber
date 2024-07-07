@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 
 public class ZauberItemTags {
     public static final TagKey<Item> BLOOD_CONTAINING = of("blood_containing");
+    public static final TagKey<Item> DESTROYED_BY_LIGHT = of("destroyed_by_light");
 
     private static TagKey<Item> of(String id) {
         return TagKey.of(RegistryKeys.ITEM, Identifier.of(Zauber.MOD_ID, id));

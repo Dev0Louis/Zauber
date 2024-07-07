@@ -38,6 +38,10 @@ repositories {
         name 'Xander Maven'
         url 'https://maven.isxander.dev/releases'
     }
+    maven { // Vineflower
+        name = "sonatype-oss-snapshots1"
+        url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 loom {
@@ -70,6 +74,7 @@ dependencies {
     include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
     modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
     modImplementation "dev.emi:trinkets:${project.trinkets_version}"
+    vineflowerDecompilerClasspath "org.vineflower:vineflower:1.11.0-SNAPSHOT"
 }
 
 remapJar {
