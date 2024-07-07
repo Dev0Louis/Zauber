@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 public class SoulHornItem extends Item implements PolymerItem, PolymerKeepModel, PolymerClientDecoded {
     private static final Identifier GOAT_HORN_ID = Identifier.tryParse("call_goat_horn");
 
-
     public SoulHornItem(Settings settings) {
         super(settings);
     }
