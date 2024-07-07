@@ -254,7 +254,6 @@ public class SpellTableScreenHandler extends ScreenHandler{
                 } else {
                     b = (slot >= 3 && slot < 30 ? !this.insertItem(itemStack2, 30, 39, false) : slot >= 30 && slot < 39 && !this.insertItem(itemStack2, 3, 30, false));
                 }
-                System.out.println(b);
                 if (b) {
                     return ItemStack.EMPTY;
                 }
