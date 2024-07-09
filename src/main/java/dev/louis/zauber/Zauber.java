@@ -48,7 +48,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.SetComponentsLootFunction;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
@@ -168,11 +167,9 @@ public class Zauber implements ModInitializer {
 
         LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
             Identifier gameplayFishingId = Identifier.of("minecraft", "gameplay/fishing");
-            if (key.getRegistry().equals(gameplayFishingId)) {
+            if (key.getValue().equals(gameplayFishingId)) {
                 tableBuilder.modifyPools(tableBuilder1 -> {
                     LostBookType.LOST_BOOKS.forEach(lostBookType -> {
-                        NbtCompound nbtCompound = new NbtCompound();
-                        nbtCompound.putString("lostBookId", String.valueOf(lostBookType.id()));
                         tableBuilder1.
                                 with(ItemEntry.builder(ZauberItems.LOST_BOOK)
                                         .apply(SetComponentsLootFunction.builder(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(lostBookType.id())))
