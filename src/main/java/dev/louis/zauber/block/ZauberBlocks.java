@@ -4,13 +4,12 @@ import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.entity.DarknessAccumulatorBlockEntity;
 import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.enums.BedPart;
-import net.minecraft.block.enums.Instrument;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -23,9 +22,9 @@ public class ZauberBlocks {
     public static final Block SPELL_TABLE = register(
             "spell_table",
             new SpellTableBlock(
-                    FabricBlockSettings.create()
+                    AbstractBlock.Settings.create()
                             .mapColor(MapColor.BLACK)
-                            .instrument(Instrument.BASEDRUM)
+                            .instrument(NoteBlockInstrument.BASEDRUM)
                             .requiresTool()
                             .luminance(SpellTableBlock::getLightLevel)
                             .strength(5.0F, 1200.0F)
@@ -36,7 +35,7 @@ public class ZauberBlocks {
     public static final Block RITUAL_STONE = register(
             "ritual_stone",
             new RitualStoneBlock(
-                    FabricBlockSettings.create()
+                    AbstractBlock.Settings.create()
                             .mapColor(MapColor.IRON_GRAY)
                             .requiresTool()
                             .strength(3.5F)
@@ -47,7 +46,7 @@ public class ZauberBlocks {
     public static final Block ITEM_SACRIFICER = register(
             "item_sacrificer",
             new ItemSacrificerBlock(
-                    FabricBlockSettings.create()
+                    AbstractBlock.Settings.create()
                             .mapColor(MapColor.IRON_GRAY)
                             .requiresTool()
                             .strength(3.5F)
@@ -58,7 +57,7 @@ public class ZauberBlocks {
     public static final Block MANA_CAULDRON = register(
             "mana_cauldron",
             new ManaCauldron(
-                    FabricBlockSettings.create()
+                    AbstractBlock.Settings.create()
                             .mapColor(MapColor.IRON_GRAY)
                             .requiresTool()
                             .strength(3.5F)

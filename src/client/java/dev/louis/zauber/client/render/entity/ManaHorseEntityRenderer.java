@@ -25,11 +25,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
         super(context);
     }
 
-    public final Identifier octagram = new Identifier(Zauber.MOD_ID, "textures/symbol/octagram.png");
-    public final Identifier spell_rings = new Identifier(Zauber.MOD_ID, "textures/symbol/spell_rings.png");
-    public final Identifier spell2 = new Identifier(Zauber.MOD_ID, "textures/symbol/spell2.png");
-    public final Identifier spell3 = new Identifier(Zauber.MOD_ID, "textures/symbol/spell3-old.png");
-    public final Identifier spell4 = new Identifier(Zauber.MOD_ID, "textures/symbol/spell4.png");
+    public final Identifier spell4 = Identifier.of(Zauber.MOD_ID, "textures/symbol/spell4.png");
 
 
     @Override
@@ -38,7 +34,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
         float lerpAngleDegrees = MathHelper.lerpAngleDegrees(tickDelta, mobEntity.prevBodyYaw, mobEntity.bodyYaw);
         float animationProgress = this.getAnimationProgress(mobEntity, tickDelta);
 
-        this.setupTransforms(mobEntity, matrixStack, animationProgress, lerpAngleDegrees, tickDelta);
+        this.setupTransforms(mobEntity, matrixStack, animationProgress, lerpAngleDegrees, tickDelta, mobEntity.getScale());
 
 
         renderSymbol(
@@ -89,22 +85,21 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
 
         Matrix4f positionMatrix = matrixStack.peek().getPositionMatrix();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
 
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
         int alpha = (int) (255 / distanceToGround);
-        buffer.vertex(positionMatrix, 0, 1, 0).color(0, 0, 255, alpha).texture(0f, 0f).next();
-        buffer.vertex(positionMatrix, 0, 0, 0).color(0, 0, 255, alpha).texture(0f, 1f).next();
-        buffer.vertex(positionMatrix, 1, 0, 0).color(0, 0, 255, alpha).texture(1f, 1f).next();
-        buffer.vertex(positionMatrix, 1, 1, 0).color(0, 0, 255, alpha).texture(1f, 0f).next();
+        bufferBuilder.vertex(positionMatrix, 0, 1, 0).color(0, 0, 255, alpha).texture(0f, 0f);
+        bufferBuilder.vertex(positionMatrix, 0, 0, 0).color(0, 0, 255, alpha).texture(0f, 1f);
+        bufferBuilder.vertex(positionMatrix, 1, 0, 0).color(0, 0, 255, alpha).texture(1f, 1f);
+        bufferBuilder.vertex(positionMatrix, 1, 1, 0).color(0, 0, 255, alpha).texture(1f, 0f);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         RenderSystem.setShaderTexture(0, texture);
         RenderSystem.enableDepthTest();
         //RenderSystem.disableCull();
         //RenderSystem.enableBlend();
 
-        tessellator.draw();
+        BufferRenderer.draw(bufferBuilder.end());
 
         //RenderSystem.disableBlend();
         //RenderSystem.enableCull();
@@ -132,22 +127,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
     }
 
     @Override
-    public float getRed() {
-        return 0;
-    }
-
-    @Override
-    public float getGreen() {
-        return 0;
-    }
-
-    @Override
-    public float getBlue() {
-        return 1f;
-    }
-
-    @Override
-    public float getAlpha() {
-        return 0.7f;
+    public int getColor() {
+        return 0xB20000FF;
     }
 }

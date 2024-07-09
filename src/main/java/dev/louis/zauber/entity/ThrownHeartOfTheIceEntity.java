@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ThrownHeartOfTheIceEntity extends ThrownItemEntity implements PolymerEntity, PolymerClientDecoded, PolymerKeepModel {
-    public static final EntityType<ThrownHeartOfTheIceEntity> TYPE = EntityType.Builder.<ThrownHeartOfTheIceEntity>create(ThrownHeartOfTheIceEntity::new, SpawnGroup.MISC).setDimensions(0.25F, 0.25F).maxTrackingRange(4).trackingTickInterval(10).build();
+    public static final EntityType<ThrownHeartOfTheIceEntity> TYPE = EntityType.Builder.<ThrownHeartOfTheIceEntity>create(ThrownHeartOfTheIceEntity::new, SpawnGroup.MISC).dimensions(0.25F, 0.25F).maxTrackingRange(4).trackingTickInterval(10).build();
 
 
     public ThrownHeartOfTheIceEntity(EntityType<? extends ThrownItemEntity> entityType, World world) {

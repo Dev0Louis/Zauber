@@ -114,17 +114,11 @@ public class ExtinguishedWallTorchBlock extends ExtinguishedTorchBlock {
     @Override
     public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
         if(Zauber.isClientModded(player)) return state;
-        return this.getPolymerBlockState(state);
+        return Blocks.WALL_TORCH.getDefaultState();
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state, ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return this;
-        return Blocks.WALL_TORCH;
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.WALL_TORCH;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.WALL_TORCH.getDefaultState();
     }
 }

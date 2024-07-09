@@ -4,12 +4,13 @@ import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.tag.ZauberPotionTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.cauldron.CauldronBehavior;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
@@ -30,14 +31,18 @@ public interface CauldronBehaviorMixin {
             at = @At(value = "HEAD")
     )
     private static void addManaPotionBehavior(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, ItemStack stack, CallbackInfoReturnable<ActionResult> cir) {
-        if (!world.isClient && PotionUtil.getPotion(stack).getRegistryEntry().isIn(ZauberPotionTags.MANA)) {
-            Item item = stack.getItem();
-            player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, new ItemStack(Items.GLASS_BOTTLE)));
-            player.incrementStat(Stats.USE_CAULDRON);
-            player.incrementStat(Stats.USED.getOrCreateStat(item));
-            world.setBlockState(pos, ZauberBlocks.MANA_CAULDRON.getDefaultState());
-            world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
-            world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
+        if (!world.isClient) {
+            stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).potion().ifPresent(potion -> {
+                if (potion.isIn(ZauberPotionTags.MANA)) {
+                    Item item = stack.getItem();
+                    player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, new ItemStack(Items.GLASS_BOTTLE)));
+                    player.incrementStat(Stats.USE_CAULDRON);
+                    player.incrementStat(Stats.USED.getOrCreateStat(item));
+                    world.setBlockState(pos, ZauberBlocks.MANA_CAULDRON.getDefaultState());
+                    world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
+                }
+            });
         }
     }
 

@@ -123,16 +123,14 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
         this.setStoredStack(ItemStack.EMPTY);
     }
 
-    public void onBlockClicked(PlayerEntity player, World world, BlockPos pos) {
+    public void onInteracted(PlayerEntity player, ItemStack stack, World world, BlockPos pos) {
         switch (this.state) {
             case INACTIVE -> {
-
-                var handStack = player.getMainHandStack().copyWithCount(1);
-                if (!handStack.isEmpty()) {
-                    player.getMainHandStack().decrement(1);
+                if (!stack.isEmpty()) {
                     this.giveBackRitualItem(player);
-                    this.tryEasterEgg(player, handStack);
-                    this.setStoredStack(handStack);
+                    this.tryEasterEgg(player, stack);
+                    this.setStoredStack(stack.copy());
+                    stack.decrement(1);
                     return;
                 } else if (player.isSneaking()) {
                     this.giveBackRitualItem(player);

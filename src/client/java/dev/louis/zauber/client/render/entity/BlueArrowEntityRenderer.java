@@ -5,13 +5,12 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.ProjectileEntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.util.Identifier;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
 
 public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<PersistentProjectileEntity> {
-    public static final Identifier TEXTURE = new Identifier("textures/entity/projectiles/arrow.png");
+    public static final Identifier TEXTURE = Identifier.ofVanilla("textures/entity/projectiles/arrow.png");
 
     public BlueArrowEntityRenderer(EntityRendererFactory.Context context) {
         super(context);
@@ -22,10 +21,11 @@ public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<Persistent
         return TEXTURE;
     }
 
+
+
     @Override
     public void vertex(
-            Matrix4f positionMatrix,
-            Matrix3f normalMatrix,
+            MatrixStack.Entry matrix,
             VertexConsumer vertexConsumer,
             int x,
             int y,
@@ -37,13 +37,13 @@ public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<Persistent
             int normalY,
             int light
     ) {
-        vertexConsumer.vertex(positionMatrix, x, y, z)
+        vertexConsumer
+                .vertex(matrix, x, y, z)
                 .color(0, 0, 255, 100)
                 .texture(u, v)
                 .overlay(OverlayTexture.DEFAULT_UV)
                 .light(light)
-                .normal(normalMatrix, (float)normalX, (float)normalY, (float)normalZ)
-                .next();
+                .normal(matrix, normalX, normalY, normalZ);
     }
 
     public RenderLayer getRenderLayer(Identifier texture) {

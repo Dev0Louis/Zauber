@@ -4,12 +4,10 @@ import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.helper.ParticleHelper;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.CompassItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
@@ -60,16 +58,17 @@ public class TeleportToLodestoneRitual extends Ritual {
                 .filter(itemSacrificerBlockEntity -> itemSacrificerBlockEntity.getStoredStack().isOf(Items.ENDER_PEARL)).toList();
         if (collectedMana >= 40 && !itemSacrificersWithEnderPearl.isEmpty()) {
             itemSacrificersWithEnderPearl.forEach(itemSacrificer -> itemSacrificer.setStoredStack(ItemStack.EMPTY));
-            NbtCompound nbt = ritualStoneBlockEntity.getStoredStack().getNbt();
-            if (nbt != null) {
-                BlockPos blockPos = NbtHelper.toBlockPos(nbt.getCompound("LodestonePos"));
+            var globalPos = ritualStoneBlockEntity.getStoredStack().get(DataComponentTypes.LODESTONE_TRACKER).target();
+            if (globalPos.isPresent()) {
+                BlockPos blockPos = globalPos.get().pos();
                 this.getAffectedEntities()
-                        // Limit the amount of entities that will be transported by the amount of enderpearls given
+                        // Limit the amount of entities that will be transported by the amount of ender pearls given
                         .limit(itemSacrificersWithEnderPearl.size()).forEach(livingEntity -> {
                     livingEntity.teleport(
                             blockPos.getX(),
                             blockPos.getY() + 1,
-                            blockPos.getZ()
+                            blockPos.getZ(),
+                            true
                     );
                 });
             }
@@ -102,18 +101,16 @@ public class TeleportToLodestoneRitual extends Ritual {
     }
 
     public static boolean isCompassWithLodestoneInSameWorld(World world, ItemStack itemStack) {
-        if (CompassItem.hasLodestone(itemStack)) {
-            NbtCompound nbt = itemStack.getNbt();
-            if (nbt == null) return false;
-            if (CompassItem.getLodestoneDimension(nbt).map(registryKey -> registryKey.equals(world.getRegistryKey())).orElse(false)) {
+        if (itemStack.contains(DataComponentTypes.LODESTONE_TRACKER)) {
+            var component = itemStack.get(DataComponentTypes.LODESTONE_TRACKER);
+            var target = component.target();
+            if (target.map(registryKey -> registryKey.dimension().equals(world.getRegistryKey())).orElse(false)) {
                 //We are in the same dimension.
-                if (nbt.contains("LodestoneTracked") && !nbt.getBoolean("LodestoneTracked")) {
+                if (!component.tracked()) {
                     return false;
                 }
-                BlockPos blockPos = NbtHelper.toBlockPos(nbt.getCompound("LodestonePos"));
-                if (world.isInBuildLimit(blockPos) && ((ServerWorld)world).getPointOfInterestStorage().hasTypeAt(PointOfInterestTypes.LODESTONE, blockPos)) {
-                    return true;
-                }
+                BlockPos blockPos = target.get().pos();
+                return world.isInBuildLimit(blockPos) && ((ServerWorld) world).getPointOfInterestStorage().hasTypeAt(PointOfInterestTypes.LODESTONE, blockPos);
             }
         }
         return false;

@@ -21,17 +21,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.EntityView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-/*
-TODO: Making it item bound, making it shake before it returns in the item. Better death sound and effect.
- */
 public class ManaHorseEntity extends HorseEntity implements PolymerEntity, PolymerClientDecoded, PolymerKeepModel, Ownable {
     public static final EntityType<ManaHorseEntity> TYPE =
-            EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).setDimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
+            EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).dimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
     private static final ParticleEffect PARTICLE_EFFECT = new DustParticleEffect(new Vector3f(0, 0, 0.8f), 1f);
     private LivingEntity owner;
 
@@ -48,12 +44,12 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     protected void initAttributes(Random random) {
         this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(12);
         this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.6);
-        this.getAttributeInstance(EntityAttributes.HORSE_JUMP_STRENGTH).setBaseValue(1.0);
+        this.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH).setBaseValue(1.0);
     }
 
     public static DefaultAttributeContainer.Builder createBaseHorseAttributes() {
         return MobEntity.createMobAttributes()
-                .add(EntityAttributes.HORSE_JUMP_STRENGTH)
+                .add(EntityAttributes.GENERIC_JUMP_STRENGTH)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 0.01)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.6);
     }
@@ -170,11 +166,6 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     @Override
     public boolean isInvisibleTo(PlayerEntity player) {
         return false;
-    }
-
-    @Override
-    public EntityView method_48926() {
-        return this.getWorld();
     }
 
     @Override

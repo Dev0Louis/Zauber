@@ -8,11 +8,11 @@ import net.minecraft.server.network.ServerPlayerConfigurationTask;
 import java.util.function.Consumer;
 
 public class OptionSyncTask implements ServerPlayerConfigurationTask {
-    public static final Key KEY = new Key(OptionSyncPacket.TYPE.getId().toString());
+    public static final Key KEY = new Key(OptionSyncPayload.ID.id().toString());
 
     @Override
     public void sendPacket(Consumer<Packet<?>> sender) {
-        var packet = new OptionSyncPacket(ConfigManager.getServerConfig());
+        var packet = new OptionSyncPayload(ConfigManager.getServerConfig());
         sender.accept(ServerConfigurationNetworking.createS2CPacket(packet));
     }
 

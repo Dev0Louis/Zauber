@@ -6,22 +6,28 @@ import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.client.keybind.SpellKeyBinding;
 import dev.louis.zauber.client.keybind.SpellKeybindManager;
+import dev.louis.zauber.client.model.SpellUnbakedModel;
 import dev.louis.zauber.client.render.entity.BlueArrowEntityRenderer;
 import dev.louis.zauber.client.render.entity.ManaHorseEntityRenderer;
 import dev.louis.zauber.client.screen.SpellTableScreen;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.entity.*;
+import dev.louis.zauber.entity.ManaArrowEntity;
+import dev.louis.zauber.entity.ManaHorseEntity;
+import dev.louis.zauber.entity.SpellArrowEntity;
+import dev.louis.zauber.entity.ThrownHeartOfTheIceEntity;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.networking.OptionSyncCompletePacket;
-import dev.louis.zauber.networking.OptionSyncPacket;
+import dev.louis.zauber.networking.OptionSyncCompletePayload;
+import dev.louis.zauber.networking.OptionSyncPayload;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -44,9 +50,10 @@ public class ZauberClient implements ClientModInitializer {
             ConfigManager.clearOverrideConfig();
         });
 
-        ClientConfigurationNetworking.registerGlobalReceiver(OptionSyncPacket.TYPE, (packet, responseSender) -> {
+        PayloadTypeRegistry.configurationS2C().register(OptionSyncPayload.ID, OptionSyncPayload.CODEC);
+        ClientConfigurationNetworking.registerGlobalReceiver(OptionSyncPayload.ID, (packet, context) -> {
             ConfigManager.setOverrideConfig(packet.overrideConfig());
-            responseSender.sendPacket(new OptionSyncCompletePacket());
+            context.responseSender().sendPacket(new OptionSyncCompletePayload());
         });
 
         ClientTickEvents.END_WORLD_TICK.register(world -> {
@@ -88,16 +95,16 @@ public class ZauberClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_TORCH, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ZauberBlocks.EXTINGUISHED_WALL_TORCH, RenderLayer.getCutout());
         EntityRendererRegistry.register(ThrownHeartOfTheIceEntity.TYPE, FlyingItemEntityRenderer::new);
-        ModelPredicateProviderRegistry.register(ZauberItems.MANA_BOW, new Identifier("pull"), (stack, world, entity, seed) -> {
+        ModelPredicateProviderRegistry.register(ZauberItems.MANA_BOW, Identifier.ofVanilla("pull"), (stack, world, entity, seed) -> {
             if (entity == null) {
                 return 0.0F;
             } else {
-                return entity.getActiveItem() != stack ? 0.0F : (float)(stack.getMaxUseTime() - entity.getItemUseTimeLeft()) / 20.0F;
+                return entity.getActiveItem() != stack ? 0.0F : (float)(stack.getMaxUseTime(entity) - entity.getItemUseTimeLeft()) / 20.0F;
             }
         });
         ModelPredicateProviderRegistry.register(
                 ZauberItems.MANA_BOW,
-                new Identifier("pulling"),
+                Identifier.of("pulling"),
                 (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
         );
         // DEBUG CODE
@@ -123,6 +130,16 @@ public class ZauberClient implements ClientModInitializer {
                 });
             });
         }*/
+        ModelLoadingPlugin.register(pluginContext -> {
+            pluginContext.resolveModel().register(context -> {
+                if (context.id().equals(Identifier.of("zauber:item/spell_book"))) {
+                    return new SpellUnbakedModel();
+                }
+                return null;
+            });
+            pluginContext.addModels(Zauber.Spells.ZAUBER_SPELLS.stream().map(SpellType::getId).map(identifier -> identifier.withPrefixedPath("item/").withSuffixedPath("_spell_book")).toList());
+
+        });
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides){

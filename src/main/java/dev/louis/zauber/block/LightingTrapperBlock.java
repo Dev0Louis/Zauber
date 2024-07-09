@@ -3,10 +3,8 @@ package dev.louis.zauber.block;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -25,11 +23,6 @@ public class LightingTrapperBlock extends BlockWithEntity implements PolymerBloc
         return CODEC;
     }
 
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.TINTED_GLASS;
-    }
-
 
     @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
@@ -39,6 +32,11 @@ public class LightingTrapperBlock extends BlockWithEntity implements PolymerBloc
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return null;
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state) {
         return null;
     }
 }

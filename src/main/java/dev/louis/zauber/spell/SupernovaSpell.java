@@ -6,7 +6,6 @@ import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
@@ -30,8 +29,7 @@ public class SupernovaSpell extends Spell {
             spawnParticleRing(serverPlayer, 20, 4);
 
             serverPlayer.playSound(
-                    SoundEvents.ENTITY_GENERIC_EXPLODE,
-                    SoundCategory.PLAYERS,
+                    SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
                     4,
                     1
             );

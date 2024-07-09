@@ -1,6 +1,7 @@
 package dev.louis.zauber.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import dev.louis.zauber.helper.SoundHelper;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithMovingElementHolder;
@@ -20,7 +21,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -33,6 +34,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.Collection;
 
+@ShutUpAboutBlockStateModels
 public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock, BlockWithMovingElementHolder {
     public static final MapCodec<ManaCauldron> CODEC = createCodec(ManaCauldron::new);
     public static final IntProperty MANA_LEVEL = IntProperty.of("mana_level", 1, 2);
@@ -50,7 +52,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
                 world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
             }
-            return ActionResult.success(world.isClient);
+            return ItemActionResult.success(world.isClient);
         }));
     }
 
@@ -85,11 +87,6 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.CAULDRON;
-    }
-
-    @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
@@ -97,6 +94,11 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new CustomHolder(initialBlockState);
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.CAULDRON.getDefaultState();
     }
 
     public static class CustomHolder extends ElementHolder {
@@ -117,7 +119,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
 
         @Override
         public void onTick() {
-            //connection.tick();
+            //connection.deletionTick();
             //connection.setGlowing(true);
             this.age++;
             var attachment = this.getAttachment();

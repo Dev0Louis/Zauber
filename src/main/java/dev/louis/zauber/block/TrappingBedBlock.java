@@ -1,8 +1,8 @@
 package dev.louis.zauber.block;
 
+import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.BedBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.BedPart;
@@ -15,14 +15,10 @@ import net.minecraft.util.math.Direction;
 /**
  * The Trapping Bed traps you in a sleep, that you would never wish to end...
  */
+@ShutUpAboutBlockStateModels
 public class TrappingBedBlock extends BedBlock implements PolymerBlock {
     public TrappingBedBlock(DyeColor color, Settings settings) {
         super(color, settings);
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BLACK_BED;
     }
 
     @Override

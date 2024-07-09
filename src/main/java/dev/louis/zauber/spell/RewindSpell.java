@@ -4,7 +4,6 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.config.ConfigManager;
-import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,8 +22,8 @@ public class RewindSpell extends Spell {
     @Override
     public void cast() {
         rewindWorld = (ServerWorld) getCaster().getWorld();
-        rewindTarget = new TeleportTarget(getCaster().getPos(), getCaster().getVelocity(), getCaster().getYaw(), getCaster().getPitch());
-        Zauber.LOGGER.debug("Player setting rewindTarget to " + rewindTarget.position + " and rewindWorld to " + rewindWorld.getRegistryKey().getValue());
+        rewindTarget = new TeleportTarget(rewindWorld, getCaster().getPos(), getCaster().getVelocity(), getCaster().getYaw(), getCaster().getPitch(), TeleportTarget.NO_OP);
+        Zauber.LOGGER.debug("Player setting rewindTarget to " + rewindTarget.pos() + " and rewindWorld to " + rewindWorld.getRegistryKey().getValue());
     }
 
     @Override
@@ -38,9 +37,9 @@ public class RewindSpell extends Spell {
     @Override
     public void finish() {
         if(!this.wasInterrupted && this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            double x = rewindTarget.position.getX();
-            double y = rewindTarget.position.getY();
-            double z = rewindTarget.position.getY();
+            double x = rewindTarget.pos().getX();
+            double y = rewindTarget.pos().getY();
+            double z = rewindTarget.pos().getY();
 
             this.playRewindSound(serverPlayer);
             rewindWorld.spawnParticles(
@@ -54,8 +53,8 @@ public class RewindSpell extends Spell {
                     0,
                     0
             );
-            Zauber.LOGGER.debug("Player is rewinding to " + rewindTarget.position + " in " + rewindWorld.getRegistryKey().getValue());
-            FabricDimensions.teleport(getCaster(), rewindWorld, rewindTarget);
+            Zauber.LOGGER.debug("Player is rewinding to " + rewindTarget.pos() + " in " + rewindWorld.getRegistryKey().getValue());
+            getCaster().teleportTo(rewindTarget);
         }
     }
 
@@ -80,9 +79,9 @@ public class RewindSpell extends Spell {
     private void playRewindSound(ServerPlayerEntity player) {
         player.getServerWorld().playSound(
                 null,
-                rewindTarget.position.getX(),
-                rewindTarget.position.getY(),
-                rewindTarget.position.getZ(),
+                rewindTarget.pos().getX(),
+                rewindTarget.pos().getY(),
+                rewindTarget.pos().getZ(),
                 SoundEvents.ENTITY_ENDERMAN_TELEPORT,
                 player.getSoundCategory(),
                 1,

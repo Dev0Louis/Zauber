@@ -10,7 +10,10 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -20,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -48,16 +52,27 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!world.isClient && hand == Hand.MAIN_HAND) {
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (!world.isClient) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
-                ritualStoneBlockEntity.onBlockClicked(player, world, pos);
+                ritualStoneBlockEntity.onInteracted(player, stack, world, pos);
+                return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
             }
-
         }
-        return ActionResult.CONSUME;
+        return ItemActionResult.FAIL;
+    }
 
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (!world.isClient) {
+            BlockEntity blockEntity = world.getBlockEntity(pos);
+            if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
+                ritualStoneBlockEntity.onInteracted(player, ItemStack.EMPTY, world, pos);
+                return ActionResult.SUCCESS;
+            }
+        }
+        return ActionResult.FAIL;
     }
 
     @Override
@@ -93,8 +108,8 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.LODESTONE;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.LODESTONE.getDefaultState();
     }
 
     @SuppressWarnings("UnreachableCode")

@@ -12,7 +12,6 @@ import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -99,7 +98,7 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
         if (this.storedStack != ItemStack.EMPTY) {
             player.getInventory().offerOrDrop(this.storedStack);
             setStoredStack(ItemStack.EMPTY);
-            player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
+            //player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
             player.playSound(sound, volume, pitch);
             player.getItemCooldownManager().set(offeredStack.getItem(), 5);
         }
@@ -108,7 +107,7 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
         player.getItemCooldownManager().set(offeredStack.getItem(), 5);
 
         setStoredStack(offeredStack.copyWithCount(1));
-        player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
+        //player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
         player.playSound(sound, volume, pitch);
 
         offeredStack.decrement(1);

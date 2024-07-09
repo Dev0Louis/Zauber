@@ -5,7 +5,10 @@ import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -22,8 +25,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
-import java.util.List;
-
 public class HauntingDamageEntity extends PersistentProjectileEntity implements PolymerEntity {
     private static final int TICKS_TILL_IMPACT = 20 * 30;
     public static final EntityType<HauntingDamageEntity> TYPE = FabricEntityTypeBuilder
@@ -34,7 +35,7 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
     private float damageAmount;
 
     public HauntingDamageEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
-        super(entityType, world, STACK);
+        super(entityType, world);
     }
 
 
@@ -152,6 +153,11 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
         return false;
     }
 
+    @Override
+    protected ItemStack getDefaultItemStack() {
+        return STACK;
+    }
+
     public Vec3d getOffset() {
         var owner = this.getOwner();
         if (age < TICKS_TILL_IMPACT && owner instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(Zauber.Spells.VENGEANCE)) {
@@ -169,16 +175,6 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-
-    }
-
-    @Override
-    public Iterable<ItemStack> getArmorItems() {
-        return List.of();
-    }
-
-    @Override
-    public void equipStack(EquipmentSlot slot, ItemStack stack) {
 
     }
 

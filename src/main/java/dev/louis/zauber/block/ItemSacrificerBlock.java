@@ -2,6 +2,7 @@ package dev.louis.zauber.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
+import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -19,6 +21,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+@ShutUpAboutBlockStateModels
 public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock {
     public static final MapCodec<ItemSacrificerBlock> CODEC = createCodec(ItemSacrificerBlock::new);
 
@@ -27,16 +30,27 @@ public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.OFF_HAND || world.isClient()) return ActionResult.FAIL;
-        ItemStack itemStack = player.getStackInHand(hand);
-
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof ItemSacrificerBlockEntity itemSacrificerBlockEntity) {
-            return itemSacrificerBlockEntity.offerItemStack(player, itemStack);
+            return itemSacrificerBlockEntity.offerItemStack(player, ItemStack.EMPTY);
         }
 
         return ActionResult.SUCCESS;
+    }
+
+    @Override
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (hand == Hand.OFF_HAND || world.isClient()) return ItemActionResult.FAIL;
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof ItemSacrificerBlockEntity itemSacrificerBlockEntity) {
+            if (!itemSacrificerBlockEntity.offerItemStack(player, stack).isAccepted()) {
+                return ItemActionResult.FAIL;
+            }
+        }
+
+        return ItemActionResult.SUCCESS;
     }
 
     @Override
@@ -76,7 +90,7 @@ public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.STONE_BRICK_WALL;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.STONE_BRICK_WALL.getDefaultState();
     }
 }

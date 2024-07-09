@@ -5,6 +5,8 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.block.TrappingBedBlock;
 import dev.louis.zauber.block.ZauberBlocks;
+import dev.louis.zauber.component.ZauberDataComponentTypes;
+import dev.louis.zauber.component.type.LostBookIdComponent;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
@@ -12,8 +14,8 @@ import dev.louis.zauber.item.SpellBookItem;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.networking.ICanHasZauberPayload;
-import dev.louis.zauber.networking.OptionSyncCompletePacket;
-import dev.louis.zauber.networking.OptionSyncPacket;
+import dev.louis.zauber.networking.OptionSyncCompletePayload;
+import dev.louis.zauber.networking.OptionSyncPayload;
 import dev.louis.zauber.networking.OptionSyncTask;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.recipe.ZauberRecipes;
@@ -28,7 +30,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -36,13 +39,15 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.function.SetNbtLootFunction;
+import net.minecraft.loot.function.SetComponentsLootFunction;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
@@ -66,8 +71,7 @@ import java.util.List;
 public class Zauber implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "zauber";
-    public static final int POLYMER_NETWORK_VERSION = 3;
-    public static final Identifier HAS_CLIENT_MODS = Identifier.of(MOD_ID, "has_spell_table");
+    public static final int POLYMER_NETWORK_VERSION = 4;
     public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
     private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
 
@@ -79,22 +83,23 @@ public class Zauber implements ModInitializer {
         ZauberPotionTags.init();
 
         ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
-            if (ServerConfigurationNetworking.canSend(handler, OptionSyncPacket.TYPE.getId())) {
+            if (ServerConfigurationNetworking.canSend(handler, OptionSyncPayload.ID)) {
                 handler.addTask(new OptionSyncTask());
             }
         });
 
-
-        ServerConfigurationNetworking.registerGlobalReceiver(OptionSyncCompletePacket.TYPE, (packet, networkHandler, responseSender) -> {
-            networkHandler.completeTask(OptionSyncTask.KEY);
+        PayloadTypeRegistry.configurationC2S().register(OptionSyncCompletePayload.ID, OptionSyncCompletePayload.CODEC);
+        ServerConfigurationNetworking.registerGlobalReceiver(OptionSyncCompletePayload.ID, (packet, context) -> {
+            context.networkHandler().completeTask(OptionSyncTask.KEY);
         });
 
-        PolymerNetworking.registerCommonPayload(Zauber.HAS_CLIENT_MODS, POLYMER_NETWORK_VERSION, ICanHasZauberPayload::read);
+        PolymerNetworking.registerCommonSimple(ICanHasZauberPayload.ID, POLYMER_NETWORK_VERSION, ICanHasZauberPayload.CODEC);
 
         Spells.init();
         ZauberRecipes.init();
         ZauberItems.init();
         ZauberBlocks.init();
+        ZauberDataComponentTypes.init();
         ZauberPointOfInterestTypes.init();
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
@@ -152,26 +157,25 @@ public class Zauber implements ModInitializer {
 
         ItemGroupEvents.modifyEntriesEvent(Registries.ITEM_GROUP.getKey(itemGroup).get()).register(content -> {
             ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
-            NbtCompound subNbt = itemStack.getOrCreateSubNbt("stored_entity");
-            subNbt.putString("id", Registries.ENTITY_TYPE.getId(ManaHorseEntity.TYPE).toString());
-            itemStack.setSubNbt("id", subNbt);
-            content.add(itemStack);
+            NbtComponent nbtComponent = NbtComponent.DEFAULT.apply(nbt -> nbt.putString("id", "zauber:mana_horse"));
 
+            itemStack.set(DataComponentTypes.ENTITY_DATA, nbtComponent);
+            content.add(itemStack);
             ZauberItems.IN_CREATIVE_INVENTORY.forEach(content::add);
             Spells.SPELLBOOKS.forEach(content::add);
         });
         LostBookType.init();
 
-        LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+        LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
             Identifier gameplayFishingId = Identifier.of("minecraft", "gameplay/fishing");
-            if (id.equals(gameplayFishingId)) {
+            if (key.getRegistry().equals(gameplayFishingId)) {
                 tableBuilder.modifyPools(tableBuilder1 -> {
                     LostBookType.LOST_BOOKS.forEach(lostBookType -> {
                         NbtCompound nbtCompound = new NbtCompound();
                         nbtCompound.putString("lostBookId", String.valueOf(lostBookType.id()));
                         tableBuilder1.
                                 with(ItemEntry.builder(ZauberItems.LOST_BOOK)
-                                        .apply(SetNbtLootFunction.builder(nbtCompound))
+                                        .apply(SetComponentsLootFunction.builder(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(lostBookType.id())))
                                 );
                     });
                 });
@@ -190,6 +194,7 @@ public class Zauber implements ModInitializer {
 
     public static class Spells {
         public static List<ItemStack> SPELLBOOKS = new ArrayList<>();
+        public static List<SpellType<?>> ZAUBER_SPELLS = new ArrayList<>();
         public static List<SpellType<?>> targetingSpells;
 
         public static SpellType<ArrowSpell> ARROW = register("arrow", ArrowSpell::new, 2);
@@ -218,12 +223,14 @@ public class Zauber implements ModInitializer {
 
         public static <T extends Spell> SpellType<T> registerParallelCasting(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
             SpellType<T> spellType = SpellType.register(Identifier.of(MOD_ID, spellName), SpellType.Builder.create(spellFactory, mana).parallelCast());
+            ZAUBER_SPELLS.add(spellType);
             SPELLBOOKS.add(SpellBookItem.createSpellBook(spellType));
             return spellType;
         }
 
         public static <T extends Spell> SpellType<T> register(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
             SpellType<T> spellType = SpellType.register(Identifier.of(MOD_ID, spellName), SpellType.Builder.create(spellFactory, mana));
+            ZAUBER_SPELLS.add(spellType);
             SPELLBOOKS.add(SpellBookItem.createSpellBook(spellType));
             return spellType;
         }
@@ -235,7 +242,7 @@ public class Zauber implements ModInitializer {
 
     public static boolean isClientModded(@Nullable ServerPlayerEntity player) {
         if(player != null && player.networkHandler != null) {
-            var version = PolymerServerNetworking.getSupportedVersion(player.networkHandler, Zauber.HAS_CLIENT_MODS);
+            var version = PolymerServerNetworking.getSupportedVersion(player.networkHandler, ICanHasZauberPayload.ID.id());
             return version == POLYMER_NETWORK_VERSION;
         }
         return false;

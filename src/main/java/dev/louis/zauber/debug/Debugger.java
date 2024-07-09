@@ -23,7 +23,7 @@ public class Debugger {
     }
 
 
-        // Will be removed next tick.
+        // Will be removed next deletionTick.
     public static void addEntityBoundBox(Entity entity, List<Pair<Box, Color>> listBox) {
         if (FabricLoader.getInstance().isDevelopmentEnvironment() && FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             BOX_LIST.put(entity, listBox);

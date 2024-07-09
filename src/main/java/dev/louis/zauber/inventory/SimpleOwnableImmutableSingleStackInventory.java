@@ -1,6 +1,5 @@
 package dev.louis.zauber.inventory;
 
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.ItemStack;
@@ -32,11 +31,6 @@ public final class SimpleOwnableImmutableSingleStackInventory implements SingleS
 
     @Override
     public void setStack(ItemStack stack) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public BlockEntity asBlockEntity() {
         throw new UnsupportedOperationException();
     }
 

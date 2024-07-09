@@ -9,9 +9,9 @@ import net.minecraft.util.Identifier;
 public class ManaDrawer {
     public static void renderMana(RenderType manaRenderType, DrawContext context, int x, int y) {
         switch (manaRenderType) {
-            case FULL -> render(new Identifier(Zauber.MOD_ID,"textures/gui/mana.png"), context, x, y);
-            case HALF -> render(new Identifier(Zauber.MOD_ID,"textures/gui/half_mana.png"), context, x, y);
-            case EMPTY -> render(new Identifier(Zauber.MOD_ID,"textures/gui/empty_mana.png"), context, x, y);
+            case FULL -> render(Identifier.of(Zauber.MOD_ID,"textures/gui/mana.png"), context, x, y);
+            case HALF -> render(Identifier.of(Zauber.MOD_ID,"textures/gui/half_mana.png"), context, x, y);
+            case EMPTY -> render(Identifier.of(Zauber.MOD_ID,"textures/gui/empty_mana.png"), context, x, y);
         }
     }
 

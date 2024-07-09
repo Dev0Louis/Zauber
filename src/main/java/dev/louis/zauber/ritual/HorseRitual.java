@@ -2,9 +2,10 @@ package dev.louis.zauber.ritual;
 
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
-import dev.louis.zauber.entity.ManaHorseEntity;
 import dev.louis.zauber.item.ZauberItems;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.HorseEntity;
@@ -12,23 +13,16 @@ import net.minecraft.item.Instrument;
 import net.minecraft.item.Instruments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.InstrumentTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -76,9 +70,10 @@ public class HorseRitual extends Ritual {
             horse.discard();
             world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 4);
             ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
-            NbtCompound subNbt = itemStack.getOrCreateSubNbt("stored_entity");
-            subNbt.putString("id", Registries.ENTITY_TYPE.getId(ManaHorseEntity.TYPE).toString());
-            itemStack.setSubNbt("id", subNbt);
+
+            NbtComponent nbtComponent = NbtComponent.DEFAULT.apply(nbt -> nbt.putString("id", "zauber:mana_horse"));
+            itemStack.set(DataComponentTypes.ENTITY_DATA, nbtComponent);
+
             world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, itemStack, 0, 0.3f, 0));
         }
     }
@@ -130,16 +125,14 @@ public class HorseRitual extends Ritual {
     }
 
     private static Optional<? extends RegistryEntry<Instrument>> getInstrument(ItemStack stack) {
-        NbtCompound nbtCompound = stack.getNbt();
-        if (nbtCompound != null && nbtCompound.contains("instrument", NbtElement.STRING_TYPE)) {
-            Identifier identifier = Identifier.tryParse(nbtCompound.getString("instrument"));
-            if (identifier != null) {
-                return Registries.INSTRUMENT.getEntry(RegistryKey.of(RegistryKeys.INSTRUMENT, identifier));
+        if (stack.contains(DataComponentTypes.INSTRUMENT)) {
+            var instrument = stack.get(DataComponentTypes.INSTRUMENT);
+            if (instrument != null) {
+                return Optional.of(instrument);
             }
         }
 
-        Iterator<RegistryEntry<Instrument>> iterator = Registries.INSTRUMENT.iterateEntries(InstrumentTags.GOAT_HORNS).iterator();
-        return iterator.hasNext() ? Optional.of(iterator.next()) : Optional.empty();
+        return Optional.empty();
     }
 
 

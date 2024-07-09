@@ -93,7 +93,7 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
 
     @Override
     public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
-        data.removeIf(serializedEntry -> serializedEntry.handler().equals(ITEM.getType()));
-        data.add(new DataTracker.SerializedEntry<>(ITEM.getId(), ITEM.getType(), this.getDefaultItem().getDefaultStack()));
+        data.removeIf(serializedEntry -> serializedEntry.handler().equals(ITEM.dataType()));
+        data.add(new DataTracker.SerializedEntry<>(ITEM.id(), ITEM.dataType(), this.getDefaultItem().getDefaultStack()));
     }
 }

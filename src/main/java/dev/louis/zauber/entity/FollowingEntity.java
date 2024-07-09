@@ -85,7 +85,7 @@ public class FollowingEntity extends Entity implements PolymerEntity {
     }
 
     @Override
-    protected void initDataTracker() {
+    protected void initDataTracker(DataTracker.Builder builder) {
 
     }
 
@@ -106,10 +106,10 @@ public class FollowingEntity extends Entity implements PolymerEntity {
 
     @Override
     public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
-        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.getId(), DisplayEntity.ItemDisplayEntity.ITEM.getType(), ZauberItems.TOTEM_OF_DARKNESS.getDefaultStack()));
-        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.SCALE.getId(), DisplayEntity.SCALE.getType(), new Vector3f(.2f)));
-        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.TELEPORT_DURATION.getId(), DisplayEntity.TELEPORT_DURATION.getType(), 5));
-        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.BILLBOARD.getId(), DisplayEntity.BILLBOARD.getType(), (byte) 3));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.id(), DisplayEntity.ItemDisplayEntity.ITEM.dataType(), ZauberItems.TOTEM_OF_DARKNESS.getDefaultStack()));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.SCALE.id(), DisplayEntity.SCALE.dataType(), new Vector3f(.2f)));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.TELEPORT_DURATION.id(), DisplayEntity.TELEPORT_DURATION.dataType(), 5));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.BILLBOARD.id(), DisplayEntity.BILLBOARD.dataType(), (byte) 3));
     }
 
     @Override

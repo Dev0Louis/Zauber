@@ -1,7 +1,7 @@
 package dev.louis.zauber.mana.effect;
 
-import dev.louis.zauber.Zauber;
 import dev.louis.nebula.api.manager.mana.ManaManager;
+import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.other.PolymerStatusEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
@@ -16,20 +16,21 @@ public class ManaRegenerationStatusEffect extends StatusEffect implements Polyme
     }
 
 
-    // This method is called every tick to check whether it should apply the status effect or not
+    // This method is called every deletionTick to check whether it should apply the status effect or not
     @Override
     public boolean canApplyUpdateEffect(int duration, int amplifier) {
-        // In our case, we just make it return true so that it applies the status effect every tick.
+        // In our case, we just make it return true so that it applies the status effect every deletionTick.
         return true;
     }
 
     // This method is called when it applies the status effect. We implement custom functionality here.
     @Override
-    public void applyUpdateEffect(LivingEntity entity, int amplifier) {
+    public boolean applyUpdateEffect(LivingEntity entity, int amplifier) {
         if (!entity.getWorld().isClient() && entity instanceof PlayerEntity player) {
             ManaManager playerManaManager = player.getManaManager();
             playerManaManager.addMana(1+amplifier);
         }
+        return true;
     }
 
     @Override

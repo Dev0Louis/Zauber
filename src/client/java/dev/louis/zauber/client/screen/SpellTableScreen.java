@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 public class SpellTableScreen extends HandledScreen<SpellTableScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier(Zauber.MOD_ID,"textures/gui/container/spell_table.png");
+    private static final Identifier TEXTURE = Identifier.of(Zauber.MOD_ID,"textures/gui/container/spell_table.png");
     private float scrollAmount;
     private boolean mouseClicked;
     private int scrollOffset;

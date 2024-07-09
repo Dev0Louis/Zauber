@@ -2,6 +2,7 @@ package dev.louis.zauber.block;
 
 import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.block.entity.DarknessAccumulatorBlockEntity;
+import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -22,6 +23,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+@ShutUpAboutBlockStateModels
 public class DarknessAccumulatorBlock extends TransparentBlock implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder {
     public static final MapCodec<DarknessAccumulatorBlock> CODEC = createCodec(DarknessAccumulatorBlock::new);
     public static final BooleanProperty HAS_DARKNESS = BooleanProperty.of("has_darkness");
@@ -70,16 +72,16 @@ public class DarknessAccumulatorBlock extends TransparentBlock implements Polyme
         return new DarknessAccumulatorBlockEntity(pos, state);
     }
 
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.GLASS;
-    }
-
     @Nullable
     protected static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> validateTicker(
             BlockEntityType<A> givenType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> ticker
     ) {
         return expectedType == givenType ? (BlockEntityTicker<A>) ticker : null;
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.GLASS.getDefaultState();
     }
 
     private static class CustomHolder extends ElementHolder {

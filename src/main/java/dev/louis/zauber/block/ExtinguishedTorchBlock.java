@@ -8,7 +8,10 @@ import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
-import net.minecraft.block.*;
+import net.minecraft.block.AbstractTorchBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.RedstoneTorchBlock;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -34,15 +37,10 @@ public class ExtinguishedTorchBlock extends AbstractTorchBlock implements Polyme
         return Blocks.REDSTONE_TORCH.getDefaultState().with(RedstoneTorchBlock.LIT, false);
     }
 
-    @Override
-    public Block getPolymerBlock(BlockState state, ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return this;
-        return Blocks.REDSTONE_TORCH;
-    }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.REDSTONE_TORCH;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.REDSTONE_TORCH.getDefaultState();
     }
 
     @Override

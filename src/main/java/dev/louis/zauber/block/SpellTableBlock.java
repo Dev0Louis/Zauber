@@ -19,7 +19,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -30,6 +29,7 @@ import net.minecraft.world.World;
 public class SpellTableBlock extends Block implements PolymerBlock, PolymerClientDecoded, PolymerKeepModel {
     private static final Text TITLE = Text.translatable("container.spell_crafting");
 
+    protected static final VoxelShape SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 12.0, 16.0);
     public static final MapCodec<SpellTableBlock> CODEC = createCodec(SpellTableBlock::new);
     public static final int MAX_CHARGE = 32;
     public static final int MIN_CHARGE = 0;
@@ -40,7 +40,7 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.isClient) return ActionResult.SUCCESS;
 
         boolean isModded = Zauber.isClientModded((ServerPlayerEntity) player);
@@ -93,7 +93,7 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
     }
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return Blocks.ENCHANTING_TABLE.getOutlineShape(state, world, pos, context);
+        return SHAPE;
     }
 
     public static int getLightLevel(BlockState state) {
@@ -106,20 +106,14 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.ENCHANTING_TABLE;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.ENCHANTING_TABLE.getDefaultState();
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
         if(Zauber.isClientModded(player)) return state;
         return this.getPolymerBlockState(state);
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state, ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return this;
-        return this.getPolymerBlock(state);
     }
 
     public boolean handleMiningOnServer(ItemStack tool, BlockState state, BlockPos pos, ServerPlayerEntity player) {

@@ -6,7 +6,6 @@ import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 
@@ -27,7 +26,6 @@ public class DashSpell extends Spell {
             dashVelocity = serverPlayer.getRotationVector().multiply(dashVelocityMultiplier, 0.2, dashVelocityMultiplier);
             serverPlayer.playSound(
                     SoundEvents.BLOCK_DEEPSLATE_TILES_HIT,
-                    SoundCategory.PLAYERS,
                     2f,
                     -5f
             );
@@ -49,7 +47,6 @@ public class DashSpell extends Spell {
 
             serverPlayer.playSound(
                     SoundEvents.UI_STONECUTTER_TAKE_RESULT,
-                    SoundCategory.PLAYERS,
                     2f,
                     -5f
             );

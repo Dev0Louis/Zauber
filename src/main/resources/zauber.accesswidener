@@ -1,8 +1,8 @@
 accessWidener v2 named
 extendable class net/minecraft/client/render/entity/HorseEntityRenderer
 accessible field net/minecraft/entity/decoration/DisplayEntity RIGHT_ROTATION Lnet/minecraft/entity/data/TrackedData;
-accessible method net/minecraft/item/GoatHornItem setInstrument (Lnet/minecraft/item/ItemStack;Lnet/minecraft/registry/entry/RegistryEntry;)V
-accessible method net/minecraft/particle/DefaultParticleType <init> (Z)V
+#accessible method net/minecraft/item/GoatHornItem setInstrument (Lnet/minecraft/item/ItemStack;Lnet/minecraft/registry/entry/RegistryEntry;)V
+#accessible method net/minecraft/particle/DefaultParticleType <init> (Z)V
 accessible field net/minecraft/entity/decoration/DisplayEntity LEFT_ROTATION Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/decoration/DisplayEntity SCALE Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/client/world/ClientWorld client Lnet/minecraft/client/MinecraftClient;
@@ -10,7 +10,7 @@ accessible method net/minecraft/entity/damage/DamageSource <init> (Lnet/minecraf
 accessible field net/minecraft/block/AbstractCauldronBlock OUTLINE_SHAPE Lnet/minecraft/util/shape/VoxelShape;
 accessible field net/minecraft/block/AbstractCauldronBlock RAYCAST_SHAPE Lnet/minecraft/util/shape/VoxelShape;
 accessible method net/minecraft/block/cauldron/CauldronBehavior createMap (Ljava/lang/String;)Lnet/minecraft/block/cauldron/CauldronBehavior$CauldronBehaviorMap;
-accessible method net/minecraft/item/CompassItem getLodestoneDimension (Lnet/minecraft/nbt/NbtCompound;)Ljava/util/Optional;
+#accessible method net/minecraft/item/CompassItem getLodestoneDimension (Lnet/minecraft/nbt/NbtCompound;)Ljava/util/Optional;
 accessible field net/minecraft/structure/StructureTemplate blockInfoLists Ljava/util/List;
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler lastTickY D
 accessible field net/minecraft/entity/projectile/thrown/ThrownItemEntity ITEM Lnet/minecraft/entity/data/TrackedData;
@@ -20,3 +20,4 @@ accessible field net/minecraft/entity/decoration/DisplayEntity INTERPOLATION_DUR
 accessible field net/minecraft/entity/decoration/DisplayEntity TELEPORT_DURATION Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/decoration/DisplayEntity BILLBOARD Lnet/minecraft/entity/data/TrackedData;
 accessible method net/minecraft/entity/LivingEntity applyDamage (Lnet/minecraft/entity/damage/DamageSource;F)V
+accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData

@@ -67,7 +67,8 @@ public abstract class Ritual {
             }
 
             if (itemStack.getName().contains(Text.of("diced"))) {
-                cat.setVariant(Registries.CAT_VARIANT.get(CatVariant.PERSIAN));
+                var persianCatVariant = Registries.CAT_VARIANT.getEntry(CatVariant.PERSIAN);
+                persianCatVariant.ifPresent(cat::setVariant);
                 cat.setCustomName(Text.of("dicedpixels"));
             }
 

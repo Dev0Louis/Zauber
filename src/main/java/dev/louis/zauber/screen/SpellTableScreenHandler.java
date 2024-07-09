@@ -12,6 +12,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.screen.Property;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -187,22 +188,41 @@ public class SpellTableScreenHandler extends ScreenHandler{
         }
     }
 
-    private void updateInput(Inventory input, ItemStack stack) {
+    private void updateInput(Inventory inventory, ItemStack stack) {
         this.availableRecipes.clear();
         this.selectedRecipe.set(-1);
         this.outputSlot.setStackNoCallbacks(ItemStack.EMPTY);
         if (!stack.isEmpty() && hasCharge()) {
             this.availableRecipes = this.world.getRecipeManager().listAllOfType(ZauberRecipes.SPELL_RECIPE).stream()
-                    .filter(recipe -> recipe.value().matches(input, world))
+                    .filter(recipe -> recipe.value().matches(createRecipeInputWrapper(inventory), world))
                     .sorted(Comparator.comparing(RecipeEntry::id))
                     .collect(Collectors.toList());
         }
     }
 
+    private static RecipeInput createRecipeInputWrapper(Inventory inventory) {
+        return new RecipeInput() {
+            @Override
+            public ItemStack getStackInSlot(int slot) {
+                return inventory.getStack(slot);
+            }
+
+            @Override
+            public int getSize() {
+                return inventory.size();
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return inventory.isEmpty();
+            }
+        };
+    }
+
     void populateResult() {
         if (!this.availableRecipes.isEmpty() && this.isInBounds(this.selectedRecipe.get())) {
             RecipeEntry<SpellRecipe> spellRecipe = this.availableRecipes.get(this.selectedRecipe.get());
-            ItemStack itemStack = spellRecipe.value().craft(this.input, this.world.getRegistryManager());
+            ItemStack itemStack = spellRecipe.value().craft(createRecipeInputWrapper(this.input), this.world.getRegistryManager());
             if (itemStack.isItemEnabled(this.world.getEnabledFeatures())) {
                 this.output.setLastRecipe(spellRecipe);
                 this.outputSlot.setStackNoCallbacks(itemStack);
@@ -247,7 +267,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
             } else {
                 //WARNING AHEAD!!!
                 //DEAMONS MAY JUMP OUT OF THIS CODE AND ATTACK YOU THROUGH YOUR COMPUTER SCREEN PROCEED WITH CAUTION!
-                boolean moveIntoSpellTableSlots = slot == 0 || slot == 1 ? !this.insertItem(itemStack2, 3, 39, false) : (this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, new SimpleInventory(itemStack2, this.heartInputSlot.getStack()), this.world).isPresent() || this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, new SimpleInventory(this.bookInputSlot.getStack(), itemStack2), this.world).isPresent());
+                boolean moveIntoSpellTableSlots = slot == 0 || slot == 1 ? !this.insertItem(itemStack2, 3, 39, false) : (this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, createRecipeInputWrapper(new SimpleInventory(itemStack2, this.heartInputSlot.getStack())), this.world).isPresent() || this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, createRecipeInputWrapper(new SimpleInventory(this.bookInputSlot.getStack(), itemStack2)), this.world).isPresent());
                 boolean b;
                 if (moveIntoSpellTableSlots) {
                     b = !this.insertItem(itemStack2, 0, 2, false);

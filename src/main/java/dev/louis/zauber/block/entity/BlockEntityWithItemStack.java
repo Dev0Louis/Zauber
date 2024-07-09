@@ -3,9 +3,12 @@ package dev.louis.zauber.block.entity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 
 public class BlockEntityWithItemStack extends BlockEntity implements SingleStackInventory {
@@ -16,15 +19,19 @@ public class BlockEntityWithItemStack extends BlockEntity implements SingleStack
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        nbt.put("storedStack", this.storedStack.writeNbt(new NbtCompound()));
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        if (!this.storedStack.isEmpty()) {
+            nbt.put("storedStack", this.storedStack.encodeAllowEmpty(registryLookup));
+        }
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        setStoredStack(ItemStack.fromNbt(nbt.getCompound("storedStack")));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        if (nbt.contains("Item", NbtElement.COMPOUND_TYPE)) {
+            ItemStack.fromNbt(registryLookup, nbt.get("storedStack")).ifPresent(this::setStoredStack);
+        }
     }
 
     public void setStoredStack(ItemStack storedStack) {
@@ -57,7 +64,7 @@ public class BlockEntityWithItemStack extends BlockEntity implements SingleStack
     }
 
     @Override
-    public BlockEntity asBlockEntity() {
-        return this;
+    public boolean canPlayerUse(PlayerEntity player) {
+        return true;
     }
 }

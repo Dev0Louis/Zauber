@@ -7,6 +7,7 @@ import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +31,7 @@ public abstract class StructureEntity extends Entity implements PolymerEntity {
     public abstract BlockState[][][] getBlockStateArray();
 
     @Override
-    protected void initDataTracker() {
+    protected void initDataTracker(DataTracker.Builder builder) {
 
     }
 

@@ -1,10 +1,13 @@
 package dev.louis.zauber.mixin;
 
+import dev.louis.zauber.component.ZauberDataComponentTypes;
+import dev.louis.zauber.component.type.JuggernautTickComponent;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.duck.ItemStackJuggernautModeDuck;
+import net.minecraft.component.ComponentHolder;
+import net.minecraft.component.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -15,10 +18,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemStack.class)
-public abstract class ItemStackMixin implements ItemStackJuggernautModeDuck {
-    @Shadow public abstract @Nullable NbtCompound getNbt();
+public abstract class ItemStackMixin implements ItemStackJuggernautModeDuck, ComponentHolder {
     @Shadow public abstract void setCount(int count);
-    @Shadow public abstract NbtCompound getOrCreateNbt();
+
+    @Shadow @Nullable public abstract <T> T set(ComponentType<? super T> type, @Nullable T value);
 
     @Inject(method = "inventoryTick", at = @At("TAIL"))
     public void removeAfterExpiration(World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
@@ -30,21 +33,20 @@ public abstract class ItemStackMixin implements ItemStackJuggernautModeDuck {
     }
     @Override
     public void zauber$setJuggernautModeTick(long ticks) {
-        NbtCompound nbt = this.getOrCreateNbt();
-        if(nbt == null)return;
-        nbt.putLong("JuggernautTicks", ticks);
+        this.set(ZauberDataComponentTypes.JUGGERNAUT_TICK, new JuggernautTickComponent(ticks));
     }
 
     @Override
     public long zauber$getJuggernautTick() {
-        if(this.getNbt() == null)return 0L;
-        return this.getNbt().getLong("JuggernautTicks");
+        JuggernautTickComponent component = this.get(ZauberDataComponentTypes.JUGGERNAUT_TICK);
+
+        if (component == null) return 0L;
+        return component.deletionTick();
     }
 
     @Override
     public boolean zauber$isJuggernautItem() {
-        if(this.getNbt() == null)return false;
-        return this.getNbt().contains("JuggernautTicks");
+        return this.contains(ZauberDataComponentTypes.JUGGERNAUT_TICK);
     }
 
     public boolean zauber$isInValid(ServerWorld world) {

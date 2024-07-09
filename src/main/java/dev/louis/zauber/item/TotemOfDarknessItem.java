@@ -10,7 +10,6 @@ import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -18,15 +17,21 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
 public class TotemOfDarknessItem extends TrinketItem implements PolymerItem, PolymerKeepModel, PolymerClientDecoded {
-    public static final EntityAttributeModifier HALF = new EntityAttributeModifier("Half", -.5, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
-    public static final EntityAttributeModifier DOUBLE = new EntityAttributeModifier("Double", 1, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
-    public static Multimap<EntityAttribute, EntityAttributeModifier> activeMap = Multimaps.newMultimap(Maps.newLinkedHashMap(), ArrayList::new);
+    public static final EntityAttributeModifier HALF =
+            new EntityAttributeModifier(Identifier.of(Zauber.MOD_ID, "half"), -.5, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    public static final EntityAttributeModifier DOUBLE =
+            new EntityAttributeModifier(Identifier.of(Zauber.MOD_ID, "double"), 1, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    public static Multimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> activeMap = Multimaps.newMultimap(Maps.newLinkedHashMap(), ArrayList::new);
 
     static {
         activeMap.put(EntityAttributes.GENERIC_MAX_HEALTH, HALF);
@@ -42,8 +47,8 @@ public class TotemOfDarknessItem extends TrinketItem implements PolymerItem, Pol
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipContext context, @Nullable ServerPlayerEntity player) {
-        return Zauber.isClientModded(player) ? itemStack : PolymerItem.super.getPolymerItemStack(itemStack, context, player);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
+        return Zauber.isClientModded(player) ? itemStack : PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, lookup, player);
     }
 
     @Override
@@ -75,7 +80,7 @@ public class TotemOfDarknessItem extends TrinketItem implements PolymerItem, Pol
     }
 
 
-    public Multimap<EntityAttribute, EntityAttributeModifier> getTotemModifiers() {
+    public Multimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> getTotemModifiers() {
         return activeMap;
     }
 

@@ -7,12 +7,12 @@ import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -39,7 +39,7 @@ public class SmeltingRitual extends Ritual {
     }
 
     private static Optional<Integer> getCookTime(World world, ItemStack itemStack) {
-        return world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, new SimpleInventory(itemStack), world).map(recipe -> recipe.value().getCookingTime());
+        return world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, new SingleStackRecipeInput(itemStack), world).map(recipe -> recipe.value().getCookingTime());
     }
 
     public static Optional<Integer> getFuelTime(ItemConvertible item) {
@@ -49,7 +49,7 @@ public class SmeltingRitual extends Ritual {
     }
 
     public static Optional<ItemStack> cook(World world, ItemStack itemStack) {
-        return world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, new SimpleInventory(itemStack), world).map(recipe -> recipe.value().getResult(world.getRegistryManager()));
+        return world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, new SingleStackRecipeInput(itemStack), world).map(recipe -> recipe.value().getResult(world.getRegistryManager()));
     }
 
     @Override
@@ -136,8 +136,6 @@ public class SmeltingRitual extends Ritual {
         ItemStack ritualItemStack = ritualStoneBlockEntity.getStoredStack();
         var fuelTime = getFuelTime(ritualItemStack.getItem());
 
-
-        //TODO: Check if any items are available with this fuelTime
         if(fuelTime.isEmpty()) return null;
 
         ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);

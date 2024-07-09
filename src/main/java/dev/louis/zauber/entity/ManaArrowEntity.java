@@ -19,25 +19,29 @@ import net.minecraft.world.event.GameEvent;
 
 public class ManaArrowEntity extends PersistentProjectileEntity implements PolymerClientDecoded, PolymerKeepModel, PolymerEntity {
     private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
-
-    public static final EntityType<ManaArrowEntity> TYPE = EntityType.Builder.<ManaArrowEntity>create(ManaArrowEntity::new, SpawnGroup.MISC).setDimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build("mana_arrow");
+    public static final EntityType<ManaArrowEntity> TYPE = EntityType.Builder.<ManaArrowEntity>create(ManaArrowEntity::new, SpawnGroup.MISC).dimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build("mana_arrow");
 
     public ManaArrowEntity(EntityType<? extends ManaArrowEntity> entityType, World world) {
-        super(entityType, world, DEFAULT_STACK);
+        super(entityType, world);
     }
 
     public ManaArrowEntity(World world, LivingEntity owner, ItemStack stack) {
-        super(TYPE, owner, world, stack);
+        super(TYPE, owner, world, stack, null);
     }
 
 
     public ManaArrowEntity(World world, double x, double y, double z, ItemStack stack) {
-        super(TYPE, x, y, z, world, stack);
+        super(TYPE, x, y, z, world, stack, null);
     }
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
 
+    }
+
+    @Override
+    protected ItemStack getDefaultItemStack() {
+        return DEFAULT_STACK;
     }
 
 

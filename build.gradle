@@ -67,7 +67,7 @@ dependencies {
     modImplementation "maven.modrinth:nebula:${project.nebula_version}"
     //modImplementation "dev.louis:Nebula:${project.nebula_version}"
 
-    modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${project.yacl_version}")
+    modImplementation("dev.isxander:yet-another-config-lib:${project.yacl_version}")
 
     modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 

@@ -1,16 +1,17 @@
 package dev.louis.zauber;
 
 import dev.louis.zauber.inventory.SimpleOwnableImmutableSingleStackInventory;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.screen.LecternScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.RawFilteredPair;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
@@ -69,14 +70,18 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
 
     private ItemStack createFakeBook() {
         ItemStack itemStack = Items.WRITTEN_BOOK.getDefaultStack();
-        if (!LOST_BOOKS.isEmpty()) {
-            NbtList nbtList = new NbtList();
-            this.pages().forEach(text -> nbtList.add(NbtString.of(text.getString())));
-            itemStack.setSubNbt("pages", nbtList);
-        }
 
-        itemStack.setSubNbt("author", NbtString.of("Unknown Magician"));
-        itemStack.setSubNbt("title", NbtString.of(this.id.getPath()));
+        itemStack.set(
+                DataComponentTypes.WRITTEN_BOOK_CONTENT,
+                new WrittenBookContentComponent(
+                        RawFilteredPair.of(this.id.getPath()),
+                        "Unknown Magician",
+                        3,
+                        this.pages().stream().map(RawFilteredPair::of).toList(),
+                        false
+                )
+        );
+
         return itemStack;
     }
 

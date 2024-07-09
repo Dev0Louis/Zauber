@@ -6,7 +6,6 @@ import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 
@@ -57,7 +56,7 @@ public class WindExpelSpell extends Spell {
             );
 
 
-            this.getCaster().playSound(SoundEvents.BLOCK_GLASS_HIT, SoundCategory.PLAYERS, 2f, -1f);
+            this.getCaster().playSound(SoundEvents.BLOCK_GLASS_HIT, 2f, -1f);
 
         }
     }
@@ -66,10 +65,10 @@ public class WindExpelSpell extends Spell {
     public void finish() {
         if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
             if (this.wasInterrupted()) {
-                this.getCaster().playSound(SoundEvents.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1f, -1f);
+                this.getCaster().playSound(SoundEvents.ITEM_SHIELD_BREAK, 1f, -1f);
                 return;
             }
-            this.getCaster().playSound(SoundEvents.ENTITY_CAMEL_DASH, SoundCategory.PLAYERS, 1f, -1f);
+            this.getCaster().playSound(SoundEvents.ENTITY_CAMEL_DASH, 1f, -1f);
 
             if(!this.getCaster().isOnGround()) {
                 serverPlayer.setVelocity(serverPlayer.getVelocity().multiply(1, 0.7, 1));

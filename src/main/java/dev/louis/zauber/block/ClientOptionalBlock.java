@@ -9,20 +9,21 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ClientOptionalBlock extends Block implements PolymerBlock, PolymerKeepModel, PolymerClientDecoded {
-    private final Block polymerBlock;
+    private final BlockState polymerBlockState;
 
-    public ClientOptionalBlock(Settings settings, Block polymerBlock) {
+    public ClientOptionalBlock(Settings settings, Block polymerBlockState) {
         super(settings);
-        this.polymerBlock = polymerBlock;
+        this.polymerBlockState = polymerBlockState.getDefaultState();
+    }
+
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
+        return Zauber.isClientModded(player) ? state : polymerBlockState;
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return polymerBlock;
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state, ServerPlayerEntity player) {
-        return Zauber.isClientModded(player) ? this : polymerBlock;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return polymerBlockState;
     }
 }

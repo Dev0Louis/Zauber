@@ -5,12 +5,13 @@ import dev.louis.zauber.entity.ManaHorseEntity;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -36,9 +37,9 @@ public class SoulHornItem extends Item implements PolymerItem, PolymerKeepModel,
             if(!Zauber.isClientModded(serverUser)) return TypedActionResult.fail(user.getStackInHand(hand));
 
             playSound(world, serverUser);
-            NbtCompound nbt = user.getStackInHand(hand).getSubNbt("stored_entity");
+            NbtComponent nbt = user.getStackInHand(hand).get(DataComponentTypes.ENTITY_DATA);
             if (nbt != null) {
-                EntityType.fromNbt(nbt).ifPresent(entityType -> {
+                EntityType.fromNbt(nbt.getNbt()).ifPresent(entityType -> {
                     ManaHorseEntity manaHorseEntity = new ManaHorseEntity(world, serverUser);
                     manaHorseEntity.setPosition(serverUser.getPos());
                     world.spawnEntity(manaHorseEntity);
