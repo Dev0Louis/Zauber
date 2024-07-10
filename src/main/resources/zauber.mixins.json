@@ -6,11 +6,9 @@
   "mixins": [
     "BowItemMixin",
     "CauldronBehaviorMixin",
-    "IdentifierMixin",
     "ItemEntityMixin",
     "ItemStackComponentizationFixMixin",
     "ItemStackMixin",
-    "ItemStackMixinTemp",
     "LivingEntityMixin",
     "PersistentProjectileEntityMixin",
     "PlayerEntityMixin",
