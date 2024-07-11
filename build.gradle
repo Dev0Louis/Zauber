@@ -73,8 +73,16 @@ dependencies {
 
     include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
     modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
-    modImplementation "dev.emi:trinkets:${project.trinkets_version}"
+    modCompileOnly "dev.emi:trinkets:${project.trinkets_version}"
+    modRuntimeOnly files('lib/trinkets-3.10.0.jar')
+    modRuntimeOnly files('lib/cardinal-components-base-6.1.0.jar')
+    modRuntimeOnly files('lib/cardinal-components-entity-6.1.0.jar')
     vineflowerDecompilerClasspath "org.vineflower:vineflower:1.11.0-SNAPSHOT"
+}
+
+remapJar {
+    //Till Trinkets updated :)
+    nestedJars.from(file('lib/trinkets-3.10.0.jar'))
 }
 
 processResources {
