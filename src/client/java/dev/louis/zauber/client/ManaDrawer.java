@@ -16,11 +16,9 @@ public class ManaDrawer {
     }
 
     private static void render(Identifier texture, DrawContext context, int x, int y) {
-        context.getMatrices().push();
         boolean invert = ConfigManager.getClientConfig().manaDirection() == ManaDirection.LEFT;
 
-        context.drawTexture(texture, x, y, 9, 9, 9, 9, invert ? -9 : 9, 9);
-        context.getMatrices().pop();
+        context.drawTexture(texture, x, y, 0, 9, 9, 9, invert ? -9 : 9, 9);
     }
 
     public enum RenderType {

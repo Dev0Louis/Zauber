@@ -1,8 +1,8 @@
 package dev.louis.zauber.client.mixin;
 
+import dev.louis.zauber.client.ManaDrawer;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.mana.ManaDirection;
-import dev.louis.zauber.client.ManaDrawer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -20,11 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class InGameHudMixin {
     @Shadow protected abstract PlayerEntity getCameraPlayer();
 
-    @Shadow private int scaledHeight;
-
-    @Shadow private int scaledWidth;
-
-
     @Shadow @Final private MinecraftClient client;
 
     @Inject(at = @At("RETURN"), method = "renderStatusBars")
@@ -34,11 +29,13 @@ public abstract class InGameHudMixin {
         if(isInWater(playerEntity) && mana <= 0) {
             return;
         }
-        int mid = this.scaledWidth / 2 + 18;
-        int n = this.scaledWidth / 2 + 91;
+        var scaledWidth = context.getScaledWindowWidth();
+        var scaledHeight = context.getScaledWindowHeight();
+        int mid = scaledWidth / 2 + 18;
+        int n = scaledWidth / 2 + 91;
 
         int x;
-        int y = (this.scaledHeight - 39 - 10);
+        int y = (scaledHeight - 39 - 10);
 
         for(int w = 0; w < 10; ++w) {
             x = calculatePosition(mid, n, w);
