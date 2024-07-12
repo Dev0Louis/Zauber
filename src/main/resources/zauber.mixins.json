@@ -10,6 +10,7 @@
     "ItemStackComponentizationFixMixin",
     "ItemStackMixin",
     "LivingEntityMixin",
+    "LivingEntityTrinketComponentMixin",
     "PersistentProjectileEntityMixin",
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin",

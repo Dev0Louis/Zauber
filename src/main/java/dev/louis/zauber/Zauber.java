@@ -88,6 +88,7 @@ public class Zauber implements ModInitializer {
         });
 
         PayloadTypeRegistry.configurationC2S().register(OptionSyncCompletePayload.ID, OptionSyncCompletePayload.CODEC);
+        PayloadTypeRegistry.configurationS2C().register(OptionSyncPayload.ID, OptionSyncPayload.CODEC);
         ServerConfigurationNetworking.registerGlobalReceiver(OptionSyncCompletePayload.ID, (packet, context) -> {
             context.networkHandler().completeTask(OptionSyncTask.KEY);
         });
@@ -155,6 +156,7 @@ public class Zauber implements ModInitializer {
         ItemGroup itemGroup = Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> ITEM_GROUP_LOGO).displayName(Text.of("Zauber")).build());
 
         ItemGroupEvents.modifyEntriesEvent(Registries.ITEM_GROUP.getKey(itemGroup).get()).register(content -> {
+            if (true) return;
             ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
             NbtComponent nbtComponent = NbtComponent.DEFAULT.apply(nbt -> nbt.putString("id", "zauber:mana_horse"));
 

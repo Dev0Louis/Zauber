@@ -27,7 +27,6 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -50,7 +49,6 @@ public class ZauberClient implements ClientModInitializer {
             ConfigManager.clearOverrideConfig();
         });
 
-        PayloadTypeRegistry.configurationS2C().register(OptionSyncPayload.ID, OptionSyncPayload.CODEC);
         ClientConfigurationNetworking.registerGlobalReceiver(OptionSyncPayload.ID, (packet, context) -> {
             ConfigManager.setOverrideConfig(packet.overrideConfig());
             context.responseSender().sendPacket(new OptionSyncCompletePayload());

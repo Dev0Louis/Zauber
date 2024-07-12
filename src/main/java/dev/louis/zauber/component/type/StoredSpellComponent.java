@@ -8,7 +8,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryFixedCodec;
 
-public record StoredSpellComponent(RegistryEntry<SpellType<?>> spellType) {
+public record StoredSpellComponent(RegistryEntry<SpellType<?>> spellType) implements ZauberComponent {
     public static final Codec<RegistryEntry<SpellType<?>>> SPELL_CODE_ENTRY_CODEC = RegistryFixedCodec.of(SpellType.REGISTRY_KEY);
     public static final Codec<StoredSpellComponent> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(SPELL_CODE_ENTRY_CODEC.fieldOf("spell_type").forGetter(StoredSpellComponent::spellType))
@@ -23,9 +23,4 @@ public record StoredSpellComponent(RegistryEntry<SpellType<?>> spellType) {
             registryByteBuf.writeRegistryKey(itemSpellComponent.spellType.getKey().orElseThrow());
         }
     };
-
-
-    public boolean matchesCit(String string) {
-        return spellType.getIdAsString().equals(string);
-    }
 }
