@@ -53,6 +53,7 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
 
     @Override
     protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (hand == Hand.OFF_HAND) return ItemActionResult.FAIL;
         if (!world.isClient) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
@@ -60,7 +61,7 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
                 return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
             }
         }
-        return ItemActionResult.FAIL;
+        return ItemActionResult.SUCCESS;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
                 return ActionResult.SUCCESS;
             }
         }
-        return ActionResult.FAIL;
+        return ActionResult.SUCCESS;
     }
 
     @Override

@@ -129,7 +129,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                 if (!stack.isEmpty()) {
                     this.giveBackRitualItem(player);
                     this.tryEasterEgg(player, stack);
-                    this.setStoredStack(stack.copy());
+                    this.setStoredStack(stack.copyWithCount(1));
                     stack.decrement(1);
                     return;
                 } else if (player.isSneaking()) {
