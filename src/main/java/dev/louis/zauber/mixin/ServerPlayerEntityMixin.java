@@ -87,6 +87,25 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements At
         return totemOfDarknessEntity;
     }
 
+    @Inject(
+            method = "wakeUp",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    public void noWakingUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
+        if (Zauber.isInTrappingBed(this)) {
+            ci.cancel();
+        }
+    }
+
+    @ModifyExpressionValue(
+            method = "trySleep",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isDay()Z")
+    )
+    public boolean allowToSleepInTrappingBedDuringTheDay(boolean original, BlockPos pos) {
+        return original && !Zauber.isTrappingBed(this.getWorld(), pos);
+    }
+
     @ModifyExpressionValue(
             method = {"onDisconnect", "readCustomDataFromNbt"},
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;isSleeping()Z")

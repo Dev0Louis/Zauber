@@ -59,6 +59,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -245,6 +247,10 @@ public class Zauber implements ModInitializer {
             return version == POLYMER_NETWORK_VERSION;
         }
         return false;
+    }
+
+    public static boolean isTrappingBed(World world, BlockPos pos) {
+        return world.getBlockState(pos).isOf(ZauberBlocks.TRAPPING_BED);
     }
 
     public static boolean isInTrappingBed(PlayerEntity player) {
