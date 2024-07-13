@@ -9,13 +9,19 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.poi.PointOfInterestType;
 
 public class ZauberPointOfInterestTypes {
+
+    public static final PointOfInterestType RITUAL_BLOCK =
+            PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "ritual_block"), 1, 20, ZauberBlocks.RITUAL_STONE);
+    public static final RegistryKey<PointOfInterestType> RITUAL_BLOCK_KEY =
+            Registries.POINT_OF_INTEREST_TYPE.getKey(RITUAL_BLOCK).orElseThrow();
+
     /**
      Does not cover the Ritual Stone block as this POI is used to search for block out of the perspective of the Ritual Stone.
      */
-    public static final PointOfInterestType RITUAL_BLOCKS =
-            PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "ritual_blocks"), 1, 20, ZauberBlocks.ITEM_SACRIFICER, ZauberBlocks.MANA_CAULDRON);
+    public static final PointOfInterestType ADDITIONAL_RITUAL_BLOCKS =
+            PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "additional_ritual_blocks"), 1, 20, ZauberBlocks.ITEM_SACRIFICER, ZauberBlocks.MANA_CAULDRON);
     public static final RegistryKey<PointOfInterestType> RITUAL_BLOCKS_KEY =
-            Registries.POINT_OF_INTEREST_TYPE.getKey(RITUAL_BLOCKS).orElseThrow();
+            Registries.POINT_OF_INTEREST_TYPE.getKey(ADDITIONAL_RITUAL_BLOCKS).orElseThrow();
 
     public static final PointOfInterestType DARKNESS_ACCUMULATOR =
             PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "darkness_accumulator"), 1, 20, ZauberBlocks.DARKNESS_ACCUMULATOR);

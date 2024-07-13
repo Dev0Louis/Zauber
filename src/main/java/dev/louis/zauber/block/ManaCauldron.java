@@ -1,8 +1,10 @@
 package dev.louis.zauber.block;
 
 import com.mojang.serialization.MapCodec;
+import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import dev.louis.zauber.helper.SoundHelper;
+import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithMovingElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -28,11 +30,15 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.event.GameEvent;
+import net.minecraft.world.poi.PointOfInterest;
+import net.minecraft.world.poi.PointOfInterestStorage;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @ShutUpAboutBlockStateModels
 public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock, BlockWithMovingElementHolder {
@@ -105,9 +111,11 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
         private static final BlockState MANA_FILL_STATE = Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
         private static final BlockState MANA_BUBBLE_STATE = Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
         private final BlockDisplayElement manaFill;
-        private final Collection<BlockDisplayElementWithVelocity> manaBubbles = new ArrayList<>();
+        private final Collection<ManaBlockDisplayElement> manaBubbles = new ArrayList<>();
         private final Random random = Random.create();
         private int age;
+        @Nullable
+        private RitualStoneBlockEntity ritualStone;
 
         public CustomHolder(BlockState initialBlockState) {
             this.manaFill = this.addElement(new BlockDisplayElement(MANA_FILL_STATE));
@@ -137,16 +145,32 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
                 }
                 if (manaBubbles.size() < manaLevel * 10) {
                     Vec3d velocity = new Vec3d((random.nextFloat() - 0.5) * 0.2, 0.05f * manaLevel, (random.nextFloat() - 0.5) * 0.2);
-                    var blockDisplayEntity = new BlockDisplayElementWithVelocity(MANA_BUBBLE_STATE, velocity);
+                    var blockDisplayEntity = new ManaBlockDisplayElement(world, MANA_BUBBLE_STATE, velocity, age);
+                    blockDisplayEntity.setInterpolationDuration(6);
                     blockDisplayEntity.setScale(new Vector3f(0.1f));
                     this.addElement(blockDisplayEntity);
                     manaBubbles.add(blockDisplayEntity);
                 }
             }
 
-            manaBubbles.forEach(BlockDisplayElementWithVelocity::tick);
+            manaBubbles.forEach(ManaBlockDisplayElement::tick);
+
+            Stream<PointOfInterest> stream = world.getPointOfInterestStorage()
+                    .getInSquare(
+                            poiType -> poiType.matchesKey(ZauberPointOfInterestTypes.RITUAL_BLOCK_KEY),
+                            BlockPos.ofFloored(CustomHolder.this.getPos()),
+                            20,
+                            PointOfInterestStorage.OccupationStatus.ANY
+                    );
+            this.ritualStone = stream.map(poi -> world.getBlockEntity(poi.getPos(), RitualStoneBlockEntity.TYPE).orElse(null)).filter(Objects::nonNull).filter(RitualStoneBlockEntity::shouldManaCircle).findAny().orElse(null);
+
             manaBubbles.removeIf(element -> {
-                var remove = element.getOffset().getY() > 3 * manaLevel || random.nextFloat() > 0.93f;
+                boolean remove;
+                if (this.ritualStone == null) {
+                    remove = element.getOffset().getY() > 3 * manaLevel || random.nextFloat() > 0.93f;
+                } else {
+                    remove = element.getCurrentPos().isWithinRangeOf(ritualStone.getPos().toCenterPos(), 0.6, 0.6);
+                }
                 if (remove) {
                     var pos = this.getAttachment().getPos().add(element.getOffset());
                     if (random.nextFloat() > 0.5f) {
@@ -176,22 +200,38 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
             });
 
         }
-    }
 
-    public static class BlockDisplayElementWithVelocity extends BlockDisplayElement {
-        private Vec3d velocity;
+        public class ManaBlockDisplayElement extends BlockDisplayElement {
+            private final ServerWorld world;
+            private Vec3d velocity;
+            private final int creationAge;
 
-        public BlockDisplayElementWithVelocity(BlockState state, Vec3d velocity) {
-            super(state);
-            this.velocity = velocity;
+            public ManaBlockDisplayElement(ServerWorld world, BlockState state, Vec3d velocity, int creationAge) {
+                super(state);
+                this.world = world;
+                this.velocity = velocity;
+                this.creationAge = creationAge;
+            }
+
+            @Override
+            public void tick() {
+                super.tick();
+                if (CustomHolder.this.ritualStone != null) {
+                    //A Ritual Stone that pulls mana was found.
+                    var speed = ritualStone.getManaCirclingSpeed();
+                    var distance = ritualStone.getManaCirclingDistance();
+                    var progress = (this.creationAge + world.getTime());
+                    var targetPos = ritualStone.getPos().toCenterPos().add(0, 0.5, 0);
+
+                    velocity = velocity.multiply(0.9).add(this.getCurrentPos().relativize(targetPos).normalize().multiply(0.01));
+                    //velocity.multiply(0.9);
+                } else {
+                    //No Ritual Stone that pulls Mana wasn't found
+                    velocity = velocity.multiply(0.9, 1, 0.9);
+                }
+                this.setOffset(this.getOffset().add(velocity));
+            }
         }
 
-
-        @Override
-        public void tick() {
-            super.tick();
-            velocity = velocity.multiply(0.9, 1, 0.9);
-            this.setOffset(this.getOffset().add(velocity));
-        }
     }
 }

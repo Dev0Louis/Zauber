@@ -18,7 +18,7 @@ import net.minecraft.world.poi.PointOfInterestTypes;
 
 import java.util.stream.Stream;
 
-public class TeleportToLodestoneRitual extends Ritual {
+public class TeleportToLodestoneRitual extends Ritual implements ManaPullingRitual {
     private int collectedMana;
     private boolean failedToFindMana;
 

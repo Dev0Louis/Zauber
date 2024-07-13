@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class ManaBowRitual extends Ritual {
+public class ManaBowRitual extends Ritual implements ManaPullingRitual {
     private final BlockPos manaStorageBlockPos;
 
     protected ManaBowRitual(World world, RitualStoneBlockEntity blockEntity, BlockPos manaStorageBlockPos) {

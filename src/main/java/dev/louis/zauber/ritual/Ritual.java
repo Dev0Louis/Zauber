@@ -6,6 +6,7 @@ import dev.louis.zauber.ritual.heart.HeartOfDarknessRitual;
 import dev.louis.zauber.ritual.heart.HeartOfTheIceRitual;
 import dev.louis.zauber.ritual.heart.HeartOfTheSeaRitual;
 import dev.louis.zauber.ritual.spell.HailSpellRitual;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatVariant;
 import net.minecraft.item.Items;
@@ -77,7 +78,9 @@ public abstract class Ritual {
 
         RITUAL_STARTERS.add(SmeltingRitual::tryStart);
 
-
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            RITUAL_STARTERS.add(TestRitual::new);
+        }
     }
 
 

@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class HorseRitual extends Ritual {
+public class HorseRitual extends Ritual implements ManaPullingRitual {
     private final BlockPos manaStorageBlockPos;
     private final HorseEntity horse;
 
@@ -160,5 +160,4 @@ public class HorseRitual extends Ritual {
 
         return Optional.ofNullable(entity);
     }
-
 }

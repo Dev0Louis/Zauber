@@ -6,6 +6,7 @@ import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
+import dev.louis.zauber.ritual.ManaPullingRitual;
 import dev.louis.zauber.ritual.Ritual;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -199,6 +200,26 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
             if (ritual != null) return ritual;
         }
         return null;
+    }
+
+    public boolean shouldManaCircle() {
+        return this.state == State.ACTIVE && (this.ritual instanceof ManaPullingRitual manaPullingRitual) && manaPullingRitual.shouldPull();
+    }
+
+    public float getManaCirclingSpeed() {
+        if (this.ritual instanceof ManaPullingRitual manaPullingRitual) {
+            return manaPullingRitual.getCirclingSpeed();
+        } else {
+            return 0;
+        }
+    }
+
+    public float getManaCirclingDistance() {
+        if (this.ritual instanceof ManaPullingRitual manaPullingRitual) {
+            return manaPullingRitual.getCirclingDistance();
+        } else {
+            return 0;
+        }
     }
 
     protected void spawnConnectionParticle() {

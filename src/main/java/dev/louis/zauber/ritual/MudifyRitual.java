@@ -14,20 +14,17 @@ import net.minecraft.world.event.GameEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class MudifyRitual extends Ritual {
-    private final List<BlockPos> manaCauldrons;
     private int transformableBlocks;
     private boolean ranOutOfMana = false;
 
     public Collection<BlockPos.Mutable> mudders = new ArrayList<>();
 
 
-    public MudifyRitual(World world, RitualStoneBlockEntity ritualStoneBlockEntity, List<BlockPos> manaCauldrons) {
+    public MudifyRitual(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         super(world, ritualStoneBlockEntity);
-        this.manaCauldrons = manaCauldrons;
     }
 
     @Override
@@ -111,6 +108,6 @@ public class MudifyRitual extends Ritual {
 
         var manaCauldrons = ritualStoneBlockEntity.getFilledManaStorages().collect(Collectors.toList());
         if(manaCauldrons.isEmpty() || !ritualItemStack.isOf(Items.WATER_BUCKET)) return null;
-        return new MudifyRitual(world, ritualStoneBlockEntity, manaCauldrons);
+        return new MudifyRitual(world, ritualStoneBlockEntity);
     }
 }
