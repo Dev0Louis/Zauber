@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class ControlsListWidgetMixin {
     @ModifyExpressionValue(
             method = "<init>",
-            at = @At(value = "INVOKE", target = "Lorg/apache/commons/lang3/ArrayUtils;clone([Ljava/lang/Object;)[Ljava/lang/Object;")
+            at = @At(value = "INVOKE", target = "Lorg/apache/commons/lang3/ArrayUtils;clone([Ljava/lang/Object;)[Ljava/lang/Object;", remap = false)
     )
     public Object[] a(Object[] original) {
         return Arrays.stream(original).filter(keyBinding -> !(keyBinding instanceof SpellKeyBinding) || ((SpellKeyBinding) keyBinding).shouldShow()).toArray(KeyBinding[]::new);
