@@ -1,5 +1,7 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.item.TotemOfDarknessItem;
+import dev.louis.zauber.item.ZauberItems;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -16,6 +18,11 @@ public class TotemOfDarknessEntity extends FollowingEntity {
     }
 
     public TotemOfDarknessEntity(World world, LivingEntity owner) {
-        super(TYPE, world, owner);
+        super(TYPE, world, owner, ZauberItems.TOTEM_OF_DARKNESS.getDefaultStack());
+    }
+
+    @Override
+    public boolean isActive(LivingEntity livingEntity) {
+        return TotemOfDarknessItem.isActive(livingEntity);
     }
 }

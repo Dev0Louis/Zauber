@@ -1,12 +1,14 @@
 package dev.louis.zauber.entity;
 
 import dev.louis.zauber.duck.AttachableEntity;
-import dev.louis.zauber.item.ZauberItems;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
@@ -14,10 +16,7 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-public class FollowingEntity extends Entity implements PolymerEntity {
-    public static final EntityType<FollowingEntity> TYPE = FabricEntityTypeBuilder
-            .<FollowingEntity>create(SpawnGroup.MISC, FollowingEntity::new)
-            .build();
+public abstract class FollowingEntity extends Entity implements PolymerEntity {
     private static final double HARD_TELEPORT_SQUARED_DISTANCE = Math.pow(32, 2);
     private static final double PUSH_AWAY_SQUARED_DISTANCE = 1;
     private static final double MOVE_TO_PLAYER_SQUARED_DISTANCE = Math.pow(3, 2);
@@ -25,13 +24,15 @@ public class FollowingEntity extends Entity implements PolymerEntity {
 
     private final LivingEntity owner;
     private final double heightOffset;
+    private final ItemStack stack;
 
     public FollowingEntity(EntityType<?> type, World world) {
-        this(type, world, world.getPlayers().get(0));
+        this(type, world, world.getPlayers().get(0), ItemStack.EMPTY);
     }
 
-    public FollowingEntity(EntityType<?> type, World world, LivingEntity owner) {
+    public FollowingEntity(EntityType<?> type, World world, LivingEntity owner, ItemStack stack) {
         super(type, world);
+        this.stack = stack;
         this.circleRotationSpeed = world.random.nextDouble() * 0.5 + 0.5;
         this.heightOffset = world.random.nextDouble() * 0.5;
         this.owner = owner;
@@ -78,6 +79,7 @@ public class FollowingEntity extends Entity implements PolymerEntity {
         //Debugger.addEntityBoundBox(this, this.getBoundingBox(), Color.BLACK);
     }
 
+    public abstract boolean isActive(LivingEntity livingEntity);
 
     @Override
     public boolean collidesWith(Entity other) {
@@ -106,7 +108,7 @@ public class FollowingEntity extends Entity implements PolymerEntity {
 
     @Override
     public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
-        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.id(), DisplayEntity.ItemDisplayEntity.ITEM.dataType(), ZauberItems.TOTEM_OF_DARKNESS.getDefaultStack()));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.id(), DisplayEntity.ItemDisplayEntity.ITEM.dataType(), stack));
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.SCALE.id(), DisplayEntity.SCALE.dataType(), new Vector3f(.2f)));
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.TELEPORT_DURATION.id(), DisplayEntity.TELEPORT_DURATION.dataType(), 5));
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.BILLBOARD.id(), DisplayEntity.BILLBOARD.dataType(), (byte) 3));
