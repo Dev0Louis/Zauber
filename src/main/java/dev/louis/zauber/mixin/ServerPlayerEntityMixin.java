@@ -3,13 +3,21 @@ package dev.louis.zauber.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.authlib.GameProfile;
 import dev.emi.trinkets.api.TrinketsApi;
+import dev.louis.zauber.PlayerTotemData;
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.duck.AttachableEntity;
+import dev.louis.zauber.duck.EntityWithFollowingEntities;
+import dev.louis.zauber.entity.FollowingEntity;
 import dev.louis.zauber.entity.TotemOfDarknessEntity;
+import dev.louis.zauber.entity.TotemOfIceEntity;
+import dev.louis.zauber.entity.TotemOfManaEntity;
 import dev.louis.zauber.helper.SoundHelper;
 import dev.louis.zauber.item.TotemOfDarknessItem;
+import dev.louis.zauber.item.TotemOfIceItem;
+import dev.louis.zauber.item.TotemOfManaItem;
 import dev.louis.zauber.item.ZauberItems;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -17,7 +25,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,8 +34,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity implements AttachableEntity {
+public abstract class ServerPlayerEntityMixin extends PlayerEntity implements EntityWithFollowingEntities {
     @Shadow
     @Final
     public MinecraftServer server;
@@ -40,51 +53,81 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements At
     }
 
     @Unique
-    @Nullable
-    private TotemOfDarknessEntity totemOfDarknessEntity;
+    @NotNull
+    private List<FollowingEntity> followingEntities = new ArrayList<>();
+
+    @Unique
+    @NotNull
+    private static final Map<Item, PlayerTotemData<LivingEntity, ? extends FollowingEntity>> ITEM_TO_TOTEM_DATA;
+
+    static {
+        ITEM_TO_TOTEM_DATA = new HashMap<>();
+        ITEM_TO_TOTEM_DATA.put(
+                ZauberItems.TOTEM_OF_DARKNESS,
+                new PlayerTotemData<>(TotemOfDarknessItem::isActive, TotemOfDarknessEntity.TYPE)
+        );
+        ITEM_TO_TOTEM_DATA.put(
+                ZauberItems.TOTEM_OF_ICE,
+                new PlayerTotemData<>(TotemOfIceItem::isActive, TotemOfIceEntity.TYPE)
+        );
+        ITEM_TO_TOTEM_DATA.put(
+                ZauberItems.TOTEM_OF_MANA,
+                new PlayerTotemData<>(TotemOfManaItem::isActive, TotemOfManaEntity.TYPE)
+        );
+    }
 
     @Inject(
             method = "tick",
             at = @At("RETURN")
     )
     public void checkIfTotemOfDarknessIsEquippedAndIfNeededSpawnCompanionEntity(CallbackInfo ci) {
-        var isDarkTotemPresent = TrinketsApi.getTrinketComponent(this).map(trinketComponent -> trinketComponent.isEquipped(ZauberItems.TOTEM_OF_DARKNESS)).orElse(false);
-        if (isDarkTotemPresent) {
-            if (TotemOfDarknessItem.isActive(this)) {
-                if (totemOfDarknessEntity == null || totemOfDarknessEntity.isRemoved()) {
-                    totemOfDarknessEntity = new TotemOfDarknessEntity(this.getWorld(), this);
-                    totemOfDarknessEntity.setPosition(this.getPos());
-                    this.getWorld().spawnEntity(totemOfDarknessEntity);
-                    SoundHelper.playSound(
-                            this.getServerWorld(),
-                            this.getPos(),
-                            SoundEvents.ENTITY_SHULKER_BULLET_HIT,
-                            SoundCategory.AMBIENT,
-                            1,
-                            2
-                    );
+        //var isDarkTotemPresent = TrinketsApi.getTrinketComponent(this).map(trinketComponent -> trinketComponent.isEquipped(ZauberItems.TOTEM_OF_DARKNESS)).orElse(false);
+        TrinketsApi.getTrinketComponent(this).ifPresent(component -> {
+            ITEM_TO_TOTEM_DATA.forEach((item, playerTotemData) -> {
+                var entityType = playerTotemData.entityType();
+                var checker = playerTotemData.activityChecker();
+                if (component.isEquipped(item) && checker.isActive(this)) {
+                    if (followingEntities.stream().noneMatch(entity -> entity.getType().equals(entityType))) {
+                        FollowingEntity followingEntity = entityType.create(this.getWorld());
+                        followingEntity.setOwner(this);
+                        followingEntity.setPosition(this.getPos());
+                        followingEntities.add(followingEntity);
+                        this.getWorld().spawnEntity(followingEntity);
+                        followingEntity.onActivation();
+
+                        SoundHelper.playSound(
+                                this.getServerWorld(),
+                                this.getPos(),
+                                SoundEvents.ENTITY_SHULKER_BULLET_HIT,
+                                SoundCategory.AMBIENT,
+                                1,
+                                2
+                        );
+                    }
+                } else {
+                    if (followingEntities.removeIf(entity -> {
+                        boolean remove = entity.getType().equals(entityType);
+                        if (remove) entity.discard();
+                        return remove;
+                    })) {
+                        SoundHelper.playSound(
+                                this.getServerWorld(),
+                                this.getPos(),
+                                SoundEvents.ENTITY_SHULKER_BULLET_HIT,
+                                SoundCategory.AMBIENT,
+                                1,
+                                1
+                        );
+                    }
                 }
-            } else {
-                if (totemOfDarknessEntity != null) {
-                    SoundHelper.playSound(
-                            this.getServerWorld(),
-                            this.getPos(),
-                            SoundEvents.ENTITY_SHULKER_BULLET_HIT,
-                            SoundCategory.AMBIENT,
-                            1,
-                            1
-                    );
-                    totemOfDarknessEntity = null;
-                }
-            }
-        } else {
-            totemOfDarknessEntity = null;
-        }
+            });
+        });
+
     }
 
     @Override
-    public TotemOfDarknessEntity zauber$getTotemOfDarkness() {
-        return totemOfDarknessEntity;
+    public @NotNull List<FollowingEntity> zauber$getFollowingEntities() {
+        return followingEntities;
     }
 
     @Inject(

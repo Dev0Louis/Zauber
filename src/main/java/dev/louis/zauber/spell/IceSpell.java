@@ -1,7 +1,9 @@
 package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.Zauber;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.entity.TotemOfIceEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -24,6 +26,11 @@ public class IceSpell extends AreaEffectSpell {
         entity.setFrozenTicks(100);
         entity.extinguishWithSound();
         super.affect(entity);
+    }
+
+    @Override
+    protected int getDamage() {
+        return Zauber.hasTotem(this.caster, TotemOfIceEntity.TYPE) ? 3 : 1;
     }
 
     @Override

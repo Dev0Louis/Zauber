@@ -1,12 +1,11 @@
 package dev.louis.zauber.entity;
 
-import dev.louis.zauber.duck.AttachableEntity;
-import dev.louis.zauber.item.ZauberItems;
+import dev.louis.zauber.duck.EntityWithFollowingEntities;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
@@ -14,33 +13,32 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-public class FollowingEntity extends Entity implements PolymerEntity {
-    public static final EntityType<FollowingEntity> TYPE = FabricEntityTypeBuilder
-            .<FollowingEntity>create(SpawnGroup.MISC, FollowingEntity::new)
-            .build();
+public abstract class FollowingEntity extends Entity implements PolymerEntity, Ownable {
     private static final double HARD_TELEPORT_SQUARED_DISTANCE = Math.pow(32, 2);
     private static final double PUSH_AWAY_SQUARED_DISTANCE = 1;
     private static final double MOVE_TO_PLAYER_SQUARED_DISTANCE = Math.pow(3, 2);
     private final double circleRotationSpeed;
 
-    private final LivingEntity owner;
     private final double heightOffset;
+    private final ItemStack stack;
+
+    private LivingEntity owner;
 
     public FollowingEntity(EntityType<?> type, World world) {
-        this(type, world, world.getPlayers().get(0));
+        this(type, world, ItemStack.EMPTY);
     }
 
-    public FollowingEntity(EntityType<?> type, World world, LivingEntity owner) {
+    public FollowingEntity(EntityType<?> type, World world, ItemStack stack) {
         super(type, world);
+        this.stack = stack;
         this.circleRotationSpeed = world.random.nextDouble() * 0.5 + 0.5;
         this.heightOffset = world.random.nextDouble() * 0.5;
-        this.owner = owner;
         this.setVelocity(world.random.nextDouble() * 10, world.random.nextDouble() * 10, world.random.nextDouble() * 10);
     }
 
     @Override
     public void tick() {
-        if (this.owner == null || this.owner.isRemoved() || ((AttachableEntity) owner).zauber$getTotemOfDarkness() != this) {
+        if (this.owner == null || this.owner.isRemoved() || !((EntityWithFollowingEntities) owner).zauber$getFollowingEntities().contains(this) || !this.isActive(owner)) {
             this.discard();
             return;
         }
@@ -52,7 +50,7 @@ public class FollowingEntity extends Entity implements PolymerEntity {
         double x = Math.sin(this.age / timer) * 2;
         double z = Math.cos(this.age / timer) * 2;
         target = target.add(x, .8 + heightOffset, z);
-        var sqrtDistance = target.squaredDistanceTo(this.getPos());;
+        var sqrtDistance = target.squaredDistanceTo(this.getPos());
 
         if (sqrtDistance > HARD_TELEPORT_SQUARED_DISTANCE) {
             this.setPosition(target);
@@ -78,6 +76,16 @@ public class FollowingEntity extends Entity implements PolymerEntity {
         //Debugger.addEntityBoundBox(this, this.getBoundingBox(), Color.BLACK);
     }
 
+    @Override
+    public LivingEntity getOwner() {
+        return owner;
+    }
+
+    public void setOwner(LivingEntity owner) {
+        this.owner = owner;
+    }
+
+    public abstract boolean isActive(LivingEntity livingEntity);
 
     @Override
     public boolean collidesWith(Entity other) {
@@ -106,7 +114,7 @@ public class FollowingEntity extends Entity implements PolymerEntity {
 
     @Override
     public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
-        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.id(), DisplayEntity.ItemDisplayEntity.ITEM.dataType(), ZauberItems.TOTEM_OF_DARKNESS.getDefaultStack()));
+        data.add(new DataTracker.SerializedEntry<>(DisplayEntity.ItemDisplayEntity.ITEM.id(), DisplayEntity.ItemDisplayEntity.ITEM.dataType(), stack));
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.SCALE.id(), DisplayEntity.SCALE.dataType(), new Vector3f(.2f)));
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.TELEPORT_DURATION.id(), DisplayEntity.TELEPORT_DURATION.dataType(), 5));
         data.add(new DataTracker.SerializedEntry<>(DisplayEntity.BILLBOARD.id(), DisplayEntity.BILLBOARD.dataType(), (byte) 3));
@@ -115,5 +123,13 @@ public class FollowingEntity extends Entity implements PolymerEntity {
     @Override
     public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
         return EntityType.ITEM_DISPLAY;
+    }
+
+    public void onActivation() {
+
+    }
+
+    public void onDeletion() {
+        this.discard();
     }
 }
