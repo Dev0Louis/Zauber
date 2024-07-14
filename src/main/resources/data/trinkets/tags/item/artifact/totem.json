@@ -1,6 +1,8 @@
 {
   "values": [
     "zauber:totem_of_darkness",
+    "zauber:totem_of_ice",
+    "zauber:totem_of_mana",
     "minecraft:totem_of_undying"
   ]
 }

@@ -17,6 +17,14 @@ import java.util.List;
 public class ZauberItems {
     public static final List<Item> IN_CREATIVE_INVENTORY = new ArrayList<>();
 
+    //It is important that these are above, as the Blocks will be initialised if any BlockItems are registered before these and the Cauldron behavior needs to be put into a map, if this map is created before these items are initialised resulting in null -> Behavior, which breaks the interaction
+    public static final Item TOTEM_OF_DARKNESS =
+            registerCreativeTab("totem_of_darkness", new TotemOfDarknessItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item TOTEM_OF_ICE =
+            registerCreativeTab("totem_of_ice", new TotemOfDarknessItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item TOTEM_OF_MANA =
+            registerCreativeTab("totem_of_mana", new TotemOfDarknessItem(new Item.Settings().maxDamage(100).rarity(Rarity.UNCOMMON)));
+
     public static final Item SPELL_BOOK =
             register("spell_book", new SpellBookItem(new Item.Settings().fireproof().rarity(Rarity.RARE)));
     public static final Item SOUL_HORN =
@@ -37,10 +45,7 @@ public class ZauberItems {
             registerCreativeTab("mana_bow", new ManaBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxDamage(384)));
     public static final Item LOST_BOOK =
             register("lost_book", new LostBookItem(new Item.Settings().rarity(Rarity.COMMON)));
-    public static final Item TOTEM_OF_DARKNESS =
-            registerCreativeTab("totem_of_darkness", new TotemOfDarknessItem(new Item.Settings().rarity(Rarity.UNCOMMON)));
-    public static final Item TOTEM_OF_ICE =
-            registerCreativeTab("totem_of_ice", new TotemOfDarknessItem(new Item.Settings().rarity(Rarity.UNCOMMON)));
+
 
     private static Item registerCreativeTab(String path, Item item) {
         IN_CREATIVE_INVENTORY.add(item);

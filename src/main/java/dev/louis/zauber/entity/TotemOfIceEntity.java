@@ -14,11 +14,7 @@ public class TotemOfIceEntity extends FollowingEntity {
             .build();
 
     public TotemOfIceEntity(EntityType<?> type, World world) {
-        super(type, world);
-    }
-
-    public TotemOfIceEntity(World world, LivingEntity owner) {
-        super(TYPE, world, owner, ZauberItems.TOTEM_OF_ICE.getDefaultStack());
+        super(type, world, ZauberItems.TOTEM_OF_ICE.getDefaultStack());
     }
 
     @Override

@@ -1,6 +1,8 @@
 package dev.louis.zauber;
 
 import com.mojang.logging.LogUtils;
+import dev.emi.trinkets.api.SlotType;
+import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.block.TrappingBedBlock;
@@ -8,6 +10,7 @@ import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.component.ZauberDataComponentTypes;
 import dev.louis.zauber.component.type.LostBookIdComponent;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.duck.EntityWithFollowingEntities;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.item.SpellBookItem;
@@ -27,6 +30,7 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -36,6 +40,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -43,7 +48,9 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.entry.ItemEntry;
@@ -53,6 +60,8 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -74,7 +83,6 @@ public class Zauber implements ModInitializer {
     public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
     private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
 
-    private static final ItemStack ITEM_GROUP_LOGO = SpellBookItem.createSpellBook(Spells.SUPERNOVA);
 
     @Override
     public void onInitialize() {
@@ -139,6 +147,8 @@ public class Zauber implements ModInitializer {
         registerEntity("ice_peak", IcePeakEntity.TYPE);
         registerEntity("hail_stone", HailStoneEntity.TYPE);
         registerEntity("totem_of_darkness", TotemOfDarknessEntity.TYPE);
+        registerEntity("totem_of_ice", TotemOfIceEntity.TYPE);
+        registerEntity("totem_of_mana", TotemOfManaEntity.TYPE);
         registerEntity("mana_horse", ManaHorseEntity.TYPE);
         registerEntity("thrown_heart_of_the_ice", ThrownHeartOfTheIceEntity.TYPE);
         registerEntity("mana_arrow", ManaArrowEntity.TYPE);
@@ -152,7 +162,7 @@ public class Zauber implements ModInitializer {
         ZauberPotionEffects.init();
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SpellStructureResourceReloadListener());
-        ItemGroup itemGroup = Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> ITEM_GROUP_LOGO).displayName(Text.of("Zauber")).build());
+        ItemGroup itemGroup = Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> SpellBookItem.createSpellBook(Spells.SUPERNOVA)).displayName(Text.of("Zauber")).build());
 
         ItemGroupEvents.modifyEntriesEvent(Registries.ITEM_GROUP.getKey(itemGroup).get()).register(content -> {
             if (true) return;
@@ -179,6 +189,33 @@ public class Zauber implements ModInitializer {
                 });
             }
         });
+
+        TrinketsApi.registerTrinketPredicate(Identifier.of(MOD_ID, "tag_and_unique"), ((stack, ref, livingEntity) -> {
+            SlotType slot = ref.inventory().getSlotType();
+            var containsItem = TrinketsApi.getTrinketComponent(livingEntity).map(component -> component.getInventory().get(slot.getGroup()).get(slot.getName()).containsAny(stack1 -> stack1.getItem().equals(stack.getItem()))).orElse(false);
+            var tagCheck = TrinketsApi.getTrinketPredicate(Identifier.of("trinkets", "tag")).get();
+            if (!containsItem && tagCheck.apply(stack, ref, livingEntity) == TriState.TRUE) {
+                return TriState.TRUE;
+            }
+            return TriState.FALSE;
+        }));
+
+        AttackEntityCallback.EVENT.register((player, world, hand, target, hitResult) -> {
+            if (player.isSpectator() || world.isClient()) return ActionResult.PASS;
+
+            if (hasTotem(player, TotemOfIceEntity.TYPE)) {
+                target.setFrozenTicks(Math.min(target.getFrozenTicks() + 50, 400));
+            }
+            return ActionResult.PASS;
+        });
+    }
+
+    public static boolean hasTotem(LivingEntity livingEntity, EntityType<? extends TotemOfIceEntity> entityType) {
+        if (livingEntity instanceof EntityWithFollowingEntities entityWithFollowingEntities) {
+            return entityWithFollowingEntities.zauber$getFollowingEntities().stream().anyMatch(entity -> entity.getType().equals(entityType));
+        } else {
+            return false;
+        }
     }
 
     public static <T extends ParticleEffect> void registerParticle(String path, ParticleType<T> type) {

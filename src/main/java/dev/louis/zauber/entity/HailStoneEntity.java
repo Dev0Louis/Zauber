@@ -1,5 +1,6 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Blocks;
@@ -26,8 +27,9 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
     public static final EntityType<HailStoneEntity> TYPE = FabricEntityTypeBuilder
             .create(SpawnGroup.MISC, HailStoneEntity::new)
             .build();
-    private static final int DAMAGE = 4;
+    private static final int BASE_DAMAGE = 4;
     private boolean bounce = this.random.nextBoolean();
+    public boolean castedWithIceTotem;
 
     public HailStoneEntity(EntityType<? extends ThrownItemEntity> type, World world) {
         super(type, world);
@@ -77,9 +79,13 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
 
     private void damageEntity(LivingEntity entity) {
         var damageSource = entity.getDamageSources().create(entity.getDamageSources().freeze().getTypeRegistryEntry().getKey().get(), this.getOwner());
-        float damage = DAMAGE;
+        float damage = BASE_DAMAGE;
 
         if(entity.getWorld().getBiome(entity.getBlockPos()).value().isCold(entity.getBlockPos())) {
+            damage = damage * 2;
+        }
+
+        if(castedWithIceTotem) {
             damage = damage * 2;
         }
 

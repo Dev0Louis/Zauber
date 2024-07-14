@@ -50,6 +50,6 @@ public class TotemOfIceItem extends TrinketItem implements PolymerItem, PolymerK
     }
 
     public static boolean isActive(LivingEntity entity) {
-        return true;
+        return !entity.getWorld().getDimension().ultrawarm();
     }
 }

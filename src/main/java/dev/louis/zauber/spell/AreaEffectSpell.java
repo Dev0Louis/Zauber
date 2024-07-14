@@ -47,7 +47,11 @@ public abstract class AreaEffectSpell extends Spell {
      * This method can be overridden to run something when an Entity is affected by the spell.
      */
     protected void affect(Entity entity) {
-        if(entity instanceof LivingEntity livingEntity && livingEntity.isMobOrPlayer()) entity.damage(getDamageSource(), 1);
+        if(entity instanceof LivingEntity livingEntity && livingEntity.isMobOrPlayer()) entity.damage(getDamageSource(), this.getDamage());
+    }
+
+    protected int getDamage() {
+        return 1;
     }
 
     /**
