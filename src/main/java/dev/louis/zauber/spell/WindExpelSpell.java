@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.helper.SoundHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -56,8 +57,10 @@ public class WindExpelSpell extends Spell {
             );
 
 
-            this.getCaster().playSound(SoundEvents.BLOCK_GLASS_HIT, 2f, -1f);
-
+            SoundHelper.playPlayerSound(
+                    serverPlayer,
+                    SoundEvents.BLOCK_GLASS_HIT
+            );
         }
     }
 
@@ -65,10 +68,10 @@ public class WindExpelSpell extends Spell {
     public void finish() {
         if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
             if (this.wasInterrupted()) {
-                this.getCaster().playSound(SoundEvents.ITEM_SHIELD_BREAK, 1f, -1f);
+                SoundHelper.playPlayerSound(serverPlayer, SoundEvents.ITEM_SHIELD_BREAK, 1f, -1f);
                 return;
             }
-            this.getCaster().playSound(SoundEvents.ENTITY_CAMEL_DASH, 1f, -1f);
+            SoundHelper.playPlayerSound(serverPlayer, SoundEvents.ENTITY_CAMEL_DASH, 1f, -1f);
 
             if(!this.getCaster().isOnGround()) {
                 serverPlayer.setVelocity(serverPlayer.getVelocity().multiply(1, 0.7, 1));
