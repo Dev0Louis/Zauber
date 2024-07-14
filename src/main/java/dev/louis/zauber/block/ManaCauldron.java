@@ -5,6 +5,7 @@ import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import dev.louis.zauber.helper.SoundHelper;
 import dev.louis.zauber.item.ZauberItems;
+import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithMovingElementHolder;
@@ -13,11 +14,11 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.cauldron.CauldronBehavior;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsage;
-import net.minecraft.item.Items;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.item.*;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.potion.Potion;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -50,7 +51,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
 
     static {
         MANA_CAULDRON_BEHAVIOR.map().put(Items.POTION, ((state, world, pos, player, hand, stack) -> {
-            if (!world.isClient && state.get(MANA_LEVEL) < 2) {
+            if (!world.isClient && state.get(MANA_LEVEL) < 2 && stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).matches(ZauberPotionEffects.MANA_INSTANT)) {
                 Item item = stack.getItem();
                 player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, new ItemStack(Items.GLASS_BOTTLE)));
                 player.incrementStat(Stats.USE_CAULDRON);
