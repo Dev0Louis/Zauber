@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import dev.louis.zauber.helper.SoundHelper;
+import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithMovingElementHolder;
@@ -57,6 +58,20 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
                 world.setBlockState(pos, state.with(MANA_LEVEL, state.get(MANA_LEVEL) + 1));
                 world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
+            }
+            return ItemActionResult.success(world.isClient);
+        }));
+
+        MANA_CAULDRON_BEHAVIOR.map().put(ZauberItems.TOTEM_OF_MANA, ((state, world, pos, player, hand, stack) -> {
+            if (stack.isDamaged()) {
+                stack.setDamage(Math.max(0, stack.getDamage() - 10));
+                var manaLevel = state.get(MANA_LEVEL) - 1;
+                if (manaLevel == 0) {
+                    world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
+                } else {
+                    world.setBlockState(pos, state.with(MANA_LEVEL, manaLevel));
+                }
+                return ItemActionResult.CONSUME;
             }
             return ItemActionResult.success(world.isClient);
         }));

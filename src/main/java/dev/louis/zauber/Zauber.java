@@ -13,8 +13,7 @@ import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.duck.EntityWithFollowingEntities;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
-import dev.louis.zauber.item.SpellBookItem;
-import dev.louis.zauber.item.ZauberItems;
+import dev.louis.zauber.item.*;
 import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.networking.ICanHasZauberPayload;
 import dev.louis.zauber.networking.OptionSyncCompletePayload;
@@ -60,8 +59,6 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -70,12 +67,15 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("UnreachableCode")
 public class Zauber implements ModInitializer {
@@ -84,6 +84,37 @@ public class Zauber implements ModInitializer {
     public static final int POLYMER_NETWORK_VERSION = 4;
     public static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
     private static final ParticleEffect BLACK_PARTICLE = new DustParticleEffect(BLACK_PARTICLE_COLOR, 1);
+
+    @NotNull
+    public static final Map<Item, PlayerTotemData> ITEM_TO_TOTEM_DATA;
+
+    static {
+        ITEM_TO_TOTEM_DATA = new HashMap<>();
+        ITEM_TO_TOTEM_DATA.put(
+                ZauberItems.TOTEM_OF_DARKNESS,
+                new PlayerTotemData(
+                        TotemOfDarknessItem::isActive,
+                        TotemOfDarknessEntity.TYPE,
+                        Identifier.of(Zauber.MOD_ID, "artifact/totem_of_darkness")
+                )
+        );
+        ITEM_TO_TOTEM_DATA.put(
+                ZauberItems.TOTEM_OF_ICE,
+                new PlayerTotemData(
+                        TotemOfIceItem::isActive,
+                        TotemOfIceEntity.TYPE,
+                        Identifier.of(Zauber.MOD_ID, "artifact/totem_of_ice")
+                )
+        );
+        ITEM_TO_TOTEM_DATA.put(
+                ZauberItems.TOTEM_OF_MANA,
+                new PlayerTotemData(
+                        TotemOfManaItem::isActive,
+                        TotemOfManaEntity.TYPE,
+                        Identifier.of(Zauber.MOD_ID, "artifact/totem_of_mana")
+                )
+        );
+    }
 
 
     @Override

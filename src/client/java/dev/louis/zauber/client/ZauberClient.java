@@ -1,7 +1,11 @@
 package dev.louis.zauber.client;
 
+import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
+import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.PlayerTotemData;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.client.keybind.SpellKeyBinding;
@@ -11,10 +15,7 @@ import dev.louis.zauber.client.render.entity.BlueArrowEntityRenderer;
 import dev.louis.zauber.client.render.entity.ManaHorseEntityRenderer;
 import dev.louis.zauber.client.screen.SpellTableScreen;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.entity.ManaArrowEntity;
-import dev.louis.zauber.entity.ManaHorseEntity;
-import dev.louis.zauber.entity.SpellArrowEntity;
-import dev.louis.zauber.entity.ThrownHeartOfTheIceEntity;
+import dev.louis.zauber.entity.*;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.OptionSyncCompletePayload;
 import dev.louis.zauber.networking.OptionSyncPayload;
@@ -27,15 +28,22 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
@@ -64,6 +72,100 @@ public class ZauberClient implements ClientModInitializer {
                     playerInView = null;
                 }
             }
+        });
+
+        HudRenderCallback.EVENT.register((context, tickCounter) -> {
+            var client = MinecraftClient.getInstance();
+            TrinketsApi.getTrinketComponent(client.player).ifPresent(component -> {
+                List<Map.Entry<Item, PlayerTotemData>> sortedList = Zauber.ITEM_TO_TOTEM_DATA.entrySet().stream().collect(Collectors.toList());
+                //Collections.shuffle(sortedList);
+                sortedList.sort((totemData, totemData2) -> {
+                    var active = totemData.getValue().activityChecker().isActive(client.player);
+                    var active2 = totemData2.getValue().activityChecker().isActive(client.player);
+
+                    if (active) return -1;
+                    if (!active2) return 1;
+                    return 1;
+                });
+
+                if (!sortedList.isEmpty()) {
+                    if (client.currentScreen instanceof AbstractInventoryScreen<?> abstractInventoryScreen && abstractInventoryScreen.hideStatusEffectHud()) return;
+                    RenderSystem.enableBlend();
+                    int i = 0;
+                    int j = 0;
+                    List<Runnable> list = Lists.newArrayListWithExpectedSize(sortedList.size());
+
+                    for (Map.Entry<Item, PlayerTotemData> entry : sortedList) {
+                        if (!component.isEquipped(entry.getKey())) continue;
+                        var playerTotemData = entry.getValue();
+                        var texture = playerTotemData.texture();
+                        int k = 0;
+                        int l = 0;
+
+                        k += 24 * i;
+                        i++;
+
+                        float f = 1.0F;
+                        context.drawGuiTexture(Identifier.of(Zauber.MOD_ID, "artifact/icon_background"), k, l, 24, 24);
+                        if (!playerTotemData.activityChecker().isActive(MinecraftClient.getInstance().player)) {
+                            int m = MinecraftClient.getInstance().player.age;
+                            int n = 10 - m / 20;
+                            f = MathHelper.cos(m / (float) Math.PI * 20.0F) * 0.1f + 0.4f;
+                        }
+
+                        int n = k;
+                        int o = l;
+                        float g = f;
+                        list.add(() -> {
+                            context.setShaderColor(1.0F, 1.0F, 1.0F, g);
+                            context.getMatrices().translate(0, -0.25, 0);
+                            context.drawGuiTexture(texture, n + 3, o + 3, 0, 18, 18);
+                            context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                        });
+                    }
+
+                    list.forEach(Runnable::run);
+                    RenderSystem.disableBlend();
+                }
+
+            });
+
+            /*AtomicInteger atomicInteger = new AtomicInteger();
+            var matrixStack = drawContext.getMatrices();
+            matrixStack.scale(4, 4, 4);
+            Zauber.ITEM_TO_TOTEM_DATA.forEach((item, playerTotemData) -> {
+                matrixStack.push();
+                float a = (float) 0.8f;
+                int i = atomicInteger.getAndIncrement();
+
+                matrixStack.translate(16 * i, 0, 0);
+
+
+                drawContext.drawGuiTexture(
+                        Identifier.of(Zauber.MOD_ID, "artifact/icon_background"),
+                        0,
+                        0,
+                        16,
+                        16
+                );
+
+                matrixStack.pop();
+                matrixStack.push();
+
+                //matrixStack.translate(16 * i, 0, 0);
+                matrixStack.translate(a, a, 0);
+                matrixStack.scale(a, a, 0);
+
+                drawContext.drawGuiTexture(
+                        playerTotemData.texture(),
+                        0,
+                        0,
+                        16,
+                        16
+                );
+
+                matrixStack.pop();
+            });*/
         });
 
         createSpellKeyBind(Zauber.Spells.ARROW, false);

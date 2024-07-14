@@ -1,10 +1,12 @@
 package dev.louis.zauber;
 
-import net.minecraft.entity.Entity;
+import dev.louis.zauber.entity.FollowingEntity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 
-public record PlayerTotemData<C, E extends Entity>(ActivityChecker<C> activityChecker, EntityType<E> entityType) {
-    public interface ActivityChecker<C> {
-        boolean isActive(C checked);
+public record PlayerTotemData(ActivityChecker activityChecker, EntityType<? extends FollowingEntity> entityType, Identifier texture) {
+    public interface ActivityChecker {
+        boolean isActive(PlayerEntity checked);
     }
 }

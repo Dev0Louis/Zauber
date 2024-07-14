@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dev.louis.zauber.Zauber.ITEM_TO_TOTEM_DATA;
+
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity implements EntityWithFollowingEntities {
     @Shadow
@@ -56,25 +58,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements En
     @NotNull
     private List<FollowingEntity> followingEntities = new ArrayList<>();
 
-    @Unique
-    @NotNull
-    private static final Map<Item, PlayerTotemData<LivingEntity, ? extends FollowingEntity>> ITEM_TO_TOTEM_DATA;
-
-    static {
-        ITEM_TO_TOTEM_DATA = new HashMap<>();
-        ITEM_TO_TOTEM_DATA.put(
-                ZauberItems.TOTEM_OF_DARKNESS,
-                new PlayerTotemData<>(TotemOfDarknessItem::isActive, TotemOfDarknessEntity.TYPE)
-        );
-        ITEM_TO_TOTEM_DATA.put(
-                ZauberItems.TOTEM_OF_ICE,
-                new PlayerTotemData<>(TotemOfIceItem::isActive, TotemOfIceEntity.TYPE)
-        );
-        ITEM_TO_TOTEM_DATA.put(
-                ZauberItems.TOTEM_OF_MANA,
-                new PlayerTotemData<>(TotemOfManaItem::isActive, TotemOfManaEntity.TYPE)
-        );
-    }
 
     @Inject(
             method = "tick",
