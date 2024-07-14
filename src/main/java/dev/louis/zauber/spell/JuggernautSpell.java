@@ -6,6 +6,7 @@ import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.duck.ItemStackJuggernautModeDuck;
 import dev.louis.zauber.mixin.ServerWorldAccessor;
+import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,8 +35,9 @@ public class JuggernautSpell extends Spell {
         var tick = ((ServerWorldAccessor)getCaster().getWorld()).getWorldProperties().getTime();
         var player = (ServerPlayerEntity) getCaster();
         generateJuggernautItemAndSetToSlot(player, 0, Items.NETHERITE_SWORD, tick);
-        generateJuggernautItemAndSetToSlot(player, 1, Items.NETHERITE_AXE, tick);
-        generateJuggernautItemAndSetToSlot(player, 2, Items.BOW, tick);
+        generateJuggernautItemAndSetToSlot(player, 1, Items.MACE, tick);
+        generateJuggernautItemAndSetToSlot(player, 2, Items.NETHERITE_AXE, tick);
+        generateJuggernautItemAndSetToSlot(player, 3, Items.BOW, tick);
 
         RegistryWrapper<Enchantment> registry = player.getServer().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT);
         ItemStack goldenApple = generateJuggernautItem(Items.GOLDEN_APPLE, registry, tick);
@@ -113,7 +115,9 @@ public class JuggernautSpell extends Spell {
     public static void enchantMax(ItemStack itemStack, RegistryWrapper<Enchantment> registry, List<RegistryKey<Enchantment>> excludedEnchantments) {
         registry.streamKeys().filter(enchantmentKey -> !excludedEnchantments.contains(enchantmentKey)).forEach(enchantmentKey -> {
             var enchantment = registry.getOrThrow(enchantmentKey);
-            itemStack.addEnchantment(enchantment, enchantment.value().getMaxLevel() + 1);
+            if (itemStack.canBeEnchantedWith(enchantment, EnchantingContext.ACCEPTABLE)) {
+                itemStack.addEnchantment(enchantment, enchantment.value().getMaxLevel() + 1);
+            }
         });
     }
 
