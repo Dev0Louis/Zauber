@@ -41,6 +41,8 @@ public abstract class Ritual {
         //The order is important as the Rituals are checked in order.
         RITUAL_STARTERS.add(HorseRitual::tryStart);
         RITUAL_STARTERS.add(TotemOfDarknessRitual::tryStart);
+        RITUAL_STARTERS.add(TotemOfIceRitual::tryStart);
+        RITUAL_STARTERS.add(TotemOfManaRitual::tryStart);
         RITUAL_STARTERS.add(ManaBowRitual::tryStart);
         RITUAL_STARTERS.add(HeartOfDarknessRitual::tryStart);
         RITUAL_STARTERS.add(MudifyRitual::tryStart);
@@ -77,10 +79,6 @@ public abstract class Ritual {
         }, Ingredient.ofItems(Items.STRING)));
 
         RITUAL_STARTERS.add(SmeltingRitual::tryStart);
-
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            RITUAL_STARTERS.add(TestRitual::new);
-        }
     }
 
 

@@ -1,0 +1,7 @@
+{
+  "type": "zauber:spell_recipe",
+  "spell": "zauber:conjoure_fang",
+  "ingredient": {
+    "item": "zauber:heart_of_the_darkness"
+  }
+}
