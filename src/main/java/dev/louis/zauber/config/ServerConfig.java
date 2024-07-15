@@ -1,7 +1,5 @@
 package dev.louis.zauber.config;
 
-import java.util.Objects;
-
 public class ServerConfig {
     private int entityTargetingDistance = 24;
     private int blockTargetingDistance = 64;
@@ -16,7 +14,6 @@ public class ServerConfig {
     private int rewindSpellDuration = 6 * 20;
     private double windExpelSpellAcceleration = 0.1;
     private int windExpelSpellDuration = 20;
-    private boolean convertOldNamespace = false;
 
     protected ServerConfig() {
 
@@ -34,8 +31,7 @@ public class ServerConfig {
             int juggernautSpellDuration,
             int rewindSpellDuration,
             double windExpelSpellAcceleration,
-            int windExpelSpellDuration,
-            boolean convertOldNamespace
+            int windExpelSpellDuration
     ) {
         this.entityTargetingDistance = entityTargetingDistance;
         this.spellCooldown = spellCooldown;
@@ -49,7 +45,6 @@ public class ServerConfig {
         this.rewindSpellDuration = rewindSpellDuration;
         this.windExpelSpellAcceleration = windExpelSpellAcceleration;
         this.windExpelSpellDuration = windExpelSpellDuration;
-        this.convertOldNamespace = convertOldNamespace;
     }
 
     public void entityTargetingDistance(int entityTargetingDistance) {
@@ -156,14 +151,6 @@ public class ServerConfig {
         return windExpelSpellDuration;
     }
 
-    public void convertOldNamespace(boolean convertOldNamespace) {
-        this.convertOldNamespace = convertOldNamespace;
-    }
-
-    public boolean convertOldNamespace() {
-        return convertOldNamespace;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -177,28 +164,6 @@ public class ServerConfig {
                 this.iceSpellDuration == that.iceSpellDuration &&
                 this.juggernautSpellDuration == that.juggernautSpellDuration &&
                 this.rewindSpellDuration == that.rewindSpellDuration &&
-                this.windExpelSpellDuration == that.windExpelSpellDuration &&
-                this.convertOldNamespace == that.convertOldNamespace;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(entityTargetingDistance, supernovaExplosionPower, dashSpellDuration, sproutSpellDuration, fireSpellDuration, iceSpellDuration, juggernautSpellDuration, rewindSpellDuration, windExpelSpellDuration, convertOldNamespace);
-    }
-
-    @Override
-    public String toString() {
-        return "ServerConfig[" +
-                "entityTargetingDistance=" + entityTargetingDistance + ", " +
-                "spellCooldown=" + spellCooldown + ", " +
-                "supernovaExplosionPower=" + supernovaExplosionPower + ", " +
-                "dashSpellDuration=" + dashSpellDuration + ", " +
-                "sproutSpellDuration=" + sproutSpellDuration + ", " +
-                "fireSpellDuration=" + fireSpellDuration + ", " +
-                "iceSpellDuration=" + iceSpellDuration + ", " +
-                "juggernautSpellDuration=" + juggernautSpellDuration + ", " +
-                "rewindSpellDuration=" + rewindSpellDuration + ", " +
-                "windExpelSpellDuration=" + windExpelSpellDuration + ", " +
-                "convertOldNamespace=" + convertOldNamespace + ']';
+                this.windExpelSpellDuration == that.windExpelSpellDuration;
     }
 }

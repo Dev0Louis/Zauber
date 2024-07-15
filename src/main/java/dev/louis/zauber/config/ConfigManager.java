@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ConfigManager {
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -83,7 +83,6 @@ public class ConfigManager {
         buf.writeInt(serverConfig.rewindSpellDuration());
         buf.writeDouble(serverConfig.windExpelSpellAcceleration());
         buf.writeInt(serverConfig.windExpelSpellDuration());
-        buf.writeBoolean(serverConfig.convertOldNamespace());
     }
 
     public static ServerConfig readOverrideConfig(PacketByteBuf buf) {
@@ -104,8 +103,7 @@ public class ConfigManager {
                 buf.readInt(),
                 buf.readInt(),
                 buf.readDouble(),
-                buf.readInt(),
-                buf.readBoolean()
+                buf.readInt()
         );
         Zauber.LOGGER.info("Read Override Config with version " + configVersion);
         return overrideConfig;
@@ -154,8 +152,7 @@ public class ConfigManager {
 
         var serverCategory = ConfigCategory.createBuilder()
                 .name(category("server"))
-                .tooltip(tooltip("server"))
-                .option(
+                .tooltip(tooltip("server")).option(
                         intSlideOptionServer(
                                 "entity_targeting_distance",
                                 20,
@@ -164,8 +161,7 @@ public class ConfigManager {
                                 () -> getServerConfig().entityTargetingDistance(),
                                 (value) -> getRealServerConfig().entityTargetingDistance(value)
                         )
-                )
-                .option(
+                ).option(
                         intSlideOptionServer(
                                 "block_targeting_distance",
                                 64,
@@ -174,8 +170,7 @@ public class ConfigManager {
                                 () -> getServerConfig().blockTargetingDistance(),
                                 (value) -> getRealServerConfig().blockTargetingDistance(value)
                         )
-                )
-                .option(
+                ).option(
                         intSlideOptionServer(
                                 "spell_cooldown",
                                 10,
@@ -184,8 +179,7 @@ public class ConfigManager {
                                 () -> getServerConfig().spellCooldown(),
                                 (value) -> getRealServerConfig().spellCooldown(value)
                         )
-                )
-                .option(
+                ).option(
                         floatSlideOptionServer(
                                 "supernova_explosion_power",
                                 16.0f,
@@ -194,56 +188,49 @@ public class ConfigManager {
                                 () -> getServerConfig().supernovaExplosionPower(),
                                 (value) -> getRealServerConfig().supernovaExplosionPower(value)
                         )
-                )
-                .option(
+                ).option(
                         intFieldOptionServer(
                                 "dash_spell_duration",
                                 4,
                                 () -> getServerConfig().dashSpellDuration(),
                                 (value) -> getRealServerConfig().dashSpellDuration(value)
                         )
-                )
-                .option(
+                ).option(
                         intFieldOptionServer(
                                 "sprout_spell_duration",
                                 20 * 10,
                                 () -> getServerConfig().sproutSpellDuration(),
                                 (value) -> getRealServerConfig().sproutSpellDuration(value)
                         )
-                )
-                .option(
+                ).option(
                         intFieldOptionServer(
                                 "fire_spell_duration",
                                 20,
                                 () -> getServerConfig().fireSpellDuration(),
                                 (value) -> getRealServerConfig().fireSpellDuration(value)
                         )
-                )
-                .option(
+                ).option(
                         intFieldOptionServer(
                                 "ice_spell_duration",
                                 20,
                                 () -> getServerConfig().iceSpellDuration(),
                                 (value) -> getRealServerConfig().iceSpellDuration(value)
                         )
-                )
-                .option(
+                ).option(
                         intFieldOptionServer(
                                 "juggernaut_spell_duration",
                                 120 * 20,
                                 () -> getServerConfig().juggernautSpellDuration(),
                                 (value) -> getRealServerConfig().juggernautSpellDuration(value)
                         )
-                )
-                .option(
+                ).option(
                         intFieldOptionServer(
                                 "rewind_spell_duration",
                                 6 * 20,
                                 () -> getServerConfig().rewindSpellDuration(),
                                 (value) -> getRealServerConfig().rewindSpellDuration(value)
                         )
-                )
-                .option(
+                ).option(
                         doubleSlideOptionServer(
                                 "wind_expel_spell_acceleration",
                                 0.1,
@@ -252,8 +239,7 @@ public class ConfigManager {
                                 () -> getServerConfig().windExpelSpellAcceleration(),
                                 (value) -> getRealServerConfig().windExpelSpellAcceleration(value)
                         )
-                )
-                .option(
+                ).option(
                         intFieldOptionServer(
                                 "wind_expel_spell_duration",
                                 20,
@@ -261,14 +247,7 @@ public class ConfigManager {
                                 (value) -> getRealServerConfig().windExpelSpellDuration(value)
                         )
                 )
-                .option(
-                        booleanOption(
-                                "convert_old_namespace",
-                                false,
-                                () -> getServerConfig().convertOldNamespace(),
-                                (value) -> getRealServerConfig().convertOldNamespace(value)
-                        )
-                ).build();
+                .build();
         return List.of(clientCategory, serverCategory);
     }
 
