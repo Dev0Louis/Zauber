@@ -7,6 +7,7 @@ import dev.louis.zauber.helper.SoundHelper;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
+import dev.louis.zauber.tag.ZauberPotionTags;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithMovingElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -51,7 +52,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
 
     static {
         MANA_CAULDRON_BEHAVIOR.map().put(Items.POTION, ((state, world, pos, player, hand, stack) -> {
-            if (!world.isClient && state.get(MANA_LEVEL) < 2 && stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).matches(ZauberPotionEffects.MANA_INSTANT)) {
+            if (!world.isClient && state.get(MANA_LEVEL) < 2 && stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).potion().map(potionRegistryEntry -> potionRegistryEntry.isIn(ZauberPotionTags.MANA)).orElse(false)) {
                 Item item = stack.getItem();
                 player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, new ItemStack(Items.GLASS_BOTTLE)));
                 player.incrementStat(Stats.USE_CAULDRON);
