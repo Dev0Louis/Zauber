@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 
 public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
 
+    int mana;
+
     protected TotemOfManaRitual(World world, RitualStoneBlockEntity blockEntity) {
         super(world, blockEntity);
     }
@@ -27,6 +29,18 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
     public void tick() {
         if(age % 5 == 0) {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
+        }
+        if (age % 8 == 0) {
+            ritualStoneBlockEntity.getFilledManaStorages().findAny().ifPresent(blockPos -> {
+                var state = world.getBlockState(blockPos);
+                int newManaLevel = state.get(ManaCauldron.MANA_LEVEL) - 1;
+                if (newManaLevel >= 1) {
+                    world.setBlockState(blockPos, state.with(ManaCauldron.MANA_LEVEL, newManaLevel));
+                } else {
+                    world.setBlockState(blockPos, Blocks.CAULDRON.getDefaultState());
+                }
+                mana++;
+            });
         }
     }
 
@@ -37,16 +51,14 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
 
     @Override
     public boolean shouldStop() {
-        return age > 40;
+        return age > 80;
     }
 
     @Override
     public void finish() {
-        List<BlockPos> manaStorageState = ritualStoneBlockEntity.getFullManaStorages().limit(4).toList();
-        if (manaStorageState.size() >= 4 && isTotem(ritualStoneBlockEntity.getStoredStack())) {
+        if (mana >= 8 && isTotem(ritualStoneBlockEntity.getStoredStack())) {
             ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);
             //I REALLY REALLY REALLY NEED A SYSTEM TO ABSTRACT OVER THE MANUALLY SETTING AHHHHHHHHHHHHHh
-            manaStorageState.forEach(blockPos -> world.setBlockState(blockPos, Blocks.CAULDRON.getDefaultState()));
             world.spawnEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, ZauberItems.TOTEM_OF_MANA.getDefaultStack(), 0, 0.3f, 0));
             world.playSound(null, this.pos, SoundEvents.ENTITY_PLAYER_SPLASH_HIGH_SPEED, SoundCategory.PLAYERS, 2, -4);
 
@@ -66,7 +78,7 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
     public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
-        boolean has4FullMana = ritualStoneBlockEntity.getFullManaStorages().count() >= 4;
+        boolean has4FullMana = ritualStoneBlockEntity.getFilledManaStorages().findAny().isPresent();
         if(!isTotem(ritualItemStack) || !has4FullMana) return null;
         return new TotemOfManaRitual(world, ritualStoneBlockEntity);
     }
