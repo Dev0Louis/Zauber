@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.helper.SoundHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,7 +29,8 @@ public class SupernovaSpell extends Spell {
             spawnParticleRing(serverPlayer, 60, 13.5f);
             spawnParticleRing(serverPlayer, 20, 4);
 
-            serverPlayer.playSound(
+            SoundHelper.playPlayerSound(
+                    serverPlayer,
                     SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
                     4,
                     1

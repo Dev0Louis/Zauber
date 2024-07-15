@@ -1,6 +1,7 @@
 package dev.louis.zauber.block.entity;
 
 import dev.louis.zauber.block.ZauberBlocks;
+import dev.louis.zauber.helper.SoundHelper;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
@@ -11,6 +12,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -99,7 +101,7 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
             player.getInventory().offerOrDrop(this.storedStack);
             setStoredStack(ItemStack.EMPTY);
             //player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
-            player.playSound(sound, volume, pitch);
+            SoundHelper.playPlayerSound((ServerPlayerEntity) player, sound, volume, pitch);
             player.getItemCooldownManager().set(offeredStack.getItem(), 5);
         }
 
@@ -108,7 +110,7 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
 
         setStoredStack(offeredStack.copyWithCount(1));
         //player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
-        player.playSound(sound, volume, pitch);
+        SoundHelper.playPlayerSound((ServerPlayerEntity) player, sound, volume, pitch);
 
         offeredStack.decrement(1);
         player.getInventory().markDirty();

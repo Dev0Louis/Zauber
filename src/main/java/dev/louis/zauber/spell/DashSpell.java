@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.helper.SoundHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,7 +25,8 @@ public class DashSpell extends Spell {
             serverPlayer.setNoDrag(true);
             var dashVelocityMultiplier = ConfigManager.getServerConfig().dashVelocityMultiplier();
             dashVelocity = serverPlayer.getRotationVector().multiply(dashVelocityMultiplier, 0.2, dashVelocityMultiplier);
-            serverPlayer.playSound(
+            SoundHelper.playPlayerSound(
+                    serverPlayer,
                     SoundEvents.BLOCK_DEEPSLATE_TILES_HIT,
                     2f,
                     -5f
@@ -45,7 +47,8 @@ public class DashSpell extends Spell {
                 entity.velocityModified = true;
             });
 
-            serverPlayer.playSound(
+            SoundHelper.playPlayerSound(
+                    serverPlayer,
                     SoundEvents.UI_STONECUTTER_TAKE_RESULT,
                     2f,
                     -5f
