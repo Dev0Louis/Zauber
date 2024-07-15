@@ -92,35 +92,37 @@ public class ZauberClient implements ClientModInitializer {
                     if (client.currentScreen instanceof AbstractInventoryScreen<?> abstractInventoryScreen && abstractInventoryScreen.hideStatusEffectHud()) return;
                     RenderSystem.enableBlend();
                     int i = 0;
-                    int j = 0;
                     List<Runnable> list = Lists.newArrayListWithExpectedSize(sortedList.size());
 
                     for (Map.Entry<Item, PlayerTotemData> entry : sortedList) {
                         if (!component.isEquipped(entry.getKey())) continue;
                         var playerTotemData = entry.getValue();
                         var texture = playerTotemData.texture();
-                        int k = 0;
-                        int l = 0;
+                        int x = 0;
+                        int y = 0;
 
-                        k += 24 * i;
+                        x += 24 * i;
                         i++;
 
-                        float f = 1.0F;
-                        context.drawGuiTexture(Identifier.of(Zauber.MOD_ID, "artifact/icon_background"), k, l, 24, 24);
+                        float totemAlpha = 1.0F;
                         if (!playerTotemData.activityChecker().isActive(MinecraftClient.getInstance().player)) {
-                            int m = MinecraftClient.getInstance().player.age;
-                            int n = 10 - m / 20;
-                            f = MathHelper.cos(m / (float) Math.PI * 20.0F) * 0.1f + 0.4f;
+                            int age = MinecraftClient.getInstance().player.age;
+                            totemAlpha = MathHelper.cos(age / (float) Math.PI * 20.0F) * 0.1f + 0.4f;
+                            context.setShaderColor(1.0F, 1.0F, 1.0F, 0.6f);
                         }
+                        context.drawGuiTexture(Identifier.of(Zauber.MOD_ID, "artifact/icon_background"), x, y, 22, 22);
+                        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-                        int n = k;
-                        int o = l;
-                        float g = f;
+                        int n = x;
+                        int o = y;
+                        float finalTotemAlpha = totemAlpha;
                         list.add(() -> {
-                            context.setShaderColor(1.0F, 1.0F, 1.0F, g);
+                            context.getMatrices().push();
+                            context.setShaderColor(1.0F, 1.0F, 1.0F, finalTotemAlpha);
                             context.getMatrices().translate(0, -0.25, 0);
-                            context.drawGuiTexture(texture, n + 3, o + 3, 0, 18, 18);
+                            context.drawGuiTexture(texture, n + 3, o + 3, 0, 16, 16);
                             context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                            context.getMatrices().pop();
                         });
                     }
 

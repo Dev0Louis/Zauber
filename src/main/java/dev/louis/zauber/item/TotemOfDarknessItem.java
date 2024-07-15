@@ -42,6 +42,10 @@ public class TotemOfDarknessItem extends TrinketItem implements PolymerItem, Pol
 
 
     public static boolean isActive(LivingEntity entity) {
+        if (entity.getWorld().isClient()) {
+            //As on the client it can be called on the render thread
+            entity.getWorld().calculateAmbientDarkness();
+        }
         return TrinketsApi.getTrinketComponent(entity).map(component -> component.isEquipped(ZauberItems.TOTEM_OF_DARKNESS)).orElse(false) && entity.getWorld().getLightLevel(entity.getBlockPos()) <= HeartOfTheDarknessItem.MAX_BRIGHTNESS;
     }
 }

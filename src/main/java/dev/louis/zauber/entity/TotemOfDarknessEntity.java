@@ -64,6 +64,7 @@ public class TotemOfDarknessEntity extends FollowingEntity {
         super.tick();
 
         var owner = this.getOwner();
+        if (owner == null) return;
         if (isActive(owner)) {
             owner.getAttributes().addTemporaryModifiers(this.getTotemModifiers());
         } else {
@@ -73,8 +74,8 @@ public class TotemOfDarknessEntity extends FollowingEntity {
 
     @Override
     public void remove(RemovalReason removalReason) {
-        if (this.getWorld().isClient()) return;
-
+        super.remove(removalReason);
+        if (this.getWorld().isClient() || this.getOwner() == null) return;
         this.getOwner().getAttributes().removeModifiers(this.getTotemModifiers());
     }
 

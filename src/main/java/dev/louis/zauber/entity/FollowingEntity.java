@@ -77,6 +77,11 @@ public abstract class FollowingEntity extends Entity implements PolymerEntity, O
     }
 
     @Override
+    public boolean canUsePortals(boolean allowVehicles) {
+        return false;
+    }
+
+    @Override
     public LivingEntity getOwner() {
         return owner;
     }
