@@ -21,9 +21,9 @@ public class ZauberItems {
     public static final Item TOTEM_OF_DARKNESS =
             registerCreativeTab("totem_of_darkness", new TotemOfDarknessItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item TOTEM_OF_ICE =
-            registerCreativeTab("totem_of_ice", new TotemOfDarknessItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+            registerCreativeTab("totem_of_ice", new TotemOfIceItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item TOTEM_OF_MANA =
-            registerCreativeTab("totem_of_mana", new TotemOfDarknessItem(new Item.Settings().maxDamage(100).rarity(Rarity.UNCOMMON)));
+            registerCreativeTab("totem_of_mana", new TotemOfManaItem(new Item.Settings().maxDamage(100).rarity(Rarity.UNCOMMON)));
 
     public static final Item SPELL_BOOK =
             register("spell_book", new SpellBookItem(new Item.Settings().fireproof().rarity(Rarity.RARE)));

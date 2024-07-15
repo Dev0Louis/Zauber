@@ -75,7 +75,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
                 }
                 return ItemActionResult.CONSUME;
             }
-            return ItemActionResult.success(world.isClient);
+            return ItemActionResult.CONSUME;
         }));
     }
 
