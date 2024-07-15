@@ -73,6 +73,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
                 } else {
                     world.setBlockState(pos, state.with(MANA_LEVEL, manaLevel));
                 }
+                world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 return ItemActionResult.CONSUME;
             }
             return ItemActionResult.CONSUME;
