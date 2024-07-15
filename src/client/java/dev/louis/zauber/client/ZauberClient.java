@@ -185,6 +185,7 @@ public class ZauberClient implements ClientModInitializer {
         createSpellKeyBind(Zauber.Spells.SPROUT, false);
         createSpellKeyBind(Zauber.Spells.VENGEANCE, false);
         createSpellKeyBind(Zauber.Spells.DASH, false);
+        createSpellKeyBind(Zauber.Spells.CONJOURE_FANG, false);
         HandledScreens.register(ZauberRecipes.SPELL_TABLE, SpellTableScreen::new);
 
         EntityRendererRegistry.register(SpellArrowEntity.TYPE, BlueArrowEntityRenderer::new);

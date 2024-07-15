@@ -243,7 +243,7 @@ public class Zauber implements ModInitializer {
         });
     }
 
-    public static boolean hasTotem(LivingEntity livingEntity, EntityType<? extends TotemOfIceEntity> entityType) {
+    public static boolean hasTotem(LivingEntity livingEntity, EntityType<?> entityType) {
         if (livingEntity instanceof EntityWithFollowingEntities entityWithFollowingEntities) {
             return entityWithFollowingEntities.zauber$getFollowingEntities().stream().anyMatch(entity -> entity.getType().equals(entityType));
         } else {
@@ -280,6 +280,7 @@ public class Zauber implements ModInitializer {
         public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
         public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);
         public static SpellType<VengeanceSpell> VENGEANCE = register("vengeance", VengeanceSpell::new, 2);
+        public static SpellType<ConjoureFangSpell> CONJOURE_FANG = register("conjure_fang", ConjoureFangSpell::new, 4);
 
 
         public static <T extends Spell> SpellType<T> registerNoLearning(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
