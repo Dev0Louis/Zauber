@@ -95,7 +95,7 @@ public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Re
         private SpellRecipeSerializer() {
             this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Identifier.CODEC.fieldOf("spell").forGetter(SpellRecipe::getSpellId),
-                    Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("ingredient").forGetter(SpellRecipe::ingredient)
+                    Ingredient.DISALLOW_EMPTY_CODEC.optionalFieldOf("ingredient", Ingredient.empty()).forGetter(SpellRecipe::ingredient)
             ).apply(instance, (identifier, ingredient) -> SpellType.get(identifier).map(type -> new SpellRecipe(ingredient, SpellBookItem.createSpellBook(type))).orElse(SpellRecipe.EMPTY)));
         }
 

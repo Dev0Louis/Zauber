@@ -15,7 +15,7 @@
     }
   },
   "result": {
-    "item": "zauber:item_sacrificer",
+    "id": "zauber:item_sacrificer",
     "count": 1
   }
 }

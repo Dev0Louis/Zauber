@@ -40,15 +40,12 @@ public class ConjoureFangSpell extends Spell {
 
                 mutable.move(0, 1, 0);
                 recursion++;
-                System.out.println("a: " + mutable);
-
             }
         } else {
             while (world.getBlockState(mutable.down()).isAir()) {
                 if (recursion > MAX_RECURSION_DEPTH) return;
                 mutable.move(0, -1, 0);
                 recursion++;
-                System.out.println("b: " + mutable);
             }
         }
         this.getCaster().getWorld().spawnEntity(new EvokerFangsEntity(this.getCaster().getWorld(), mutable.getX(), mutable.getY(), mutable.getZ(), 0, 0, this.getCaster()));

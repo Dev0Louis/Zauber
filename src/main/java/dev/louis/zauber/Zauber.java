@@ -280,7 +280,7 @@ public class Zauber implements ModInitializer {
         public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
         public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);
         public static SpellType<VengeanceSpell> VENGEANCE = register("vengeance", VengeanceSpell::new, 2);
-        public static SpellType<ConjoureFangSpell> CONJOURE_FANG = register("conjure_fang", ConjoureFangSpell::new, 4);
+        public static SpellType<ConjoureFangSpell> CONJOURE_FANG = register("conjoure_fang", ConjoureFangSpell::new, 2);
 
 
         public static <T extends Spell> SpellType<T> registerNoLearning(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {

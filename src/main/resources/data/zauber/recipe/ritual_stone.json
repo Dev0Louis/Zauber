@@ -18,7 +18,7 @@
     }
   },
   "result": {
-    "item": "zauber:ritual_stone",
+    "id": "zauber:ritual_stone",
     "count": 1
   }
 }
