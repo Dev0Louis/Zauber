@@ -20,7 +20,7 @@ public class EffectHelper {
     }
 
     public static void playBreakItemEffect(ServerWorld world, Position pos, ItemStack itemStack) {
-        ParticleHelper.spawn50Particles(
+        ParticleHelper.spawn20Particles(
                 world,
                 pos,
                 new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack)
@@ -40,7 +40,7 @@ public class EffectHelper {
     }
 
     public static void playBloodItemEffect(ServerWorld world, Position pos, ItemStack itemStack) {
-        ParticleHelper.spawn50Particles(
+        ParticleHelper.spawn20Particles(
                 world,
                 pos,
                 new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack)

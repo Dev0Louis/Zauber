@@ -2,27 +2,20 @@ package dev.louis.zauber.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.authlib.GameProfile;
+import com.mojang.datafixers.util.Either;
 import dev.emi.trinkets.api.TrinketsApi;
-import dev.louis.zauber.PlayerTotemData;
 import dev.louis.zauber.Zauber;
+import dev.louis.zauber.criterion.ZauberCriteria;
 import dev.louis.zauber.duck.EntityWithFollowingEntities;
 import dev.louis.zauber.entity.FollowingEntity;
-import dev.louis.zauber.entity.TotemOfDarknessEntity;
-import dev.louis.zauber.entity.TotemOfIceEntity;
-import dev.louis.zauber.entity.TotemOfManaEntity;
 import dev.louis.zauber.helper.SoundHelper;
-import dev.louis.zauber.item.TotemOfDarknessItem;
-import dev.louis.zauber.item.TotemOfIceItem;
-import dev.louis.zauber.item.TotemOfManaItem;
-import dev.louis.zauber.item.ZauberItems;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +28,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static dev.louis.zauber.Zauber.ITEM_TO_TOTEM_DATA;
 
@@ -46,9 +37,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements En
     @Shadow
     @Final
     public MinecraftServer server;
+    private boolean wasLastWakeUpCanceled = false;
 
     @Shadow
     public abstract ServerWorld getServerWorld();
+
+    @Shadow public abstract Either<SleepFailureReason, Unit> trySleep(BlockPos pos);
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(world, pos, yaw, gameProfile);
@@ -120,7 +114,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements En
     )
     public void noWakingUp(boolean skipSleepTimer, boolean updateSleepingPlayers, CallbackInfo ci) {
         if (Zauber.isInTrappingBed(this)) {
+            wasLastWakeUpCanceled = true;
             ci.cancel();
+            return;
+        }
+        if (wasLastWakeUpCanceled) {
+            ZauberCriteria.WAKING_UP_FROM_NEVER_ENDING_SLEEP.trigger((ServerPlayerEntity) (Object) this);
+            wasLastWakeUpCanceled = false;
         }
     }
 

@@ -3,11 +3,14 @@ package dev.louis.zauber.block.entity;
 import dev.louis.zauber.block.DarknessAccumulatorBlock;
 import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.ZauberBlocks;
+import dev.louis.zauber.criterion.ZauberCriteria;
 import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.ritual.ManaPullingRitual;
 import dev.louis.zauber.ritual.Ritual;
+import dev.louis.zauber.ritual.mana.ManaPool;
+import dev.louis.zauber.ritual.mana.ManaReference;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -15,13 +18,18 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
@@ -33,8 +41,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -139,10 +146,14 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                 }
 
 
-                this.ritual = createRitual(world, pos);
+                var pair = createRitual(world, pos);
+                this.ritual = pair.getRight();
                 if (ritual != null) {
                     ritual.onStart();
                     this.state = State.ACTIVE;
+                    if (player instanceof ServerPlayerEntity serverPlayer) {
+                        ZauberCriteria.RITUAL_FINISHED.trigger(serverPlayer, pair.getLeft());
+                    }
                     return;
                 }
                 interactionTimes++;
@@ -193,16 +204,15 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
         })).findAny();
     }
 
-    @Nullable
-    private Ritual createRitual(World world, BlockPos pos) {
-        for (Ritual.Starter starter : Ritual.RITUAL_STARTERS) {
-            var ritual = starter.tryStart(world, this);
-            if (ritual != null) return ritual;
+    private Pair<@Nullable Identifier, @Nullable Ritual> createRitual(World world, BlockPos pos) {
+        for (Map.Entry<Identifier, Ritual.Starter> entry : Ritual.RITUAL_STARTERS.entrySet()) {
+            var ritual = entry.getValue().tryStart(world, this);
+            if (ritual != null) return new Pair<>(entry.getKey(), ritual);
         }
-        return null;
+        return new Pair<>(null, null);
     }
 
-    public boolean shouldManaCircle() {
+    public boolean shouldManaBePulled() {
         return this.state == State.ACTIVE && (this.ritual instanceof ManaPullingRitual manaPullingRitual) && manaPullingRitual.shouldPull();
     }
 
@@ -251,11 +261,11 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
         );
     }
 
-    public Stream<PointOfInterest> getRitualBlockPoses() {
+    public Stream<PointOfInterest> getItemSacrificersPoI() {
         if (world instanceof ServerWorld serverWorld) {
             return serverWorld.getPointOfInterestStorage()
                     .getInSquare(
-                            poiType -> poiType.matchesKey(ZauberPointOfInterestTypes.RITUAL_BLOCKS_KEY),
+                            poiType -> poiType.matchesKey(ZauberPointOfInterestTypes.ITEM_SACRIFICERS_KEY),
                             this.pos,
                             20,
                             PointOfInterestStorage.OccupationStatus.ANY
@@ -265,25 +275,60 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     }
 
     public Stream<ItemSacrificerBlockEntity> getItemSacrificers() {
-        return getRitualBlockPoses().map(poi -> world.getBlockEntity(poi.getPos(), ItemSacrificerBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get);
+        return getItemSacrificersPoI().map(poi -> world.getBlockEntity(poi.getPos(), ItemSacrificerBlockEntity.TYPE)).filter(Optional::isPresent).map(Optional::get);
     }
 
     public Stream<ItemSacrificerBlockEntity> getNonEmptyItemSacrificers() {
         return this.getItemSacrificers().filter(blockEntity -> !blockEntity.storedStack.isEmpty());
     }
 
-    public Stream<BlockPos> getFilledManaStorages() {
-        return getRitualBlockPoses().filter(poi -> {
-            var blockState = world.getBlockState(poi.getPos());
-            return blockState.isOf(ZauberBlocks.MANA_CAULDRON) && blockState.get(ManaCauldron.MANA_LEVEL) > 0;
-        }).map(PointOfInterest::getPos);
+    public Optional<ManaPool> acquireManaPool(int amount) {
+        Collection<ManaReference> gatheredManaReferences = new ArrayList<>();
+        int gatheredMana = 0;
+        for (BlockPos manaStoragePos : this.getManaStorages()) {
+            var neededMana = amount - gatheredMana;
+            if (neededMana <= 0) break;
+            BlockState state1 = world.getBlockState(manaStoragePos);
+            var mana = Math.min(state1.get(ManaCauldron.MANA_LEVEL), neededMana);
+            gatheredManaReferences.add(new ManaReference(mana, world, manaStoragePos));
+            gatheredMana += mana;
+        }
+        if (gatheredMana == amount) {
+            return Optional.of(new ManaPool(amount, gatheredManaReferences));
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public Stream<BlockPos> getFullManaStorages() {
-        return getRitualBlockPoses().filter(poi -> {
-            BlockState blockState = world.getBlockState(poi.getPos());
-            return blockState.isOf(ZauberBlocks.MANA_CAULDRON) && blockState.get(ManaCauldron.MANA_LEVEL) == 2;
-        }).map(PointOfInterest::getPos);
+    public Optional<ManaReference> acquireManaReference() {
+        return this.getManaStoragesStream().findAny().map(blockPos -> {
+            BlockState state1 = world.getBlockState(blockPos);
+            var mana = state1.get(ManaCauldron.MANA_LEVEL);
+            return new ManaReference(mana, world, blockPos);
+        });
+    }
+
+    private Collection<BlockPos> getManaStorages() {
+        var list = ((ServerWorld) world).getPointOfInterestStorage().getInSquare(
+                poiType -> poiType.matchesKey(ZauberPointOfInterestTypes.MANA_CAULDRON_KEY),
+                this.pos,
+                20,
+                PointOfInterestStorage.OccupationStatus.ANY
+        ).map(PointOfInterest::getPos).collect(Collectors.toList());
+        Collections.shuffle(list);
+        return list;
+    }
+
+    public Stream<BlockPos> getManaStoragesStream() {
+        return this.getManaStorages().stream();
+    }
+
+    public Stream<BlockPos> getFullManaStoragesStream() {
+        return getManaStorages().stream().filter(pos -> {
+            BlockState blockState = world.getBlockState(pos);
+            var max = ManaCauldron.MANA_LEVEL.getValues().stream().mapToInt(Integer::intValue).max().getAsInt();
+            return blockState.get(ManaCauldron.MANA_LEVEL) == max;
+        });
     }
 
     public Stream<BlockPos> getFilledDarknessAccumulators() {

@@ -15,16 +15,18 @@ import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
 public abstract class Ritual {
-    public static final List<Starter> RITUAL_STARTERS = new ArrayList<>();
+    public static final HashMap<Identifier, Starter> RITUAL_STARTERS = new HashMap<>();
 
     protected final World world;
     protected final BlockPos pos;
@@ -39,30 +41,30 @@ public abstract class Ritual {
 
     public static void init() {
         //The order is important as the Rituals are checked in order.
-        RITUAL_STARTERS.add(HorseRitual::tryStart);
-        RITUAL_STARTERS.add(TotemOfDarknessRitual::tryStart);
-        RITUAL_STARTERS.add(TotemOfIceRitual::tryStart);
-        RITUAL_STARTERS.add(TotemOfManaRitual::tryStart);
-        RITUAL_STARTERS.add(ManaBowRitual::tryStart);
-        RITUAL_STARTERS.add(HeartOfDarknessRitual::tryStart);
-        RITUAL_STARTERS.add(MudifyRitual::tryStart);
-        RITUAL_STARTERS.add(HailSpellRitual::tryStart);
-        RITUAL_STARTERS.add(HeartOfTheIceRitual::tryStart);
-        RITUAL_STARTERS.add(HeartOfTheSeaRitual::tryStart);
-        RITUAL_STARTERS.add(TeleportToLodestoneRitual::tryStart);
+        register("horse_ritual", HorseRitual::tryStart);
+        register("totem_of_darkness", TotemOfDarknessRitual::tryStart);
+        register("totem_of_ice", TotemOfIceRitual::tryStart);
+        register("totem_of_mana", TotemOfManaRitual::tryStart);
+        register("mana_bow", ManaBowRitual::tryStart);
+        register("heart_of_darkness", HeartOfDarknessRitual::tryStart);
+        register("mudify", MudifyRitual::tryStart);
+        register("hail_spell", HailSpellRitual::tryStart);
+        register("heart_of_the_ice", HeartOfTheIceRitual::tryStart);
+        register("heart_of_the_sea", HeartOfTheSeaRitual::tryStart);
+        register("teleport_to_lodestone", TeleportToLodestoneRitual::tryStart);
 
         //TODO: Data drive this
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.COW, Ingredient.ofItems(Items.BEEF)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.PIG, Ingredient.ofItems(Items.PORKCHOP)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.RABBIT, Ingredient.ofItems(Items.RABBIT)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.SHEEP, Ingredient.ofItems(Items.MUTTON)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.ZOMBIE_HORSE, Ingredient.ofItems(Items.ROTTEN_FLESH)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.SPIDER, Ingredient.ofItems(Items.SPIDER_EYE)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.SQUID, Ingredient.ofItems(Items.INK_SAC)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.GLOW_SQUID, Ingredient.ofItems(Items.GLOW_INK_SAC)));
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter(EntityType.CHICKEN, Ingredient.ofItems(Items.CHICKEN)));
+        register("summon_cow", new SummonEntityRitual.Starter(EntityType.COW, Ingredient.ofItems(Items.BEEF)));
+        register("summon_pig", new SummonEntityRitual.Starter(EntityType.PIG, Ingredient.ofItems(Items.PORKCHOP)));
+        register("summon_rabbit", new SummonEntityRitual.Starter(EntityType.RABBIT, Ingredient.ofItems(Items.RABBIT)));
+        register("summon_sheep", new SummonEntityRitual.Starter(EntityType.SHEEP, Ingredient.ofItems(Items.MUTTON)));
+        register("summon_zombie_horse", new SummonEntityRitual.Starter(EntityType.ZOMBIE_HORSE, Ingredient.ofItems(Items.ROTTEN_FLESH)));
+        register("summon_spider", new SummonEntityRitual.Starter(EntityType.SPIDER, Ingredient.ofItems(Items.SPIDER_EYE)));
+        register("summon_squid", new SummonEntityRitual.Starter(EntityType.SQUID, Ingredient.ofItems(Items.INK_SAC)));
+        register("summon_glow_squid", new SummonEntityRitual.Starter(EntityType.GLOW_SQUID, Ingredient.ofItems(Items.GLOW_INK_SAC)));
+        register("summon_chicken", new SummonEntityRitual.Starter(EntityType.CHICKEN, Ingredient.ofItems(Items.CHICKEN)));
 
-        RITUAL_STARTERS.add(new SummonEntityRitual.Starter((world1, itemStack) -> {
+        register("summon_cat", new SummonEntityRitual.Starter((world1, itemStack) -> {
             var cat = EntityType.CAT.create(world1);
             if (cat == null) {
                 Zauber.LOGGER.error("THE CAT IS NULL; HOW WHAT THE FRICK?");
@@ -78,9 +80,19 @@ public abstract class Ritual {
             return cat;
         }, Ingredient.ofItems(Items.STRING)));
 
-        RITUAL_STARTERS.add(SmeltingRitual::tryStart);
+        register("smelting", SmeltingRitual::tryStart);
     }
 
+
+    public static void register(String id, Starter starter) {
+        register(Identifier.of(Zauber.MOD_ID, id), starter);
+    }
+
+
+    public static void register(Identifier id, Starter starter) {
+        if (RITUAL_STARTERS.containsKey(id)) throw new IllegalStateException("TRIED DOUBLE REGISTRATION OF " + id + "!");
+        RITUAL_STARTERS.put(id, starter);
+    }
 
     public abstract void tick();
 
@@ -92,14 +104,6 @@ public abstract class Ritual {
 
     public SoundEvent getStartSound() {
         return SoundEvents.ENTITY_ARROW_HIT_PLAYER;
-    }
-
-    public float getPitch() {
-        return 1;
-    }
-
-    public float getVolume() {
-        return 1;
     }
 
     public Stream<Position> getConnections() {

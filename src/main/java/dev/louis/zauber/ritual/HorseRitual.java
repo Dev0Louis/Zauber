@@ -1,9 +1,8 @@
 package dev.louis.zauber.ritual;
 
-import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.item.ZauberItems;
-import net.minecraft.block.Blocks;
+import dev.louis.zauber.ritual.mana.ManaPool;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
@@ -28,12 +27,12 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class HorseRitual extends Ritual implements ManaPullingRitual {
-    private final BlockPos manaStorageBlockPos;
+    private final ManaPool manaPool;
     private final HorseEntity horse;
 
-    protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, BlockPos manaStorageBlockPos, HorseEntity horse) {
+    protected HorseRitual(World world, RitualStoneBlockEntity blockEntity, ManaPool manaPool, HorseEntity horse) {
         super(world, blockEntity);
-        this.manaStorageBlockPos = manaStorageBlockPos;
+        this.manaPool = manaPool;
         this.horse = horse;
     }
 
@@ -57,16 +56,10 @@ public class HorseRitual extends Ritual implements ManaPullingRitual {
     @Override
     public void finish() {
         //ItemSacrificerBlockEntity with a call goat horn.
-        var manaStorageState = world.getBlockState(manaStorageBlockPos);
-        int manaLevel = manaStorageState.get(ManaCauldron.MANA_LEVEL);
-        if (horse.isAlive() && manaLevel >= 1 && HorseRitual.isCallGoatHorn(ritualStoneBlockEntity.getStoredStack())) {
-            manaLevel--;
+
+        if (horse.isAlive() && manaPool.isValid() && HorseRitual.isCallGoatHorn(ritualStoneBlockEntity.getStoredStack())) {
             ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);
-            if (manaLevel == 0) {
-                world.setBlockState(manaStorageBlockPos, Blocks.CAULDRON.getDefaultState());
-            } else {
-                world.setBlockState(manaStorageBlockPos, manaStorageState.with(ManaCauldron.MANA_LEVEL, manaLevel));
-            }
+            manaPool.apply();
             horse.discard();
             world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1, 4);
             ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
@@ -79,21 +72,11 @@ public class HorseRitual extends Ritual implements ManaPullingRitual {
     }
 
     @Override
-    public float getVolume() {
-        return 2;
-    }
-
-    @Override
     public Stream<Position> getConnections() {
-        return Stream.of(
-                this.manaStorageBlockPos.toCenterPos(),
-                horse.getPos()
+        return Stream.concat(
+                this.manaPool.manaReferences().stream().map(manaReference -> manaReference.source().toCenterPos()),
+                Stream.of(horse.getPos())
         );
-    }
-
-    @Override
-    public float getPitch() {
-        return -2;
     }
 
     public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
@@ -104,10 +87,10 @@ public class HorseRitual extends Ritual implements ManaPullingRitual {
         //if (availableItemStacks.count() != 1) return null;
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
-        var filledManaStorage = ritualStoneBlockEntity.getFilledManaStorages().findAny();
+        var manaPool = ritualStoneBlockEntity.acquireManaPool(2);
         var horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        if(!HorseRitual.isCallGoatHorn(ritualItemStack) || filledManaStorage.isEmpty() || horse.isEmpty()) return null;
-        return new HorseRitual(world, ritualStoneBlockEntity, filledManaStorage.get(), horse.get());
+        if(!HorseRitual.isCallGoatHorn(ritualItemStack) || manaPool.isEmpty() || horse.isEmpty()) return null;
+        return new HorseRitual(world, ritualStoneBlockEntity, manaPool.get(), horse.get());
     }
 
 

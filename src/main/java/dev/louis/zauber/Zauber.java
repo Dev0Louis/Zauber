@@ -3,6 +3,7 @@ package dev.louis.zauber;
 import com.mojang.logging.LogUtils;
 import dev.emi.trinkets.api.SlotType;
 import dev.emi.trinkets.api.TrinketsApi;
+import dev.louis.nebula.api.event.SpellCastCallback;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.block.TrappingBedBlock;
@@ -10,6 +11,7 @@ import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.component.ZauberDataComponentTypes;
 import dev.louis.zauber.component.type.LostBookIdComponent;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.criterion.ZauberCriteria;
 import dev.louis.zauber.duck.EntityWithFollowingEntities;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
@@ -120,6 +122,7 @@ public class Zauber implements ModInitializer {
     @Override
     public void onInitialize() {
         ConfigManager.loadServerConfig();
+        ZauberCriteria.init();
         ZauberPotionTags.init();
 
         ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
@@ -142,6 +145,13 @@ public class Zauber implements ModInitializer {
         ZauberBlocks.init();
         ZauberDataComponentTypes.init();
         ZauberPointOfInterestTypes.init();
+
+        SpellCastCallback.EVENT.register((playerEntity, spell) -> {
+            if (playerEntity instanceof ServerPlayerEntity serverPlayer) {
+                ZauberCriteria.SPELL_CAST.trigger(serverPlayer, spell.getType());
+            }
+            return ActionResult.PASS;
+        });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             if (world.isClient) return ActionResult.PASS;

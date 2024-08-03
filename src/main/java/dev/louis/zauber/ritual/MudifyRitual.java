@@ -1,6 +1,5 @@
 package dev.louis.zauber.ritual;
 
-import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
@@ -58,20 +57,16 @@ public class MudifyRitual extends Ritual {
         }
 
         if (manaDue <= 0) return;
-        for (BlockPos blockPos : ritualStoneBlockEntity.getFilledManaStorages().toList()) {
-            if (manaDue > 0) {
-                var state = world.getBlockState(blockPos);
-                var manaLevel = state.get(ManaCauldron.MANA_LEVEL);
-                manaLevel--;
+
+        final int finalManaDue = manaDue;
+        for (int i = 0; i < finalManaDue; i++) {
+            var optional = ritualStoneBlockEntity.acquireManaReference();
+            if (optional.isPresent()) {
                 manaDue--;
-                if (manaLevel == 0) {
-                    world.setBlockState(blockPos, Blocks.CAULDRON.getDefaultState());
-                } else {
-                    world.setBlockState(blockPos, state.with(ManaCauldron.MANA_LEVEL, manaLevel));
-                }
+                optional.get().apply();
             }
-            if (manaDue != 0) this.ranOutOfMana = true;
         }
+        if (manaDue != 0) this.ranOutOfMana = true;
         //Get mana and if not get able end.
     }
 
@@ -106,7 +101,7 @@ public class MudifyRitual extends Ritual {
     public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
-        var manaCauldrons = ritualStoneBlockEntity.getFilledManaStorages().collect(Collectors.toList());
+        var manaCauldrons = ritualStoneBlockEntity.getManaStoragesStream().collect(Collectors.toList());
         if(manaCauldrons.isEmpty() || !ritualItemStack.isOf(Items.WATER_BUCKET)) return null;
         return new MudifyRitual(world, ritualStoneBlockEntity);
     }

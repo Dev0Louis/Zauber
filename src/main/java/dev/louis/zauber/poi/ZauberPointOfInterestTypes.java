@@ -15,13 +15,17 @@ public class ZauberPointOfInterestTypes {
     public static final RegistryKey<PointOfInterestType> RITUAL_BLOCK_KEY =
             Registries.POINT_OF_INTEREST_TYPE.getKey(RITUAL_BLOCK).orElseThrow();
 
-    /**
-     Does not cover the Ritual Stone block as this POI is used to search for block out of the perspective of the Ritual Stone.
-     */
-    public static final PointOfInterestType ADDITIONAL_RITUAL_BLOCKS =
-            PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "additional_ritual_blocks"), 1, 20, ZauberBlocks.ITEM_SACRIFICER, ZauberBlocks.MANA_CAULDRON);
-    public static final RegistryKey<PointOfInterestType> RITUAL_BLOCKS_KEY =
-            Registries.POINT_OF_INTEREST_TYPE.getKey(ADDITIONAL_RITUAL_BLOCKS).orElseThrow();
+
+    public static final PointOfInterestType ITEM_SACRIFICERS =
+            PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "item"), 1, 20, ZauberBlocks.ITEM_SACRIFICER);
+    public static final RegistryKey<PointOfInterestType> ITEM_SACRIFICERS_KEY =
+            Registries.POINT_OF_INTEREST_TYPE.getKey(ITEM_SACRIFICERS).orElseThrow();
+
+    public static final PointOfInterestType MANA_CAULDRON =
+            PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "mana_cauldron"), 1, 20, ZauberBlocks.MANA_CAULDRON);
+    public static final RegistryKey<PointOfInterestType> MANA_CAULDRON_KEY =
+            Registries.POINT_OF_INTEREST_TYPE.getKey(MANA_CAULDRON).orElseThrow();
+
 
     public static final PointOfInterestType DARKNESS_ACCUMULATOR =
             PointOfInterestHelper.register(Identifier.of(Zauber.MOD_ID, "darkness_accumulator"), 1, 20, ZauberBlocks.DARKNESS_ACCUMULATOR);

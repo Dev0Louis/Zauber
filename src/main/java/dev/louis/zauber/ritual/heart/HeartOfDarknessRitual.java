@@ -58,7 +58,7 @@ public class HeartOfDarknessRitual extends Ritual {
             }
 
             if (this.collectedDarkness >= 1) {
-                ParticleHelper.spawn50Particles(
+                ParticleHelper.spawn20Particles(
                         (ServerWorld) world,
                         pos.toCenterPos().add(0, 0.9, 0),
                         new DustParticleEffect(BLACK_PARTICLE_COLOR, 0.3f)
@@ -66,7 +66,7 @@ public class HeartOfDarknessRitual extends Ritual {
             }
         }
         if (this.intenseParticleSpawnTicks-- > 0) {
-            ParticleHelper.spawn50Particles(
+            ParticleHelper.spawn20Particles(
                     (ServerWorld) world,
                     pos.toCenterPos().add(0, 0.9, 0),
                     new DustParticleEffect(BLACK_PARTICLE_COLOR, 0.7f)

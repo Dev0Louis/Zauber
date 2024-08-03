@@ -29,9 +29,8 @@ public class TeleportToLodestoneRitual extends Ritual implements ManaPullingRitu
     @Override
     public void tick() {
         if (this.age % 20 == 0) {
-            ritualStoneBlockEntity.getFullManaStorages().findAny().ifPresentOrElse(blockPos -> {
-                world.setBlockState(blockPos, Blocks.CAULDRON.getDefaultState());
-                // we add 2 as we clear the entire cauldron
+            ritualStoneBlockEntity.acquireManaPool(2).ifPresentOrElse(manaPool -> {
+                manaPool.apply();
                 this.collectedMana += 2;
             }, () -> this.failedToFindMana = true);
             this.getAffectedEntities().forEach(livingEntity -> {
@@ -94,9 +93,8 @@ public class TeleportToLodestoneRitual extends Ritual implements ManaPullingRitu
     public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
-        var fullManaCauldrons = ritualStoneBlockEntity.getFullManaStorages();
         boolean hasOneEnderPearl = ritualStoneBlockEntity.getAvailableItemStacks().anyMatch(itemStack -> itemStack.isOf(Items.ENDER_PEARL));
-        if(fullManaCauldrons.count() < 12 || !isCompassWithLodestoneInSameWorld(world, ritualItemStack) || !hasOneEnderPearl) return null;
+        if(!isCompassWithLodestoneInSameWorld(world, ritualItemStack) || !hasOneEnderPearl) return null;
         return new TeleportToLodestoneRitual(world, ritualStoneBlockEntity);
     }
 

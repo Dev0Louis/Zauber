@@ -5,7 +5,6 @@ import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
 import dev.louis.zauber.helper.SoundHelper;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.mana.effect.ZauberPotionEffects;
 import dev.louis.zauber.poi.ZauberPointOfInterestTypes;
 import dev.louis.zauber.tag.ZauberPotionTags;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -19,7 +18,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.*;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.potion.Potion;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -180,7 +178,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
                             20,
                             PointOfInterestStorage.OccupationStatus.ANY
                     );
-            this.ritualStone = stream.map(poi -> world.getBlockEntity(poi.getPos(), RitualStoneBlockEntity.TYPE).orElse(null)).filter(Objects::nonNull).filter(RitualStoneBlockEntity::shouldManaCircle).findAny().orElse(null);
+            this.ritualStone = stream.map(poi -> world.getBlockEntity(poi.getPos(), RitualStoneBlockEntity.TYPE).orElse(null)).filter(Objects::nonNull).filter(RitualStoneBlockEntity::shouldManaBePulled).findAny().orElse(null);
 
             manaBubbles.removeIf(element -> {
                 boolean remove;

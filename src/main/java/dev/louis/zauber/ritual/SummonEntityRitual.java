@@ -109,7 +109,7 @@ public class SummonEntityRitual extends Ritual {
             entity.setPosition(pos.up().toCenterPos());
             world.spawnEntity(entity);
 
-            ParticleHelper.spawn50Particles(
+            ParticleHelper.spawn20Particles(
                     (ServerWorld) world,
                     entity.getPos().add(0, 0.75, 0),
                     new DustParticleEffect(RED_COLOR, 3)

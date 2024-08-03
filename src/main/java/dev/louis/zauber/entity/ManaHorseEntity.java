@@ -5,6 +5,7 @@ import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -38,6 +39,9 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     public ManaHorseEntity(World world, LivingEntity owner) {
         super(TYPE, world);
         this.owner = owner;
+        if (owner instanceof ServerPlayerEntity player) {
+            Criteria.SUMMONED_ENTITY.trigger(player, this);
+        }
     }
 
     @Override

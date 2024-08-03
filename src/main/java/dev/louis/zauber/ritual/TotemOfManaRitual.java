@@ -1,24 +1,18 @@
 package dev.louis.zauber.ritual;
 
-import dev.louis.zauber.block.ManaCauldron;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.item.ZauberItems;
-import net.minecraft.block.Blocks;
+import dev.louis.zauber.ritual.mana.ManaPool;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
-
     int mana;
 
     protected TotemOfManaRitual(World world, RitualStoneBlockEntity blockEntity) {
@@ -31,16 +25,11 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
         }
         if (age % 8 == 0) {
-            ritualStoneBlockEntity.getFilledManaStorages().findAny().ifPresent(blockPos -> {
-                var state = world.getBlockState(blockPos);
-                int newManaLevel = state.get(ManaCauldron.MANA_LEVEL) - 1;
-                if (newManaLevel >= 1) {
-                    world.setBlockState(blockPos, state.with(ManaCauldron.MANA_LEVEL, newManaLevel));
-                } else {
-                    world.setBlockState(blockPos, Blocks.CAULDRON.getDefaultState());
-                }
+            ritualStoneBlockEntity.acquireManaReference().ifPresent(manaReference -> {
+                manaReference.apply();
                 mana++;
             });
+
         }
     }
 
@@ -65,27 +54,15 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
         }
     }
 
-    @Override
-    public float getVolume() {
-        return 2;
-    }
-
-    @Override
-    public float getPitch() {
-        return -2;
-    }
-
     public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
-        boolean has4FullMana = ritualStoneBlockEntity.getFilledManaStorages().findAny().isPresent();
-        if(!isTotem(ritualItemStack) || !has4FullMana) return null;
+        Optional<ManaPool> manaPool = ritualStoneBlockEntity.acquireManaPool(4);
+        if(!isTotem(ritualItemStack) || manaPool.isPresent()) return null;
         return new TotemOfManaRitual(world, ritualStoneBlockEntity);
     }
 
     public static boolean isTotem(ItemStack itemStack) {
         return itemStack.isOf(Items.TOTEM_OF_UNDYING);
     }
-
-
 }

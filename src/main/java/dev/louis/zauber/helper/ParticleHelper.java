@@ -53,8 +53,8 @@ public class ParticleHelper {
         );
     }
 
-    public static void spawn50Particles(ServerWorld world, BlockPos pos, ParticleEffect particleEffect) {
-        spawn50Particles(world, pos.toCenterPos(), particleEffect);
+    public static void spawn20Particles(ServerWorld world, BlockPos pos, ParticleEffect particleEffect) {
+        spawn20Particles(world, pos.toCenterPos(), particleEffect);
     }
 
     public static void spawnParticle(ServerWorld world, Position pos, float range, int speed, ParticleEffect particleEffect) {
@@ -71,8 +71,8 @@ public class ParticleHelper {
         );
     }
 
-    public static void spawn50Particles(ServerWorld world, Position pos, ParticleEffect particleEffect) {
-        spawnParticles(world, pos, particleEffect, 50, 0.1f, 0.1f);
+    public static void spawn20Particles(ServerWorld world, Position pos, ParticleEffect particleEffect) {
+        spawnParticles(world, pos, particleEffect, 20, 0.1f, 0.1f);
     }
 
     //TODO: Make Path Finding a
