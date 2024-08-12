@@ -1,13 +1,11 @@
 package dev.louis.zauber.item;
 
-import dev.emi.trinkets.api.Trinket;
-import dev.emi.trinkets.api.TrinketComponent;
-import dev.emi.trinkets.api.TrinketItem;
-import dev.emi.trinkets.api.TrinketsApi;
+import dev.emi.trinkets.api.*;
 import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
 import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -17,10 +15,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Pair;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +37,13 @@ public class TotemOfManaItem extends Item implements PolymerItem, Trinket, Polym
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         return TypedActionResult.pass(user.getStackInHand(hand));
+    }
+
+    @Override
+    public boolean canEquip(ItemStack stack, SlotReference ref, LivingEntity entity) {
+        SlotType slot = ref.inventory().getSlotType();
+        var containsItem = TrinketsApi.getTrinketComponent(entity).map(component -> component.getInventory().get(slot.getGroup()).get(slot.getName()).containsAny(stack1 -> stack1.getItem().equals(stack.getItem()))).orElse(false);
+        return !containsItem;
     }
 
     public static boolean isActive(LivingEntity entity) {

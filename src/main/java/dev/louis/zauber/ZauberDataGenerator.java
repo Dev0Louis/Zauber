@@ -14,16 +14,18 @@ import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.advancement.criterion.*;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.predicate.DamagePredicate;
 import net.minecraft.predicate.TagPredicate;
@@ -32,10 +34,14 @@ import net.minecraft.predicate.entity.EntityEquipmentPredicate;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.predicate.item.ItemPredicate;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.ShapelessRecipe;
+import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -47,7 +53,28 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
         FabricDataGenerator.Pack pack = generator.createPack();
         ZauberDataGenerator.generator = generator;
+        pack.addProvider(RecipeProvider::new);
         pack.addProvider(AdvancementsProvider::new);
+    }
+
+    static class RecipeProvider extends FabricRecipeProvider {
+        protected RecipeProvider(FabricDataOutput dataGenerator) {
+            super(dataGenerator, generator.getRegistries());
+        }
+
+        @Override
+        public void generate(RecipeExporter exporter) {
+            exporter.accept(
+                    Identifier.of(Zauber.MOD_ID, "break_lost_books"),
+                    new ShapelessRecipe(
+                            "misc",
+                            CraftingRecipeCategory.MISC,
+                            Items.LEATHER.getDefaultStack(),
+                            DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(ZauberItems.LOST_BOOK))
+                    ),
+                    null
+            );
+        }
     }
 
     static class AdvancementsProvider extends FabricAdvancementProvider {

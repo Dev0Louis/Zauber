@@ -1,4 +1,12 @@
 {
+  "advancements.zauber.root": "Zauber",
+  "advancements.zauber.root.description": "You've started your adventure to uncover the secrets about this world.",
+  "advancements.zauber.spell_table": "Discovering Spells",
+  "advancements.zauber.spell_table.description": "How could you ignite the souls?",
+  "advancements.zauber.ritual_stone": "Discovering Rituals",
+  "advancements.zauber.ritual_stone.description": "What powers could it hide?",
+  "advancements.zauber.call_goat": "Calling Souls",
+  "advancements.zauber.call_goat.description": "What is in there?",
   "block.zauber.darkness_accumulator": "Darkness Accumulator",
   "block.zauber.item_sacrificer": "Item Sacrificer",
   "block.zauber.ritual_stone": "Ritual Stone",

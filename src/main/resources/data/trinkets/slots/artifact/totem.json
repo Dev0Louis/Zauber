@@ -1,5 +1,5 @@
 {
   "icon": "zauber:gui/slots/totem",
   "amount": 2,
-  "validator_predicates": ["zauber:tag_and_unique"]
+  "validator_predicates": ["trinkets:tag"]
 }

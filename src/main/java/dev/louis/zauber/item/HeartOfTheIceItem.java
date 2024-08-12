@@ -38,10 +38,10 @@ public class HeartOfTheIceItem extends Item implements PolymerItem, PolymerKeepM
                 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
         );
         if (!world.isClient) {
-            ThrownHeartOfTheIceEntity snowballEntity = new ThrownHeartOfTheIceEntity(user, world);
-            snowballEntity.setItem(itemStack);
-            snowballEntity.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1.5F, 1.0F);
-            world.spawnEntity(snowballEntity);
+            ThrownHeartOfTheIceEntity thrownHeart = new ThrownHeartOfTheIceEntity(user, world);
+            thrownHeart.setItem(itemStack);
+            thrownHeart.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1.5F, 1.0F);
+            world.spawnEntity(thrownHeart);
         }
 
         user.incrementStat(Stats.USED.getOrCreateStat(this));

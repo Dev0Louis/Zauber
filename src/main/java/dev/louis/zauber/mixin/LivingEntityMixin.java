@@ -51,7 +51,7 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @SuppressWarnings("InvalidInjectorMethodSignature")
+    @SuppressWarnings({"InvalidInjectorMethodSignature", "UnreachableCode"})
     @ModifyVariable(
             method = "tryUseTotem",
             at = @At(value = "LOAD", opcode = 0),

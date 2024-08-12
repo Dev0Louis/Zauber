@@ -29,7 +29,7 @@ public class BlockEntityWithItemStack extends BlockEntity implements SingleStack
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        if (nbt.contains("Item", NbtElement.COMPOUND_TYPE)) {
+        if (nbt.contains("storedStack", NbtElement.COMPOUND_TYPE)) {
             ItemStack.fromNbt(registryLookup, nbt.get("storedStack")).ifPresent(this::setStoredStack);
         }
     }
@@ -60,7 +60,7 @@ public class BlockEntityWithItemStack extends BlockEntity implements SingleStack
 
     @Override
     public void setStack(ItemStack stack) {
-        this.storedStack = stack;
+        setStoredStack(stack);
     }
 
     @Override

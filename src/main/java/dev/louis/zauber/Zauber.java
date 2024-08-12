@@ -1,8 +1,6 @@
 package dev.louis.zauber;
 
 import com.mojang.logging.LogUtils;
-import dev.emi.trinkets.api.SlotType;
-import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.event.SpellCastCallback;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
@@ -34,25 +32,20 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.SetComponentsLootFunction;
@@ -205,24 +198,22 @@ public class Zauber implements ModInitializer {
         ZauberPotionEffects.init();
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SpellStructureResourceReloadListener());
-        ItemGroup itemGroup = Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> SpellBookItem.createSpellBook(Spells.SUPERNOVA)).displayName(Text.of("Zauber")).build());
-
-        ItemGroupEvents.modifyEntriesEvent(Registries.ITEM_GROUP.getKey(itemGroup).get()).register(content -> {
-            if (true) return;
+        Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> SpellBookItem.createSpellBook(Spells.SUPERNOVA)).displayName(Text.of("Zauber"))/*.entries((displayContext, entries) -> {
             ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
             NbtComponent nbtComponent = NbtComponent.DEFAULT.apply(nbt -> nbt.putString("id", "zauber:mana_horse"));
 
             itemStack.set(DataComponentTypes.ENTITY_DATA, nbtComponent);
-            content.add(itemStack);
-            ZauberItems.IN_CREATIVE_INVENTORY.forEach(content::add);
-            Spells.SPELLBOOKS.forEach(content::add);
-        });
+            entries.add(itemStack);
+            ZauberItems.IN_CREATIVE_INVENTORY.forEach(entries::add);
+            Spells.SPELLBOOKS.forEach(entries::add);
+        })*/.build());
+
         LostBookType.init();
 
         LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
-            Identifier gameplayFishingId = Identifier.of("minecraft", "gameplay/fishing");
-            if (key.getValue().equals(gameplayFishingId)) {
-                tableBuilder.modifyPools(tableBuilder1 -> {
+            Identifier gameplayFishingJunkId = Identifier.of("minecraft", "gameplay/fishing/junk");
+            if (key.getValue().equals(gameplayFishingJunkId)) {
+                tableBuilder.modifyPools(tableBuilder1 -> {;
                     LostBookType.LOST_BOOKS.forEach(lostBookType -> {
                         tableBuilder1.
                                 with(ItemEntry.builder(ZauberItems.LOST_BOOK)
@@ -232,16 +223,6 @@ public class Zauber implements ModInitializer {
                 });
             }
         });
-
-        TrinketsApi.registerTrinketPredicate(Identifier.of(MOD_ID, "tag_and_unique"), ((stack, ref, livingEntity) -> {
-            SlotType slot = ref.inventory().getSlotType();
-            var containsItem = TrinketsApi.getTrinketComponent(livingEntity).map(component -> component.getInventory().get(slot.getGroup()).get(slot.getName()).containsAny(stack1 -> stack1.getItem().equals(stack.getItem()))).orElse(false);
-            var tagCheck = TrinketsApi.getTrinketPredicate(Identifier.of("trinkets", "tag")).get();
-            if (!containsItem && tagCheck.apply(stack, ref, livingEntity) == TriState.TRUE) {
-                return TriState.TRUE;
-            }
-            return TriState.FALSE;
-        }));
 
         AttackEntityCallback.EVENT.register((player, world, hand, target, hitResult) -> {
             if (player.isSpectator() || world.isClient()) return ActionResult.PASS;

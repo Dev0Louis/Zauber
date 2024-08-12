@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import dev.emi.trinkets.api.SlotReference;
+import dev.emi.trinkets.api.SlotType;
 import dev.emi.trinkets.api.TrinketItem;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.zauber.Zauber;
@@ -40,6 +41,12 @@ public class TotemOfDarknessItem extends TrinketItem implements PolymerItem, Pol
         return Zauber.isClientModded(player) ? itemStack : PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, lookup, player);
     }
 
+    @Override
+    public boolean canEquip(ItemStack stack, SlotReference ref, LivingEntity entity) {
+        SlotType slot = ref.inventory().getSlotType();
+        var containsItem = TrinketsApi.getTrinketComponent(entity).map(component -> component.getInventory().get(slot.getGroup()).get(slot.getName()).containsAny(stack1 -> stack1.getItem().equals(stack.getItem()))).orElse(false);
+        return !containsItem;
+    }
 
     public static boolean isActive(LivingEntity entity) {
         if (entity.getWorld().isClient()) {
