@@ -25,7 +25,8 @@ public class ZauberDataComponentTypes {
 
     private static <T> ComponentType<T> register(String id, UnaryOperator<ComponentType.Builder<T>> builderOperator) {
         var componentType = Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(Zauber.MOD_ID, id), builderOperator.apply(ComponentType.builder()).build());
-        PolymerComponent.registerDataComponent(componentType);
+        //TODO: FRICKEDY FROGEDY POLYMER BREAKS MY PROPERTY!
+        //PolymerComponent.registerDataComponent(componentType);
         return componentType;
     }
 

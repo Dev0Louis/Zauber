@@ -7,6 +7,8 @@ import xyz.nucleoid.packettweaker.PacketContext;
 public interface ZauberComponent extends PolymerComponent {
     @Override
     default boolean canSyncRawToClient(PacketContext context) {
-        return Zauber.isClientModded(context.getPlayer());
+        var a = Zauber.isClientModded(context.getPlayer());
+        System.out.println(context.getPlayer() + " " + a);
+        return a;
     }
 }

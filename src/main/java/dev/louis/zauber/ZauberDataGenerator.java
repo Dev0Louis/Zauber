@@ -254,7 +254,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                             false
                     )
                     .parent(rootEntry)
-                    .criterion("spell_table", InventoryChangedCriterion.Conditions.items(ZauberItems.SPELL_TABLE))
+                    .criterion("have_spell_table", InventoryChangedCriterion.Conditions.items(ZauberItems.SPELL_TABLE))
                     .build(consumer, "zauber/spell_table");
 
 
