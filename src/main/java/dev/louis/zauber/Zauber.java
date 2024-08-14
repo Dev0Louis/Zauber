@@ -47,6 +47,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.SetComponentsLootFunction;
 import net.minecraft.particle.DustParticleEffect;
@@ -107,6 +108,14 @@ public class Zauber implements ModInitializer {
                         TotemOfManaItem::isActive,
                         TotemOfManaEntity.TYPE,
                         Identifier.of(Zauber.MOD_ID, "artifact/totem_of_mana")
+                )
+        );
+        ITEM_TO_TOTEM_DATA.put(
+                Items.TOTEM_OF_UNDYING,
+                new PlayerTotemData(
+                        (player) -> true,
+                        TotemOfUndyingEntity.TYPE,
+                        Identifier.of(Zauber.MOD_ID, "artifact/totem_of_undying")
                 )
         );
     }
@@ -185,6 +194,7 @@ public class Zauber implements ModInitializer {
         registerEntity("totem_of_darkness", TotemOfDarknessEntity.TYPE);
         registerEntity("totem_of_ice", TotemOfIceEntity.TYPE);
         registerEntity("totem_of_mana", TotemOfManaEntity.TYPE);
+        registerEntity("totem_of_undying", TotemOfUndyingEntity.TYPE);
         registerEntity("mana_horse", ManaHorseEntity.TYPE);
         registerEntity("thrown_heart_of_the_ice", ThrownHeartOfTheIceEntity.TYPE);
         registerEntity("mana_arrow", ManaArrowEntity.TYPE);
