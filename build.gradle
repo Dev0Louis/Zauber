@@ -1,3 +1,5 @@
+import net.fabricmc.loom.util.gradle.SourceSetHelper
+
 plugins {
     id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
@@ -52,12 +54,53 @@ loom {
             sourceSet sourceSets.client
         }
     }
+    runs {
+        dataGen {
+            inherit(client)
+            property("zauber-datagen.modid", "zauber-datagen")
+        }
+    }
     accessWidenerPath = file("src/main/resources/zauber.accesswidener")
 }
 
 fabricApi {
-    configureDataGeneration()
+    configureDataGeneration(dataGenerationSettings -> {
+        dataGenerationSettings.setCreateSourceSet(true)
+        dataGenerationSettings.setModId("zauber-datagen")
+    })
+    String DATAGEN_SOURCESET_NAME = "datagen";
+    var sourceSet = SourceSetHelper.getSourceSets(getProject()).getByName(DATAGEN_SOURCESET_NAME)
+
+    final SourceSet mainSourceSet = SourceSetHelper.getMainSourceSet(getProject());
+    final SourceSet clientSourceSet = SourceSetHelper.getSourceSetByName("client", getProject());
+    sourceSet.setCompileClasspath(
+            sourceSet.getCompileClasspath()
+                    .plus(mainSourceSet.getOutput())
+                    .plus(clientSourceSet.getOutput())
+    );
+
+    sourceSet.setRuntimeClasspath(
+            sourceSet.getRuntimeClasspath()
+                    .plus(mainSourceSet.getOutput())
+                    .plus(clientSourceSet.getOutput())
+    );
+
+    extendsFrom1(getProject(), sourceSet.getCompileClasspathConfigurationName(), mainSourceSet.getCompileClasspathConfigurationName());
+    extendsFrom1(getProject(), sourceSet.getRuntimeClasspathConfigurationName(), mainSourceSet.getRuntimeClasspathConfigurationName());
+
+    extendsFrom1(getProject(), sourceSet.getCompileClasspathConfigurationName(), clientSourceSet.getCompileClasspathConfigurationName());
+    extendsFrom1(getProject(), sourceSet.getRuntimeClasspathConfigurationName(), clientSourceSet.getRuntimeClasspathConfigurationName());
 }
+
+private static void extendsFrom1(Project project, String name, String extendsFrom) {
+    final ConfigurationContainer configurations = project.getConfigurations();
+
+    configurations.named(name, configuration -> {
+        configuration.extendsFrom(configurations.getByName(extendsFrom));
+    });
+}
+
+
 
 dependencies {
     // To change the versions see the gradle.properties file
@@ -77,6 +120,7 @@ dependencies {
 
     include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
     modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
+    modImplementation include("eu.pb4:polymer-resource-pack:${project.polymer_version}")
     modCompileOnly "dev.emi:trinkets:${project.trinkets_version}"
     modRuntimeOnly files('lib/trinkets-3.10.0.jar')
     modImplementation files('lib/cardinal-components-base-6.1.0.jar')
@@ -98,7 +142,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly

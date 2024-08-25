@@ -29,6 +29,7 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.networking.api.PolymerNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -58,8 +59,10 @@ import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -124,6 +127,22 @@ public class Zauber implements ModInitializer {
     @Override
     public void onInitialize() {
         ConfigManager.loadServerConfig();
+        ResourcePackManager.init();
+        //TODO:REMOVE
+        ServerTickEvents.START_SERVER_TICK.register(server -> {
+            if(server.getPlayerManager().getPlayerList().isEmpty() || server.getOverworld().getTime() % 100 != 0)return;
+           ;
+            ItemStack itemStack = ZauberItems.LOST_BOOK.getDefaultStack();
+            itemStack.set(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(LostBookType.LOST_BOOKS.get(9).id()));
+            server.getPlayerManager().getPlayerList().get(0).getInventory().offerOrDrop(itemStack);
+
+            server.getPlayerManager().getPlayerList().get(0).sendMessage(Text.literal("\u0042")
+                    .setStyle(Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "lost_book")))
+                    .append(
+                            Text.literal("ABCDEFGHI").setStyle(Style.EMPTY.withFont(Style.DEFAULT_FONT_ID))
+
+                    ));
+        });
         ZauberCriteria.init();
         ZauberPotionTags.init();
 

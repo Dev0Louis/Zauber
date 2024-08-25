@@ -1,18 +1,20 @@
 package dev.louis.zauber;
 
 import dev.louis.zauber.inventory.SimpleOwnableImmutableSingleStackInventory;
+import dev.louis.zauber.ripped_page.RippedPage;
+import dev.louis.zauber.ripped_page.RippedPages;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.screen.LecternScreenHandler;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.*;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.RawFilteredPair;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldEvents;
@@ -36,6 +38,31 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
         registerBook(Identifier.of(Zauber.MOD_ID, "heart_of_the_sea"), 3);
         registerBook(Identifier.of(Zauber.MOD_ID, "mana_horse"), 3);
 
+        /*Style style = Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "circle")).withColor(0xFFFFFF);
+        Style style1 = Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "ritual")).withColor(0xFFFFFF);
+
+        var circle = Text.literal(" \u0041").setStyle(style);
+        var manaCauldron = Text.literal("   \u0041").setStyle(style1);
+        var ritualStone = Text.literal("         \u0043").setStyle(style1);
+        registerBook(Identifier.of(Zauber.MOD_ID, "mana_bow"), circle
+                .append("\n\n")
+                .append(manaCauldron)
+                .append("\n\n\n\n\n")
+                .append(ritualStone)
+        );*/
+        Style style = Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "lost_book"));
+        Style style1 = style.withColor(0xFFFFFF);
+        MutableText text = Text.literal("\u0042").setStyle(style1);
+        MutableText text1 = Text.literal("\u0041").setStyle(style);
+        MutableText text2 = Text.literal("ABCDEFGHI").setStyle(Style.EMPTY.withColor(0xFF334F).withFont(Style.DEFAULT_FONT_ID));
+        MutableText text3 = Text.literal("\u0043").setStyle(style);
+        // MutableText text3 = Text.literal("").setStyle(Style.EMPTY.withColor(0xFF334F).withFont(Style.DEFAULT_FONT_ID));
+
+        registerBook(
+                Identifier.of(Zauber.MOD_ID, "test"),
+                text.append(text1).append("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n").append(text3).append(text1)
+        );
+
     }
 
     public static Optional<LostBookType> getById(Identifier id) {
@@ -43,7 +70,7 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
     }
 
 
-    public static void registerBook(Identifier id, int pageCount) {
+    public static void registerBook(Identifier id, int pageCount, RippedPage rippedPage) {
         if (LOST_BOOKS.stream().anyMatch(lostBookType -> id.equals(lostBookType.id))) {
             throw new IllegalStateException("Tried registering " + id + " while that id was already registered.");
         }
@@ -52,6 +79,7 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
         for (int i = 0; i < pageCount; i++) {
             pages.add(Text.translatable("lost_book." + id.getNamespace() + "." + id.getPath() + "." + i));
         }
+        pages.set(0, Text.literal(String.valueOf(rippedPage.character())).append(pages.get(0)));
 
         LOST_BOOKS.add(new LostBookType(id, pages));
     }

@@ -17,11 +17,11 @@
     "client": [
       "dev.louis.zauber.client.ZauberClient"
     ],
-    "fabric-datagen": [
-      "dev.louis.zauber.ZauberDataGenerator"
-    ],
     "modmenu": [
       "dev.louis.zauber.client.config.ModMenuIntegration"
+    ],
+    "fabric-datagen": [
+      "dev.louis.zauber.datagen.ZauberDataGenerator"
     ]
   },
   "mixins": [

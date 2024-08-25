@@ -18,3 +18,5 @@ accessible field net/minecraft/entity/decoration/DisplayEntity TELEPORT_DURATION
 accessible field net/minecraft/entity/decoration/DisplayEntity BILLBOARD Lnet/minecraft/entity/data/TrackedData;
 accessible method net/minecraft/entity/LivingEntity applyDamage (Lnet/minecraft/entity/damage/DamageSource;F)V
 accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
+accessible class net/minecraft/client/font/FontManager$Providers
+accessible method net/minecraft/client/font/FontManager$Providers <init> (Ljava/util/List;)V
