@@ -133,7 +133,7 @@ public class Zauber implements ModInitializer {
             if(server.getPlayerManager().getPlayerList().isEmpty() || server.getOverworld().getTime() % 100 != 0)return;
            ;
             ItemStack itemStack = ZauberItems.LOST_BOOK.getDefaultStack();
-            itemStack.set(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(LostBookType.LOST_BOOKS.get(9).id()));
+            itemStack.set(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(LostBookType.LOST_BOOKS.get(0).id()));
             server.getPlayerManager().getPlayerList().get(0).getInventory().offerOrDrop(itemStack);
 
             server.getPlayerManager().getPlayerList().get(0).sendMessage(Text.literal("\u0042")

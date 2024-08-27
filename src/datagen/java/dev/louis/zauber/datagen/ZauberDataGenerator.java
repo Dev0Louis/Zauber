@@ -383,7 +383,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
             Path dir = Path.of("..").toAbsolutePath();
 
             var rippedPages = RippedPages.rippedPages;
-            validateFilesPresent(dir.resolve("lost_book"), rippedPages);
+            validateFilesPresent(dir.resolve("ripped_page"), rippedPages);
             //From now on we can expect all files to be present.
 
             var mergedImage = new BufferedImage(130 * rippedPages.size(), 165, BufferedImage.TYPE_INT_ARGB);
@@ -391,7 +391,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
             for (int i = 0; i < rippedPages.size(); i++) {
                 RippedPage rippedPage = rippedPages.get(i);
                 var id = rippedPage.id();
-                File file = dir.resolve("lost_book").resolve(id.getNamespace()).resolve(id.getPath() + ".png").toFile();
+                File file = dir.resolve("ripped_page").resolve(id.getNamespace()).resolve(id.getPath() + ".png").toFile();
                 var image = ImageIO.read(file);
                 //This is very prone to memory leaking, but it is fine as it is in Datagen /shrug
                 validateImageSize(id, image);
@@ -412,7 +412,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                     "png",
                     outputStream
             );
-            writeOutput(Path.of("assets/zauber/textures/font/lost_book.png"), outputStream.toByteArray(), writer);
+            writeOutput(Path.of("assets/zauber/textures/font/ripped_page.png"), outputStream.toByteArray(), writer);
             outputStream.close();
 
             List<FontLoader> fontLoaders = new ArrayList<>();
@@ -420,7 +420,8 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
             fontLoaders.add(
                     new SpaceFont.Loader(
                             Map.of(
-                                    (int) '>', -150f
+                                    (int) '<', -150f,
+                                    (int) '>', 20f
                             )
                     )
             );
@@ -446,7 +447,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                     ZauberDataGenerator.generator.getRegistries().getNow(null),
                     FontManager.Providers.CODEC,
                     providers,
-                    output.resolve("assets/zauber/font/lost_book1.json")
+                    output.resolve("assets/zauber/font/ripped_page.json")
             ).get();
         }
 

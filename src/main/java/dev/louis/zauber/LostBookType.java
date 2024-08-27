@@ -10,11 +10,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.*;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.RawFilteredPair;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldEvents;
@@ -25,18 +23,18 @@ import java.util.Optional;
 
 public record LostBookType(Identifier id, List<Text> pages) implements NamedScreenHandlerFactory {
     public static List<LostBookType> LOST_BOOKS = new ArrayList<>();
+    public static Style LOST_BOOK_STYLE = Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "ripped_page")).withColor(0xFFFFFF);
 
     public static void init() {
-        registerBook(Identifier.of(Zauber.MOD_ID, "dark_sleep"), 2);
-        registerBook(Identifier.of(Zauber.MOD_ID, "mana_cauldron"), 1);
-        registerBook(Identifier.of(Zauber.MOD_ID, "moral_implications"), 3);
-        registerBook(Identifier.of(Zauber.MOD_ID, "a_poem"), 1);
-        //registerBook(Identifier.of(Zauber.MOD_ID, "nickel"), 1);
-        registerBook(Identifier.of(Zauber.MOD_ID, "knowledge_retention_spell"), 2);
-        registerBook(Identifier.of(Zauber.MOD_ID, "smelting"), 3);
-        registerBook(Identifier.of(Zauber.MOD_ID, "summoning"), 3);
-        registerBook(Identifier.of(Zauber.MOD_ID, "heart_of_the_sea"), 3);
-        registerBook(Identifier.of(Zauber.MOD_ID, "mana_horse"), 3);
+        registerBook(Identifier.of(Zauber.MOD_ID, "dark_sleep"), 2, RippedPages.EMPTY);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "mana_cauldron"), 1);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "moral_implications"), 3);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "a_poem"), 1);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "knowledge_retention_spell"), 2);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "smelting"), 3);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "summoning"), 3);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "heart_of_the_sea"), 3);
+        //registerBook(Identifier.of(Zauber.MOD_ID, "mana_horse"), 3);
 
         /*Style style = Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "circle")).withColor(0xFFFFFF);
         Style style1 = Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "ritual")).withColor(0xFFFFFF);
@@ -50,7 +48,7 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
                 .append("\n\n\n\n\n")
                 .append(ritualStone)
         );*/
-        Style style = Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "lost_book"));
+        /*Style style = Style.EMPTY.withFont();
         Style style1 = style.withColor(0xFFFFFF);
         MutableText text = Text.literal("\u0042").setStyle(style1);
         MutableText text1 = Text.literal("\u0041").setStyle(style);
@@ -61,7 +59,7 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
         registerBook(
                 Identifier.of(Zauber.MOD_ID, "test"),
                 text.append(text1).append("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n").append(text3).append(text1)
-        );
+        );*/
 
     }
 
@@ -79,7 +77,14 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
         for (int i = 0; i < pageCount; i++) {
             pages.add(Text.translatable("lost_book." + id.getNamespace() + "." + id.getPath() + "." + i));
         }
-        pages.set(0, Text.literal(String.valueOf(rippedPage.character())).append(pages.get(0)));
+
+        pages.set(
+                0,
+                Text.literal("<" + rippedPage.character() + ">").setStyle(LOST_BOOK_STYLE)
+                        .append(
+                                pages.get(0).copy().setStyle(Style.EMPTY.withColor(0).withFont(Style.DEFAULT_FONT_ID))
+                        )
+        );
 
         LOST_BOOKS.add(new LostBookType(id, pages));
     }
