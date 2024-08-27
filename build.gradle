@@ -70,6 +70,7 @@ fabricApi {
     String DATAGEN_SOURCESET_NAME = "datagen";
     var sourceSet = SourceSetHelper.getSourceSets(getProject()).getByName(DATAGEN_SOURCESET_NAME)
 
+    //TODO: Make a loom pr
     final SourceSet mainSourceSet = SourceSetHelper.getMainSourceSet(getProject());
     final SourceSet clientSourceSet = SourceSetHelper.getSourceSetByName("client", getProject());
     sourceSet.setCompileClasspath(
