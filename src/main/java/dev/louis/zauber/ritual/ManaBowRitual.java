@@ -24,7 +24,7 @@ public class ManaBowRitual extends Ritual implements ManaPullingRitual {
 
     @Override
     public void tick() {
-        if(age % 5 == 0) {
+        if (age % 5 == 0) {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
         }
     }
@@ -60,10 +60,9 @@ public class ManaBowRitual extends Ritual implements ManaPullingRitual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var manaPool = ritualStoneBlockEntity.acquireManaPool(2);
-        if(!ManaBowRitual.isBow(ritualItemStack) || manaPool.isEmpty()) return null;
+        if (!ManaBowRitual.isBow(ritualItemStack) || manaPool.isEmpty()) return null;
         return new ManaBowRitual(world, ritualStoneBlockEntity, manaPool.get());
     }
-
 
 
     public static boolean isBow(@Nullable ItemStack itemStack) {

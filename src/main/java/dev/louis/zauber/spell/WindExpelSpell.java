@@ -31,10 +31,10 @@ public class WindExpelSpell extends Spell {
     public void tick() {
         if (this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
             if (serverPlayer.isSneaking() && this.age > 5) {
-                serverPlayer.setVelocity(serverPlayer.getVelocity().multiply(0,0.7,0));
+                serverPlayer.setVelocity(serverPlayer.getVelocity().multiply(0, 0.7, 0));
                 serverPlayer.velocityModified = true;
                 ticksSneaking++;
-                if(ticksSneaking > 3) {
+                if (ticksSneaking > 3) {
                     stop();
                 }
                 return;
@@ -42,8 +42,8 @@ public class WindExpelSpell extends Spell {
                 serverPlayer.addVelocity(new Vec3d(0, ConfigManager.getServerConfig().windExpelSpellAcceleration(), 0));
                 serverPlayer.velocityModified = true;
             }
-            double sin = Math.sin(age/1.75f) * 2.5;
-            double cos = Math.cos(age/1.75f) * 2.5;
+            double sin = Math.sin(age / 1.75f) * 2.5;
+            double cos = Math.cos(age / 1.75f) * 2.5;
             serverPlayer.getServerWorld().spawnParticles(
                     ParticleTypes.CLOUD,
                     serverPlayer.getX() + sin,
@@ -66,14 +66,14 @@ public class WindExpelSpell extends Spell {
 
     @Override
     public void finish() {
-        if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
+        if (getCaster() instanceof ServerPlayerEntity serverPlayer) {
             if (this.wasInterrupted()) {
                 SoundHelper.playPlayerSound(serverPlayer, SoundEvents.ITEM_SHIELD_BREAK, 1f, -1f);
                 return;
             }
             SoundHelper.playPlayerSound(serverPlayer, SoundEvents.ENTITY_CAMEL_DASH, 1f, -1f);
 
-            if(!this.getCaster().isOnGround()) {
+            if (!this.getCaster().isOnGround()) {
                 serverPlayer.setVelocity(serverPlayer.getVelocity().multiply(1, 0.7, 1));
                 serverPlayer.velocityModified = true;
             }

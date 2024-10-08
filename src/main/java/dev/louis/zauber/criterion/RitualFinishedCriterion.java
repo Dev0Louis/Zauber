@@ -22,14 +22,15 @@ public class RitualFinishedCriterion extends AbstractCriterion<RitualFinishedCri
         this.trigger(player, conditions -> conditions.ritual.equals(ritual));
     }
 
-    public static record Conditions(Optional<LootContextPredicate> player, Identifier ritual) implements AbstractCriterion.Conditions {
+    public static record Conditions(Optional<LootContextPredicate> player,
+                                    Identifier ritual) implements AbstractCriterion.Conditions {
         public static final Codec<RitualFinishedCriterion.Conditions> CODEC = RecordCodecBuilder.create(
                 instance ->
                         instance.group(
-                                EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("player").forGetter(RitualFinishedCriterion.Conditions::player),
-                                Identifier.CODEC.fieldOf("ritual").forGetter(RitualFinishedCriterion.Conditions::ritual)
-                        )
-                        .apply(instance, RitualFinishedCriterion.Conditions::new)
+                                        EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("player").forGetter(RitualFinishedCriterion.Conditions::player),
+                                        Identifier.CODEC.fieldOf("ritual").forGetter(RitualFinishedCriterion.Conditions::ritual)
+                                )
+                                .apply(instance, RitualFinishedCriterion.Conditions::new)
         );
 
         public static AdvancementCriterion<RitualFinishedCriterion.Conditions> create(Identifier id) {

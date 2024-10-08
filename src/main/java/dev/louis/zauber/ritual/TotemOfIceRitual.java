@@ -127,7 +127,7 @@ public class TotemOfIceRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         List<ItemStack> ice = ritualStoneBlockEntity.getAvailableItemStacks().filter(itemStack -> itemStack.isOf(Items.ICE)).toList();
-        if(!(ritualItemStack.isOf(Items.TOTEM_OF_UNDYING)) || ice.size() < 4) return null;
+        if (!(ritualItemStack.isOf(Items.TOTEM_OF_UNDYING)) || ice.size() < 4) return null;
         return new TotemOfIceRitual(world, ritualStoneBlockEntity);
     }
 }

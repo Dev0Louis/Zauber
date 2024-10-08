@@ -102,7 +102,7 @@ public abstract class StructureEntity extends Entity implements PolymerEntity {
 
         @Override
         protected void onTick() {
-            if (this.lastSize == this.structureEntity.getSize())return;
+            if (this.lastSize == this.structureEntity.getSize()) return;
             this.lastSize = this.structureEntity.getSize();
             this.updateOffset();
         }

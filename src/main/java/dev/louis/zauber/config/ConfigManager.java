@@ -40,19 +40,20 @@ public class ConfigManager {
     protected static ServerConfig serverConfig;
 
     public static void loadClientConfig() {
-        if(FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             throw new IllegalStateException("Tried loading client config when not in the client environment");
         }
         ConfigManager.clientConfig = read(ClientConfig.class, CLIENT_PATH);
         Zauber.LOGGER.info("Loaded Client Config");
     }
+
     public static void loadServerConfig() {
         serverConfig = read(ServerConfig.class, SERVER_PATH);
         Zauber.LOGGER.info("Loaded Server Config");
     }
 
     public static void saveClientConfig() {
-        if(FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
             throw new IllegalStateException("Tried loading client config when not in the client environment");
         }
         write(clientConfig, CLIENT_PATH);
@@ -87,7 +88,7 @@ public class ConfigManager {
 
     public static ServerConfig readOverrideConfig(PacketByteBuf buf) {
         var configVersion = buf.readInt();
-        if(configVersion != VERSION)
+        if (configVersion != VERSION)
             throw new IllegalStateException("The config version (" + configVersion + ") does not match clients version (" + VERSION + ")!");
 
 
@@ -129,7 +130,7 @@ public class ConfigManager {
         return overrideConfig == null;
     }
 
-    protected static <T> Collection<? extends ConfigCategory> generateCategories()  {
+    protected static <T> Collection<? extends ConfigCategory> generateCategories() {
         var clientCategory = ConfigCategory.createBuilder()
                 .name(category("client"))
                 .tooltip(tooltip("client"))

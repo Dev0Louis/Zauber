@@ -1,7 +1,6 @@
 package dev.louis.zauber.datagen;
 
 import com.google.common.hash.HashCode;
-import com.google.gson.Gson;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;
@@ -67,6 +66,7 @@ import java.util.function.Consumer;
 public class ZauberDataGenerator implements DataGeneratorEntrypoint {
 
     public static FabricDataGenerator generator;
+
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
         FabricDataGenerator.Pack pack = generator.createPack();
@@ -288,7 +288,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                     .display(
                             SpellBookItem.createSpellBook(spellType),
                             Text.translatable("advancements.zauber.spell_cast_" + spellType.getId().getPath()),
-                            Text.translatable("advancements.zauber.spell_cast_" + spellType.getId().getPath()  + ".description"),
+                            Text.translatable("advancements.zauber.spell_cast_" + spellType.getId().getPath() + ".description"),
                             null,
                             frame,
                             true,
@@ -324,7 +324,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                     .display(
                             item,
                             Text.translatable("advancements.zauber.heart_of_the_" + heart),
-                            Text.translatable("advancements.zauber.heart_of_the_ " + heart  + ".description"),
+                            Text.translatable("advancements.zauber.heart_of_the_ " + heart + ".description"),
                             null,
                             AdvancementFrame.TASK,
                             true,
@@ -335,13 +335,13 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                     .criterion("get_heart_of_the_" + heart, InventoryChangedCriterion.Conditions.items(item))
                     .build(consumer, "zauber/get_heart_of_the_" + heart);
         }
-        
+
         public AdvancementEntry registerTotemAdvancement(String totem, Item item, AdvancementEntry parent, Consumer<AdvancementEntry> consumer) {
             return Advancement.Builder.create()
                     .display(
                             item,
                             Text.translatable("advancements.zauber.totem_of_" + totem),
-                            Text.translatable("advancements.zauber.totem_of_" + totem  + ".description"),
+                            Text.translatable("advancements.zauber.totem_of_" + totem + ".description"),
                             null,
                             AdvancementFrame.TASK,
                             true,
@@ -375,8 +375,8 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
         }
 
         /**
-            A few core things.
-            We need to generate the font image, for that we stitch together multipile pngs into a pig one.
+         * A few core things.
+         * We need to generate the font image, for that we stitch together multipile pngs into a pig one.
          */
         public void runInternal(DataWriter writer) throws IOException, ExecutionException, InterruptedException {
 
@@ -452,7 +452,8 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
         }
 
         private void validateImageSize(Identifier id, BufferedImage image) {
-            if (image.getWidth() != 130 || image.getHeight() != 165) throw new IllegalStateException("The image size, from " + id + " is not 130, 165.");
+            if (image.getWidth() != 130 || image.getHeight() != 165)
+                throw new IllegalStateException("The image size, from " + id + " is not 130, 165.");
         }
 
         private void validateFilesPresent(Path path, List<RippedPage> rippedPages) throws FileNotFoundException {

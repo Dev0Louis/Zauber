@@ -25,8 +25,6 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
-    maven { url 'https://maven.nucleoid.xyz' } // You should have it
-
     maven {
         name = "TerraformersMC"
         url = "https://maven.terraformersmc.com/"
@@ -118,14 +116,10 @@ dependencies {
 
     modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
-    include(modImplementation "eu.pb4:polymer-core:${project.polymer_version}")
-    modImplementation include("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
-    modImplementation include("eu.pb4:polymer-resource-pack:${project.polymer_version}")
     modCompileOnly "dev.emi:trinkets:${project.trinkets_version}"
     modRuntimeOnly files('lib/trinkets-3.10.0.jar')
     modImplementation files('lib/cardinal-components-base-6.1.0.jar')
     modImplementation files('lib/cardinal-components-entity-6.1.0.jar')
-    vineflowerDecompilerClasspath "org.vineflower:vineflower:1.11.0-SNAPSHOT"
 }
 
 remapJar {

@@ -102,7 +102,7 @@ public class MudifyRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var manaCauldrons = ritualStoneBlockEntity.getManaStoragesStream().collect(Collectors.toList());
-        if(manaCauldrons.isEmpty() || !ritualItemStack.isOf(Items.WATER_BUCKET)) return null;
+        if (manaCauldrons.isEmpty() || !ritualItemStack.isOf(Items.WATER_BUCKET)) return null;
         return new MudifyRitual(world, ritualStoneBlockEntity);
     }
 }

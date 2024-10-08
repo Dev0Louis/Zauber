@@ -57,8 +57,8 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
         Vec3d vec3d = this.getVelocity();
         if (this.prevPitch == 0.0F && this.prevYaw == 0.0F) {
             double d = vec3d.horizontalLength();
-            this.setYaw((float)(MathHelper.atan2(vec3d.x, vec3d.z) * 180.0F / (float)Math.PI));
-            this.setPitch((float)(MathHelper.atan2(vec3d.y, d) * 180.0F / (float)Math.PI));
+            this.setYaw((float) (MathHelper.atan2(vec3d.x, vec3d.z) * 180.0F / (float) Math.PI));
+            this.setPitch((float) (MathHelper.atan2(vec3d.y, d) * 180.0F / (float) Math.PI));
             this.prevYaw = this.getYaw();
             this.prevPitch = this.getPitch();
         }
@@ -83,16 +83,16 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
             vec3d2 = hitResult.getPos();
         }
 
-        while(!this.isRemoved()) {
+        while (!this.isRemoved()) {
             EntityHitResult entityHitResult = this.getEntityCollision(vec3d3, vec3d2);
             if (entityHitResult != null) {
                 hitResult = entityHitResult;
             }
 
             if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
-                Entity entity = ((EntityHitResult)hitResult).getEntity();
+                Entity entity = ((EntityHitResult) hitResult).getEntity();
                 Entity entity2 = this.getOwner();
-                if (entity instanceof PlayerEntity && entity2 instanceof PlayerEntity && !((PlayerEntity)entity2).shouldDamagePlayer((PlayerEntity)entity)) {
+                if (entity instanceof PlayerEntity && entity2 instanceof PlayerEntity && !((PlayerEntity) entity2).shouldDamagePlayer((PlayerEntity) entity)) {
                     hitResult = null;
                     entityHitResult = null;
                 }
@@ -116,10 +116,10 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
         double f = vec3d.y;
         double g = vec3d.z;
         if (this.isCritical()) {
-            for(int i = 0; i < 4; ++i) {
+            for (int i = 0; i < 4; ++i) {
                 this.getWorld()
                         .addParticle(
-                                ParticleTypes.CRIT, this.getX() + e * (double)i / 4.0, this.getY() + f * (double)i / 4.0, this.getZ() + g * (double)i / 4.0, -e, -f + 0.2, -g
+                                ParticleTypes.CRIT, this.getX() + e * (double) i / 4.0, this.getY() + f * (double) i / 4.0, this.getZ() + g * (double) i / 4.0, -e, -f + 0.2, -g
                         );
             }
         }
@@ -130,12 +130,12 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
         double l = vec3d.horizontalLength();
         this.setYaw((float) (MathHelper.atan2(e, g) * 180.0F / (float) Math.PI));
 
-        this.setPitch((float)(MathHelper.atan2(f, l) * 180.0F / (float)Math.PI));
+        this.setPitch((float) (MathHelper.atan2(f, l) * 180.0F / (float) Math.PI));
         this.setPitch(updateRotation(this.prevPitch, this.getPitch()));
         this.setYaw(updateRotation(this.prevYaw, this.getYaw()));
         float m = 0.99F;
         if (this.isTouchingWater()) {
-            for(int o = 0; o < 4; ++o) {
+            for (int o = 0; o < 4; ++o) {
                 this.getWorld().addParticle(ParticleTypes.BUBBLE, h - e * 0.25, j - f * 0.25, k - g * 0.25, e, f, g);
             }
 

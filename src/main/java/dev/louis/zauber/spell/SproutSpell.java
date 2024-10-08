@@ -23,24 +23,24 @@ public class SproutSpell extends Spell {
 
     @Override
     public void tick() {
-        if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
+        if (getCaster() instanceof ServerPlayerEntity serverPlayer) {
             var box = serverPlayer.getBoundingBox().expand(5, 3, 5);
             BlockPos.stream(box).forEach(pos -> {
 
-                if(!serverPlayer.getManaManager().hasEnoughMana(1)) {
+                if (!serverPlayer.getManaManager().hasEnoughMana(1)) {
                     stop();
                     return;
                 }
 
                 var world = serverPlayer.getServerWorld();
-                if(world.random.nextInt(200) != 0)return;
+                if (world.random.nextInt(200) != 0) return;
                 var blockState = serverPlayer.getServerWorld().getBlockState(pos);
                 if (blockState.getBlock() instanceof Fertilizable fertilizable && fertilizable.isFertilizable(world, pos, blockState)) {
                     if (fertilizable.canGrow(world, world.random, pos, blockState)) {
                         fertilizable.grow(world, world.random, pos, blockState);
                         world.syncWorldEvent(WorldEvents.BONE_MEAL_USED, pos, 0);
                         grownCrops++;
-                        if(grownCrops % 10 == 0) {
+                        if (grownCrops % 10 == 0) {
                             serverPlayer.getManaManager().drainMana(1);
                         }
                     }

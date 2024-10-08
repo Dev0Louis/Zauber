@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.component.type.StoredSpellComponent;
+import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.criterion.AbstractCriterion;
 import net.minecraft.predicate.entity.EntityPredicate;
@@ -24,14 +25,15 @@ public class SpellCastCriterion extends AbstractCriterion<SpellCastCriterion.Con
         this.trigger(player, conditions -> conditions.spellType.value().equals(spellType));
     }
 
-    public static record Conditions(Optional<LootContextPredicate> player, RegistryEntry<SpellType<?>> spellType) implements AbstractCriterion.Conditions {
+    public static record Conditions(Optional<LootContextPredicate> player,
+                                    RegistryEntry<SpellType<?>> spellType) implements AbstractCriterion.Conditions {
         public static final Codec<SpellCastCriterion.Conditions> CODEC = RecordCodecBuilder.create(
                 instance ->
                         instance.group(
-                                EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("player").forGetter(SpellCastCriterion.Conditions::player),
+                                        EntityPredicate.LOOT_CONTEXT_PREDICATE_CODEC.optionalFieldOf("player").forGetter(SpellCastCriterion.Conditions::player),
                                         StoredSpellComponent.SPELL_CODE_ENTRY_CODEC.fieldOf("spell_type").forGetter(SpellCastCriterion.Conditions::spellType)
-                        )
-                        .apply(instance, SpellCastCriterion.Conditions::new)
+                                )
+                                .apply(instance, SpellCastCriterion.Conditions::new)
         );
 
         public static AdvancementCriterion<SpellCastCriterion.Conditions> create(RegistryEntry<SpellType<?>> spellType) {

@@ -15,6 +15,7 @@ import net.minecraft.util.Identifier;
 public class ZauberRecipes {
     public static final RecipeType<SpellRecipe> SPELL_RECIPE = registerRecipeType("spell_recipe");
     public static final ScreenHandlerType<SpellTableScreenHandler> SPELL_TABLE = registerPolymerScreenHandler(Identifier.of(Zauber.MOD_ID, "spellcraft"), SpellTableScreenHandler::new);
+
     public static void init() {
         Registry.register(Registries.RECIPE_SERIALIZER, SpellRecipe.SpellRecipeSerializer.ID, SpellRecipe.SpellRecipeSerializer.INSTANCE);
     }

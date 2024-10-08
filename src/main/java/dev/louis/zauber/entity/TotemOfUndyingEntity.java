@@ -1,7 +1,5 @@
 package dev.louis.zauber.entity;
 
-import dev.louis.zauber.item.TotemOfIceItem;
-import dev.louis.zauber.item.ZauberItems;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

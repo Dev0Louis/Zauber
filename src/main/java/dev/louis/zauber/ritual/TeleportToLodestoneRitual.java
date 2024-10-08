@@ -63,13 +63,13 @@ public class TeleportToLodestoneRitual extends Ritual implements ManaPullingRitu
                 this.getAffectedEntities()
                         // Limit the amount of entities that will be transported by the amount of ender pearls given
                         .limit(itemSacrificersWithEnderPearl.size()).forEach(livingEntity -> {
-                    livingEntity.teleport(
-                            blockPos.getX(),
-                            blockPos.getY() + 1,
-                            blockPos.getZ(),
-                            true
-                    );
-                });
+                            livingEntity.teleport(
+                                    blockPos.getX(),
+                                    blockPos.getY() + 1,
+                                    blockPos.getZ(),
+                                    true
+                            );
+                        });
             }
         }
         EffectHelper.playBreakItemEffect((ServerWorld) world, pos, ritualStoneBlockEntity.getStoredStack());
@@ -94,7 +94,7 @@ public class TeleportToLodestoneRitual extends Ritual implements ManaPullingRitu
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         boolean hasOneEnderPearl = ritualStoneBlockEntity.getAvailableItemStacks().anyMatch(itemStack -> itemStack.isOf(Items.ENDER_PEARL));
-        if(!isCompassWithLodestoneInSameWorld(world, ritualItemStack) || !hasOneEnderPearl) return null;
+        if (!isCompassWithLodestoneInSameWorld(world, ritualItemStack) || !hasOneEnderPearl) return null;
         return new TeleportToLodestoneRitual(world, ritualStoneBlockEntity);
     }
 

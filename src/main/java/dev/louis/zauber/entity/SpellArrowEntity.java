@@ -37,7 +37,7 @@ public class SpellArrowEntity extends PersistentProjectileEntity implements Poly
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if(spell != null && spell.getCaster().equals(entityHitResult.getEntity())) return;
+        if (spell != null && spell.getCaster().equals(entityHitResult.getEntity())) return;
         super.onEntityHit(entityHitResult);
     }
 
@@ -53,7 +53,7 @@ public class SpellArrowEntity extends PersistentProjectileEntity implements Poly
     }
 
     public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return TYPE;
+        if (Zauber.isClientModded(player)) return TYPE;
         return EntityType.ARROW;
     }
 }

@@ -6,7 +6,6 @@ import dev.louis.zauber.ritual.heart.HeartOfDarknessRitual;
 import dev.louis.zauber.ritual.heart.HeartOfTheIceRitual;
 import dev.louis.zauber.ritual.heart.HeartOfTheSeaRitual;
 import dev.louis.zauber.ritual.spell.HailSpellRitual;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatVariant;
 import net.minecraft.item.Items;
@@ -20,9 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Stream;
 
 public abstract class Ritual {
@@ -90,7 +87,8 @@ public abstract class Ritual {
 
 
     public static void register(Identifier id, Starter starter) {
-        if (RITUAL_STARTERS.containsKey(id)) throw new IllegalStateException("TRIED DOUBLE REGISTRATION OF " + id + "!");
+        if (RITUAL_STARTERS.containsKey(id))
+            throw new IllegalStateException("TRIED DOUBLE REGISTRATION OF " + id + "!");
         RITUAL_STARTERS.put(id, starter);
     }
 
@@ -108,7 +106,9 @@ public abstract class Ritual {
 
     public Stream<Position> getConnections() {
         return Stream.empty();
-    };
+    }
+
+    ;
 
     public interface Starter {
         Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity);

@@ -42,7 +42,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements En
     @Shadow
     public abstract ServerWorld getServerWorld();
 
-    @Shadow public abstract Either<SleepFailureReason, Unit> trySleep(BlockPos pos);
+    @Shadow
+    public abstract Either<SleepFailureReason, Unit> trySleep(BlockPos pos);
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(world, pos, yaw, gameProfile);

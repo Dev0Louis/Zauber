@@ -38,7 +38,7 @@ public class HorseRitual extends Ritual implements ManaPullingRitual {
 
     @Override
     public void tick() {
-        if(age % 5 == 0) {
+        if (age % 5 == 0) {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
         }
     }
@@ -89,10 +89,9 @@ public class HorseRitual extends Ritual implements ManaPullingRitual {
 
         var manaPool = ritualStoneBlockEntity.acquireManaPool(2);
         var horse = getNearestEntity(HorseEntity.class, ritualStonePos, box, world);
-        if(!HorseRitual.isCallGoatHorn(ritualItemStack) || manaPool.isEmpty() || horse.isEmpty()) return null;
+        if (!HorseRitual.isCallGoatHorn(ritualItemStack) || manaPool.isEmpty() || horse.isEmpty()) return null;
         return new HorseRitual(world, ritualStoneBlockEntity, manaPool.get(), horse.get());
     }
-
 
 
     public static boolean isCallGoatHorn(@Nullable ItemStack itemStack) {
@@ -132,7 +131,7 @@ public class HorseRitual extends Ritual implements ManaPullingRitual {
         double distance = -1.0;
         T entity = null;
 
-        for(T entity2 : entities) {
+        for (T entity2 : entities) {
             if (!predicate.test(entity2)) continue;
             double e = entity2.squaredDistanceTo(x, y, z);
             if (distance == -1.0 || e < distance) {

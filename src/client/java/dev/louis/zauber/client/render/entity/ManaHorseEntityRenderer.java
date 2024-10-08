@@ -64,7 +64,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
             if (world.isOutOfHeightLimit(mutable)) break;
             var blockState = mobEntity.getWorld().getBlockState(mutable);
             var canSpellCircleRenderOn = blockState.isSolidSurface(world, mutable, mobEntity, Direction.UP);
-            if(canSpellCircleRenderOn) {
+            if (canSpellCircleRenderOn) {
                 hasFoundBlock = true;
                 break;
             }
@@ -107,7 +107,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
 
     @Override
     protected boolean isShaking(HorseEntity entity) {
-        return ((ManaHorseEntity)entity).willDisappearSoon();
+        return ((ManaHorseEntity) entity).willDisappearSoon();
     }
 
     @Nullable

@@ -126,7 +126,6 @@ public class RitualStoneBlock extends BlockWithEntity implements BlockWithElemen
         private int age;
 
 
-
         public CustomHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
             this.ritualPlate = new BlockDisplayElement(this.getState(world, initialBlockState));
             final float xSize = 0.8f;

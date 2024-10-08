@@ -17,7 +17,8 @@ public class ProjectileEntityRendererMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;getEntityCutout(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/render/RenderLayer;")
     )
     public RenderLayer makeBlueArrowEntityRendererChooseOwnRenderlayer(Identifier texture, Operation<RenderLayer> original) {
-        if (((Object) this) instanceof BlueArrowEntityRenderer entityRenderer) return entityRenderer.getRenderLayer(texture);
+        if (((Object) this) instanceof BlueArrowEntityRenderer entityRenderer)
+            return entityRenderer.getRenderLayer(texture);
         return original.call(texture);
     }
 }

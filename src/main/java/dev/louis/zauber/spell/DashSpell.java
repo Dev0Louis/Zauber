@@ -19,7 +19,7 @@ public class DashSpell extends Spell {
 
     @Override
     public void cast() {
-        if(this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
+        if (this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
             serverPlayer.setInvisible(true);
             serverPlayer.setInvulnerable(true);
             serverPlayer.setNoDrag(true);
@@ -36,8 +36,8 @@ public class DashSpell extends Spell {
 
     @Override
     public void tick() {
-        if(getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            if(serverPlayer.getVelocity().lengthSquared() < 0.3 && age > 2) {
+        if (getCaster() instanceof ServerPlayerEntity serverPlayer) {
+            if (serverPlayer.getVelocity().lengthSquared() < 0.3 && age > 2) {
                 stop();
                 return;
             }

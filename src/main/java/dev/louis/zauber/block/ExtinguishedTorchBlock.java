@@ -33,7 +33,7 @@ public class ExtinguishedTorchBlock extends AbstractTorchBlock implements Polyme
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return state;
+        if (Zauber.isClientModded(player)) return state;
         return Blocks.REDSTONE_TORCH.getDefaultState().with(RedstoneTorchBlock.LIT, false);
     }
 

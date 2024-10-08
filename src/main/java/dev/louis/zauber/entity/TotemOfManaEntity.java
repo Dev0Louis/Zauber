@@ -5,7 +5,9 @@ import dev.louis.nebula.api.NebulaPlayer;
 import dev.louis.zauber.item.TotemOfIceItem;
 import dev.louis.zauber.item.ZauberItems;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.entity.*;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
@@ -28,7 +30,8 @@ public class TotemOfManaEntity extends FollowingEntity {
                 TrinketsApi.getTrinketComponent(this.getOwner()).ifPresent(component -> {
                     component.getEquipped(ZauberItems.TOTEM_OF_MANA)
                             .stream().map(Pair::getRight).filter(stack -> stack.getDamage() + 1 < stack.getMaxDamage()).findAny().ifPresent(stack -> {
-                                stack.damage(1, (ServerWorld) this.getWorld(), this.getOwner() instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null, item -> {});
+                                stack.damage(1, (ServerWorld) this.getWorld(), this.getOwner() instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null, item -> {
+                                });
                                 player.getManaManager().addMana(1);
                             });
                 });

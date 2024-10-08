@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
-    @Shadow public abstract void readCustomDataFromNbt(NbtCompound nbt);
+    @Shadow
+    public abstract void readCustomDataFromNbt(NbtCompound nbt);
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -20,18 +21,19 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @Override
     public boolean isGlowing() {
-        if(this.getWorld().isClient() && this.isTargetedPlayer()) return true;
+        if (this.getWorld().isClient() && this.isTargetedPlayer()) return true;
         return super.isGlowing();
     }
 
     @Override
     public int getTeamColorValue() {
-        if(this.getWorld().isClient() && this.isTargetedPlayer()) return ConfigManager.getClientConfig().targetingColor().getRGB();
+        if (this.getWorld().isClient() && this.isTargetedPlayer())
+            return ConfigManager.getClientConfig().targetingColor().getRGB();
         return super.getTeamColorValue();
     }
 
     private boolean isTargetedPlayer() {
-        if(ZauberClient.isPlayerTargetable(ZauberClient.playerInView)) {
+        if (ZauberClient.isPlayerTargetable(ZauberClient.playerInView)) {
             return (Object) this == ZauberClient.playerInView;
         }
         return false;

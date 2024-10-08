@@ -1,26 +1,26 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.SpellType;
-import net.minecraft.entity.player.PlayerEntity;
+import dev.louis.nebula.api.spell.Spell;
+import dev.louis.nebula.api.spell.SpellSource;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 
 public class PushSpell extends EntitiyTargetingSpell {
-
-    public PushSpell(SpellType<?> spellType, PlayerEntity caster) {
-        super(spellType, caster);
-    }
-
     @Override
-    public void cast() {
-        var pulledPlayer = castedOn();
-        if(pulledPlayer == null)return;
-        Vec3d velocity = this.getCaster().getPos().subtract(pulledPlayer.getPos()).normalize().negate();
-        pulledPlayer.setVelocity(velocity);
-        pulledPlayer.velocityModified = true;
-    }
+    public void cast(SpellSource<LivingEntity> source) {
+        source.getManaPool().ifPresent(manaPool -> {
+            getTargetedEntity(source).ifPresent(pulled -> {
+                try(Transaction t1 = Transaction.openOuter()) {
+                    var extraction = manaPool.extractMana(2, t1);
+                    if (extraction < 2) return;
 
-    @Override
-    public int getDuration() {
-        return 0;
+                    Vec3d velocity = source.getPos().subtract(pulled.getPos()).normalize().negate();
+                    pulled.setVelocity(velocity);
+                    pulled.velocityModified = true;
+                    t1.commit();
+                }
+            });
+        });
     }
 }

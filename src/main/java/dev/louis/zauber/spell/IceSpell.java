@@ -21,11 +21,7 @@ public class IceSpell extends AreaEffectSpell {
 
     @Override
     protected void affect(Entity entity) {
-        entity.setVelocity(Vec3d.ZERO);
-        entity.velocityModified = true;
-        entity.setFrozenTicks(100);
-        entity.extinguishWithSound();
-        super.affect(entity);
+
     }
 
     @Override

@@ -136,7 +136,7 @@ public class SmeltingRitual extends Ritual {
         ItemStack ritualItemStack = ritualStoneBlockEntity.getStoredStack();
         var fuelTime = getFuelTime(ritualItemStack.getItem());
 
-        if(fuelTime.isEmpty()) return null;
+        if (fuelTime.isEmpty()) return null;
 
         ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);
         EffectHelper.playBreakItemEffect((ServerWorld) world, ritualStoneBlockEntity.getPos(), ritualItemStack);

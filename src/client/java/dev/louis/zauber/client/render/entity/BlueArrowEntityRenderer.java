@@ -22,7 +22,6 @@ public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<Persistent
     }
 
 
-
     @Override
     public void vertex(
             MatrixStack.Entry matrix,

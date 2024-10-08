@@ -1,4 +1,3 @@
-
 package dev.louis.zauber.client.keybind;
 
 
@@ -13,8 +12,8 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- The SpellKeybinds class stores a mapping between spell types and key bindings.
- It allows for easy retrieval of the key binding associated with a specific spell type.
+ * The SpellKeybinds class stores a mapping between spell types and key bindings.
+ * It allows for easy retrieval of the key binding associated with a specific spell type.
  */
 @Environment(EnvType.CLIENT)
 public class SpellKeybindManager {
@@ -25,7 +24,7 @@ public class SpellKeybindManager {
     /**
      * Sets the key binding associated with a specific spell type.
      *
-     * @param spellType the spell type to associate with the key binding
+     * @param spellType  the spell type to associate with the key binding
      * @param keyBinding the key binding to associate with the spell type
      */
     public void setSpellKeyBinding(SpellType<? extends Spell> spellType, KeyBinding keyBinding) {
@@ -39,9 +38,9 @@ public class SpellKeybindManager {
      * @param spellType the spell type to retrieve the key binding for
      * @return an Optional containing the key binding associated with the spell type, or an empty Optional
      */
-    public Optional<KeyBinding> getKey(@NotNull SpellType<? extends Spell> spellType){
+    public Optional<KeyBinding> getKey(@NotNull SpellType<? extends Spell> spellType) {
         KeyBinding keyBinding = keyBindings.get(spellType);
-        if(keyBinding==null)return Optional.empty();
+        if (keyBinding == null) return Optional.empty();
         return Optional.of(keyBinding);
     }
 }

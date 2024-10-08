@@ -18,9 +18,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -82,7 +80,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
             this.fail();
             return;
         }
-        if(ritual.shouldStop()) {
+        if (ritual.shouldStop()) {
             this.state = State.INACTIVE;
             ritual.finish();
             ritual = null;
@@ -182,7 +180,6 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     }
 
 
-
     private void tryEasterEgg(PlayerEntity player, ItemStack itemStack) {
         if (itemStack.isOf(Items.NETHER_WART) && ArrayUtils.contains(RAI_NAMES, itemStack.getName().getString())) {
             player.sendMessage(Text.literal("Zauber is not a rites ripoff...").setStyle(Style.EMPTY.withColor(Formatting.GRAY)), false);
@@ -234,7 +231,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
 
     protected void spawnConnectionParticle() {
         final Vec3d ritualPos = pos.toCenterPos();
-        if(world.getTime() % 15 == 0 && ritual != null) {
+        if (world.getTime() % 15 == 0 && ritual != null) {
 
             ritual.getConnections().forEach(position -> {
                 spawnConnectionParticles(position, ritualPos);

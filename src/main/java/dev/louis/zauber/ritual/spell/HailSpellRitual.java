@@ -28,7 +28,7 @@ public class HailSpellRitual extends Ritual {
 
     @Override
     public void tick() {
-        if(age % 5 == 0) {
+        if (age % 5 == 0) {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
         }
     }
@@ -62,7 +62,8 @@ public class HailSpellRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var optionalItemSacrificer = ritualStoneBlockEntity.getItemSacrificers().filter(itemSacrificer -> itemSacrificer.getStoredStack().isOf(ZauberItems.HEART_OF_THE_ICE)).findAny();
-        if(!SpellBookItem.getSpellType(ritualItemStack).map(spellType -> spellType.equals(Zauber.Spells.ICE)).orElse(false) || optionalItemSacrificer.isEmpty()) return null;
+        if (!SpellBookItem.getSpellType(ritualItemStack).map(spellType -> spellType.equals(Zauber.Spells.ICE)).orElse(false) || optionalItemSacrificer.isEmpty())
+            return null;
         return new HailSpellRitual(world, ritualStoneBlockEntity, optionalItemSacrificer.get().getPos());
     }
 }

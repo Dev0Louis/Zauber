@@ -128,7 +128,7 @@ public class HeartOfTheIceRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         List<ItemStack> ice = ritualStoneBlockEntity.getAvailableItemStacks().filter(itemStack -> itemStack.isOf(Items.ICE)).toList();
-        if(!(ritualItemStack.isOf(Items.HEART_OF_THE_SEA)) || ice.size() < 4) return null;
+        if (!(ritualItemStack.isOf(Items.HEART_OF_THE_SEA)) || ice.size() < 4) return null;
         return new HeartOfTheIceRitual(world, ritualStoneBlockEntity);
     }
 }

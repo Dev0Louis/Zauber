@@ -33,8 +33,8 @@ public class SoulHornItem extends Item implements PolymerItem, PolymerKeepModel,
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(user instanceof ServerPlayerEntity serverUser && !user.getItemCooldownManager().isCoolingDown(this)) {
-            if(!Zauber.isClientModded(serverUser)) return TypedActionResult.fail(user.getStackInHand(hand));
+        if (user instanceof ServerPlayerEntity serverUser && !user.getItemCooldownManager().isCoolingDown(this)) {
+            if (!Zauber.isClientModded(serverUser)) return TypedActionResult.fail(user.getStackInHand(hand));
 
             playSound(world, serverUser);
             NbtComponent nbt = user.getStackInHand(hand).get(DataComponentTypes.ENTITY_DATA);
@@ -55,7 +55,7 @@ public class SoulHornItem extends Item implements PolymerItem, PolymerKeepModel,
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return this;
+        if (Zauber.isClientModded(player)) return this;
         return Items.GOAT_HORN;
     }
 

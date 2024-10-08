@@ -28,14 +28,14 @@ public class ManaRegenerationStatusEffect extends StatusEffect implements Polyme
     public boolean applyUpdateEffect(LivingEntity entity, int amplifier) {
         if (!entity.getWorld().isClient() && entity instanceof PlayerEntity player) {
             ManaManager playerManaManager = player.getManaManager();
-            playerManaManager.addMana(1+amplifier);
+            playerManaManager.addMana(1 + amplifier);
         }
         return true;
     }
 
     @Override
     public StatusEffect getPolymerReplacement(ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player))return this;
+        if (Zauber.isClientModded(player)) return this;
         return null;
     }
 }

@@ -9,6 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class PolymerScreenHandlerType<T extends ScreenHandler> extends ScreenHandlerType<T> implements PolymerSyncedObject<ScreenHandlerType<?>> {
     private final ScreenHandlerType<?> fakeScreenHandlerType;
+
     public PolymerScreenHandlerType(Factory<T> factory, FeatureSet requiredFeatures, ScreenHandlerType<?> fakeScreenHandlerType) {
         super(factory, requiredFeatures);
         this.fakeScreenHandlerType = fakeScreenHandlerType;
@@ -16,7 +17,7 @@ public class PolymerScreenHandlerType<T extends ScreenHandler> extends ScreenHan
 
     @Override
     public ScreenHandlerType<?> getPolymerReplacement(ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return this;
+        if (Zauber.isClientModded(player)) return this;
         return fakeScreenHandlerType;
     }
 }

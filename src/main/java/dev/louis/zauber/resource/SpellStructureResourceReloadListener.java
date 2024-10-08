@@ -38,9 +38,6 @@ public class SpellStructureResourceReloadListener implements SimpleSynchronousRe
     }
 
 
-
-
-
     private BlockState[][][] generateArray(StructureTemplate structureTemplate, boolean optimize) {
         // A 3-Dimensional Array which is true at places where the block is occupied (can't be looked through)
         int sizeX = structureTemplate.getSize().getX();
@@ -102,12 +99,6 @@ public class SpellStructureResourceReloadListener implements SimpleSynchronousRe
         var block = blockState.getBlock();
         return blockState.isAir() || !blockState.isSolid() || !blockState.isOpaque() || block instanceof SlabBlock || block instanceof StairsBlock || block instanceof BlockWithEntity;
     }
-
-
-
-
-
-
 
 
     private static BlockState[][][] generate3DArray(StructureTemplate structureTemplate) {

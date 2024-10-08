@@ -17,28 +17,29 @@ import static dev.louis.zauber.duck.ItemStackJuggernautModeDuck.access;
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
 
-    @Shadow public ServerPlayerEntity player;
+    @Shadow
+    public ServerPlayerEntity player;
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/ScreenHandler;disableSyncing()V"),
             method = "onClickSlot", cancellable = true)
     public void onClickSlot(ClickSlotC2SPacket packet, CallbackInfo ci) {
-        if(packet.getSlot() < -1 && packet.getSlot() == -999) return;
+        if (packet.getSlot() < -1 && packet.getSlot() == -999) return;
 
         var modifiedStack = packet.getModifiedStacks();
-        if(modifiedStack.isEmpty())return;
+        if (modifiedStack.isEmpty()) return;
         var size = modifiedStack.size();
 
         boolean shouldCancel = false;
-        if(size == 1) {
+        if (size == 1) {
             ItemStack itemStack = modifiedStack.values().stream().toList().get(0);
             shouldCancel = access(itemStack).zauber$isJuggernautItem();
-        }else if (size == 2) {
+        } else if (size == 2) {
             ItemStack itemStack = modifiedStack.values().stream().toList().get(0);
             ItemStack itemStack2 = modifiedStack.values().stream().toList().get(1);
             shouldCancel = access(itemStack).zauber$isJuggernautItem() || access(itemStack2).zauber$isJuggernautItem();
         }
 
-        if(shouldCancel) {
+        if (shouldCancel) {
             ci.cancel();
             player.currentScreenHandler.syncState();
         }

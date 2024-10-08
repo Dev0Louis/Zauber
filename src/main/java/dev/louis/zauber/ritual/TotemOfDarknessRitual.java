@@ -126,7 +126,7 @@ public class TotemOfDarknessRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var darknessAccumulators = ritualStoneBlockEntity.getFilledDarknessAccumulators().collect(Collectors.toList());
-        if(!(ritualItemStack.isOf(Items.TOTEM_OF_UNDYING)) || darknessAccumulators.isEmpty()) return null;
+        if (!(ritualItemStack.isOf(Items.TOTEM_OF_UNDYING)) || darknessAccumulators.isEmpty()) return null;
         return new TotemOfDarknessRitual(world, ritualStoneBlockEntity, darknessAccumulators);
     }
 }

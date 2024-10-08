@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
-    @Shadow @Nullable public ClientPlayerEntity player;
+    @Shadow
+    @Nullable
+    public ClientPlayerEntity player;
     @Unique
     int spellCooldown = 0;
 
@@ -28,9 +30,9 @@ public abstract class MinecraftClientMixin {
 
         for (SpellType<?> spellType : SpellType.REGISTRY) {
             var optionalKey = ZauberClient.getSpellKeybindManager().getKey(spellType);
-            if(optionalKey.isPresent()) {
+            if (optionalKey.isPresent()) {
                 var key = optionalKey.get();
-                if(key.isPressed()) {
+                if (key.isPressed()) {
                     this.player.getSpellManager().cast(spellType);
                     this.resetSpellCooldown();
                     return;

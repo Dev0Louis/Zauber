@@ -22,8 +22,8 @@ public class HailStormSpell extends BlockTargetingSpell {
     public void tick() {
         World world = caster.getWorld();
         final int size = 8;
-        for (int x = -size; x < size; x+=2) {
-            for (int z = -size; z < size; z+=2) {
+        for (int x = -size; x < size; x += 2) {
+            for (int z = -size; z < size; z += 2) {
                 if (world.getRandom().nextFloat() < 0.75f) continue;
                 HailStoneEntity hailStoneEntity = HailStoneEntity.TYPE.create(world);
                 hailStoneEntity.setOwner(this.getCaster());

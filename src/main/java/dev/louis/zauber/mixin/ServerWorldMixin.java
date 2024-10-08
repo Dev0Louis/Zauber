@@ -33,7 +33,8 @@ import static dev.louis.zauber.block.SpellTableBlock.MAX_CHARGE;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin {
-    @Shadow protected abstract boolean processBlockEvent(BlockEvent event);
+    @Shadow
+    protected abstract boolean processBlockEvent(BlockEvent event);
 
     @Inject(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LightningEntity;setCosmetic(Z)V"), locals = LocalCapture.CAPTURE_FAILHARD)
     public void onNaturalLightningImpact(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci, ChunkPos chunkPos, boolean bl, int i, int j, Profiler profiler, BlockPos blockPos, LocalDifficulty localDifficulty, boolean bl2, LightningEntity lightningEntity) {
@@ -46,14 +47,14 @@ public abstract class ServerWorldMixin {
         final World world = chunk.getWorld();
         BlockPos.stream(box).forEach(pos -> {
             boolean isSpellTable = world.getBlockState(pos).getBlock() == ZauberBlocks.SPELL_TABLE;
-            if(isSpellTable) {
+            if (isSpellTable) {
                 spellTableList.get().add(pos.toImmutable());
             }
         });
         final int size = spellTableList.get().size();
         spellTableList.get().forEach(pos -> {
             BlockState blockState = world.getBlockState(pos);
-            int charge = Math.min(blockState.get(CHARGE)+(world.getRandom().nextBetween(9, 21)/size), MAX_CHARGE);
+            int charge = Math.min(blockState.get(CHARGE) + (world.getRandom().nextBetween(9, 21) / size), MAX_CHARGE);
             blockState = blockState.with(CHARGE, charge);
             world.setBlockState(pos, blockState);
         });

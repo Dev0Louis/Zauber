@@ -127,7 +127,7 @@ public class HeartOfTheSeaRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         List<ItemStack> prismarineCrystals = ritualStoneBlockEntity.getAvailableItemStacks().filter(itemStack -> itemStack.isOf(Items.PRISMARINE_CRYSTALS)).toList();
-        if(!(ritualItemStack.isOf(Items.NAUTILUS_SHELL)) || prismarineCrystals.size() < 4) return null;
+        if (!(ritualItemStack.isOf(Items.NAUTILUS_SHELL)) || prismarineCrystals.size() < 4) return null;
         return new HeartOfTheSeaRitual(world, ritualStoneBlockEntity);
     }
 }

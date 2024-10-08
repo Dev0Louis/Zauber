@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import static dev.louis.zauber.block.SpellTableBlock.MAX_CHARGE;
 import static dev.louis.zauber.block.SpellTableBlock.MIN_CHARGE;
 
-public class SpellTableScreenHandler extends ScreenHandler{
+public class SpellTableScreenHandler extends ScreenHandler {
     private final ScreenHandlerContext context;
     private final Property selectedRecipe = Property.create();
     private final World world;
@@ -42,8 +42,9 @@ public class SpellTableScreenHandler extends ScreenHandler{
     final Slot bookInputSlot;
     final Slot heartInputSlot;
     final Slot outputSlot;
-    Runnable contentsChangedListener = () -> {};
-    public final Inventory input = new SimpleInventory(2){
+    Runnable contentsChangedListener = () -> {
+    };
+    public final Inventory input = new SimpleInventory(2) {
         @Override
         public void markDirty() {
             super.markDirty();
@@ -65,7 +66,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
         this.world = playerInventory.player.getWorld();
         this.bookInputSlot = this.addSlot(new Slot(this.input, 0, 20, 33));
         this.heartInputSlot = this.addSlot(new Slot(this.input, 1, 20, 53));
-        this.outputSlot = this.addSlot(new Slot(this.output, 1, 143, 33){
+        this.outputSlot = this.addSlot(new Slot(this.output, 1, 143, 33) {
 
             @Override
             public void onQuickTransfer(ItemStack newItem, ItemStack original) {
@@ -79,8 +80,9 @@ public class SpellTableScreenHandler extends ScreenHandler{
 
             @Override
             public void onTakeItem(PlayerEntity player, ItemStack stack) {
-                if(!modifyCharge(-stack.getCount())) {
-                    if(player instanceof ServerPlayerEntity p)p.networkHandler.disconnect(Text.of("Please Contact Zauber Mod Dev"));
+                if (!modifyCharge(-stack.getCount())) {
+                    if (player instanceof ServerPlayerEntity p)
+                        p.networkHandler.disconnect(Text.of("Please Contact Zauber Mod Dev"));
                     return;
                 }
 
@@ -100,6 +102,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
                 });
                 super.onTakeItem(player, stack);
             }
+
             private List<ItemStack> getInputStacks() {
                 return List.of(SpellTableScreenHandler.this.bookInputSlot.getStack());
             }
@@ -142,15 +145,15 @@ public class SpellTableScreenHandler extends ScreenHandler{
 
     public boolean modifyCharge(int charge) {
         int newCharge = this.charge.get() + charge;
-        if(newCharge < MIN_CHARGE) {
+        if (newCharge < MIN_CHARGE) {
             this.charge.set(MIN_CHARGE);
             return false;
         }
-        if(newCharge > MAX_CHARGE) {
+        if (newCharge > MAX_CHARGE) {
             this.charge.set(MAX_CHARGE);
             return false;
         }
-        if(newCharge == MIN_CHARGE) this.availableRecipes.clear();
+        if (newCharge == MIN_CHARGE) this.availableRecipes.clear();
 
         this.charge.set(newCharge);
         return true;
@@ -258,7 +261,7 @@ public class SpellTableScreenHandler extends ScreenHandler{
             Item item = itemStack2.getItem();
             itemStack = itemStack2.copy();
             if (slot == 2) {
-                if(!isChargeValid(this.charge.get()-itemStack2.getCount()))return ItemStack.EMPTY;
+                if (!isChargeValid(this.charge.get() - itemStack2.getCount())) return ItemStack.EMPTY;
                 item.onCraftByPlayer(itemStack2, player.getWorld(), player);
                 if (!this.insertItem(itemStack2, 2, 38, true)) {
                     return ItemStack.EMPTY;

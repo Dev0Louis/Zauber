@@ -14,8 +14,9 @@ public abstract class BlockTargetingSpell extends Spell {
     public BlockTargetingSpell(SpellType<?> spellType, PlayerEntity caster) {
         super(spellType, caster);
         var hitResult = caster.raycast(ConfigManager.getServerConfig().blockTargetingDistance(), 0, false);
-        if (hitResult.getType() == HitResult.Type.BLOCK) pos = ((BlockHitResult) hitResult).getBlockPos().offset(((BlockHitResult) hitResult).getSide());
-        //Don't annoy me java!
+        if (hitResult.getType() == HitResult.Type.BLOCK)
+            pos = ((BlockHitResult) hitResult).getBlockPos().offset(((BlockHitResult) hitResult).getSide());
+            //Don't annoy me java!
         else pos = null;
     }
 

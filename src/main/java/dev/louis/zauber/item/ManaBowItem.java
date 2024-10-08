@@ -12,7 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class ManaBowItem extends BowItem implements PolymerItem, PolymerKeepModel, PolymerClientDecoded  {
+public class ManaBowItem extends BowItem implements PolymerItem, PolymerKeepModel, PolymerClientDecoded {
     public ManaBowItem(Settings settings) {
         super(settings);
     }

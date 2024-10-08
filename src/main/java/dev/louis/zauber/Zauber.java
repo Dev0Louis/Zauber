@@ -2,6 +2,7 @@ package dev.louis.zauber;
 
 import com.mojang.logging.LogUtils;
 import dev.louis.nebula.api.event.SpellCastCallback;
+import dev.louis.nebula.api.event.SpellCastEvent;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellType;
 import dev.louis.zauber.block.TrappingBedBlock;
@@ -39,6 +40,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -128,21 +130,26 @@ public class Zauber implements ModInitializer {
     public void onInitialize() {
         ConfigManager.loadServerConfig();
         ResourcePackManager.init();
-        //TODO:REMOVE
-        ServerTickEvents.START_SERVER_TICK.register(server -> {
-            if(server.getPlayerManager().getPlayerList().isEmpty() || server.getOverworld().getTime() % 100 != 0)return;
-           ;
-            ItemStack itemStack = ZauberItems.LOST_BOOK.getDefaultStack();
-            itemStack.set(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(LostBookType.LOST_BOOKS.get(0).id()));
-            server.getPlayerManager().getPlayerList().get(0).getInventory().offerOrDrop(itemStack);
 
-            server.getPlayerManager().getPlayerList().get(0).sendMessage(Text.literal("\u0042")
-                    .setStyle(Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "lost_book")))
-                    .append(
-                            Text.literal("ABCDEFGHI").setStyle(Style.EMPTY.withFont(Style.DEFAULT_FONT_ID))
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            //TODO:REMOVE
+            ServerTickEvents.START_SERVER_TICK.register(server -> {
+                if (server.getPlayerManager().getPlayerList().isEmpty() || server.getOverworld().getTime() % 100 != 0)
+                    return;
+                ;
+                ItemStack itemStack = ZauberItems.LOST_BOOK.getDefaultStack();
+                itemStack.set(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(LostBookType.LOST_BOOKS.get(0).id()));
+                server.getPlayerManager().getPlayerList().get(0).getInventory().offerOrDrop(itemStack);
 
-                    ));
-        });
+                server.getPlayerManager().getPlayerList().get(0).sendMessage(Text.literal("\u0042")
+                        .setStyle(Style.EMPTY.withFont(Identifier.of(Zauber.MOD_ID, "lost_book")))
+                        .append(
+                                Text.literal("ABCDEFGHI").setStyle(Style.EMPTY.withFont(Style.DEFAULT_FONT_ID))
+
+                        ));
+            });
+        }
+
         ZauberCriteria.init();
         ZauberPotionTags.init();
 
@@ -158,8 +165,6 @@ public class Zauber implements ModInitializer {
             context.networkHandler().completeTask(OptionSyncTask.KEY);
         });
 
-        PolymerNetworking.registerCommonSimple(ICanHasZauberPayload.ID, POLYMER_NETWORK_VERSION, ICanHasZauberPayload.CODEC);
-
         Spells.init();
         ZauberRecipes.init();
         ZauberItems.init();
@@ -167,7 +172,7 @@ public class Zauber implements ModInitializer {
         ZauberDataComponentTypes.init();
         ZauberPointOfInterestTypes.init();
 
-        SpellCastCallback.EVENT.register((playerEntity, spell) -> {
+        SpellCastEvent.AFTER.register((playerEntity, spell) -> {
             if (playerEntity instanceof ServerPlayerEntity serverPlayer) {
                 ZauberCriteria.SPELL_CAST.trigger(serverPlayer, spell.getType());
             }
@@ -176,7 +181,7 @@ public class Zauber implements ModInitializer {
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             if (world.isClient) return ActionResult.PASS;
-            var state =  world.getBlockState(hitResult.getBlockPos());
+            var state = world.getBlockState(hitResult.getBlockPos());
             if (player.getStackInHand(hand).isOf(ZauberItems.HEART_OF_THE_DARKNESS) && state.isOf(Blocks.BLACK_BED)) {
                 world.setBlockState(hitResult.getBlockPos(), TrappingBedBlock.getStateFor(state), Block.FORCE_STATE);
                 var offsetBlockPos = hitResult.getBlockPos().offset(TrappingBedBlock.getDirectionTowardsOtherPart(state.get(BedBlock.PART), state.get(BedBlock.FACING)));
@@ -243,7 +248,8 @@ public class Zauber implements ModInitializer {
         LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
             Identifier gameplayFishingJunkId = Identifier.of("minecraft", "gameplay/fishing/junk");
             if (key.getValue().equals(gameplayFishingJunkId)) {
-                tableBuilder.modifyPools(tableBuilder1 -> {;
+                tableBuilder.modifyPools(tableBuilder1 -> {
+                    ;
                     LostBookType.LOST_BOOKS.forEach(lostBookType -> {
                         tableBuilder1.
                                 with(ItemEntry.builder(ZauberItems.LOST_BOOK)
@@ -278,7 +284,6 @@ public class Zauber implements ModInitializer {
 
     public static <T extends Entity> void registerEntity(String path, EntityType<T> type) {
         Registry.register(Registries.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, path), type);
-        PolymerEntityUtils.registerType(type);
     }
 
     public static class Spells {
@@ -286,44 +291,7 @@ public class Zauber implements ModInitializer {
         public static List<SpellType<?>> ZAUBER_SPELLS = new ArrayList<>();
         public static List<SpellType<?>> targetingSpells;
 
-        public static SpellType<ArrowSpell> ARROW = register("arrow", ArrowSpell::new, 2);
-        public static SpellType<JuggernautSpell> JUGGERNAUT = register("juggernaut", JuggernautSpell::new, 20);
-        public static SpellType<PullSpell> PULL = register("pull", PullSpell::new, 2);
-        public static SpellType<PushSpell> PUSH = register("push", PushSpell::new, 2);
-        public static SpellType<RewindSpell> REWIND = register("rewind", RewindSpell::new, 3);
-        public static SpellType<SuicideSpell> SUICIDE = register("suicide", SuicideSpell::new, 1);
-        public static SpellType<TeleportSpell> TELEPORT = register("teleport", TeleportSpell::new, 2);
-        public static SpellType<SupernovaSpell> SUPERNOVA = register("supernova", SupernovaSpell::new, 20);
-        public static SpellType<FireSpell> FIRE = register("fire", FireSpell::new, 2);
-        public static SpellType<IceSpell> ICE = register("ice", IceSpell::new, 2);
-        public static SpellType<HailStormSpell> HAIL_STORM = registerParallelCasting("hail_storm", HailStormSpell::new, 3);
-        public static SpellType<WindExpelSpell> WIND_EXPEL = register("wind_expel", WindExpelSpell::new, 5);
-        public static SpellType<SproutSpell> SPROUT = register("sprout", SproutSpell::new, 2);
-        public static SpellType<DashSpell> DASH = register("dash", DashSpell::new, 4);
-        public static SpellType<VengeanceSpell> VENGEANCE = register("vengeance", VengeanceSpell::new, 2);
-        public static SpellType<ConjoureFangSpell> CONJOURE_FANG = register("conjoure_fang", ConjoureFangSpell::new, 2);
 
-
-        public static <T extends Spell> SpellType<T> registerNoLearning(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
-            return SpellType.register(
-                    Identifier.of(MOD_ID, spellName),
-                    SpellType.Builder.create(spellFactory, mana).needsLearning(false)
-            );
-        }
-
-        public static <T extends Spell> SpellType<T> registerParallelCasting(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
-            SpellType<T> spellType = SpellType.register(Identifier.of(MOD_ID, spellName), SpellType.Builder.create(spellFactory, mana).parallelCast());
-            ZAUBER_SPELLS.add(spellType);
-            SPELLBOOKS.add(SpellBookItem.createSpellBook(spellType));
-            return spellType;
-        }
-
-        public static <T extends Spell> SpellType<T> register(String spellName, SpellType.SpellFactory<T> spellFactory, int mana) {
-            SpellType<T> spellType = SpellType.register(Identifier.of(MOD_ID, spellName), SpellType.Builder.create(spellFactory, mana));
-            ZAUBER_SPELLS.add(spellType);
-            SPELLBOOKS.add(SpellBookItem.createSpellBook(spellType));
-            return spellType;
-        }
 
         public static void init() {
             targetingSpells = List.of(Spells.PULL, Spells.PUSH, Spells.TELEPORT);
@@ -331,7 +299,7 @@ public class Zauber implements ModInitializer {
     }
 
     public static boolean isClientModded(@Nullable ServerPlayerEntity player) {
-        if(player != null && player.networkHandler != null) {
+        if (player != null && player.networkHandler != null) {
             var version = PolymerServerNetworking.getSupportedVersion(player.networkHandler, ICanHasZauberPayload.ID.id());
             return version == POLYMER_NETWORK_VERSION;
         }

@@ -77,7 +77,7 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
 
     @Override
     public void onDeath(DamageSource damageSource) {
-        if(this.getWorld().isClient()) {
+        if (this.getWorld().isClient()) {
             this.getWorld().addParticle(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY() + 2.0, this.getZ(), 0.0, 0.0, 0.0);
         }
 
@@ -150,7 +150,7 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     @Override
     public LivingEntity getControllingPassenger() {
         var entity = this.getFirstPassenger();
-        if(entity instanceof LivingEntity livingEntity) {
+        if (entity instanceof LivingEntity livingEntity) {
             //Check if livingEntity is owner.
             return livingEntity;
         }
@@ -185,7 +185,7 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
         if (strength >= 90) {
             this.jumpStrength = 1.0F;
         } else {
-            this.jumpStrength = 0.4F + 0.4F * (float)strength / 90.0F;
+            this.jumpStrength = 0.4F + 0.4F * (float) strength / 90.0F;
         }
     }
 

@@ -32,7 +32,7 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyReturnValue(
             method = "isPushable", at = @At("RETURN"))
     public boolean dashingPlayersAreNotPushable(boolean original) {
-        return original || ((Object)this instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(Zauber.Spells.DASH));
+        return original || ((Object) this instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(Zauber.Spells.DASH));
     }
 
     @Inject(

@@ -13,7 +13,7 @@ public class ClientConfigManager extends ConfigManager {
                 .categories(generateCategories())
                 .save(() -> {
                     write(serverConfig, SERVER_PATH);
-                    if(clientConfig != null) {
+                    if (clientConfig != null) {
                         write(clientConfig, CLIENT_PATH);
                     }
                 })

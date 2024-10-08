@@ -21,7 +21,7 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
 
     @Override
     public void tick() {
-        if(age % 5 == 0) {
+        if (age % 5 == 0) {
             world.playSound(null, this.pos, SoundEvents.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, -4);
         }
         if (age % 8 == 0) {
@@ -58,7 +58,7 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         Optional<ManaPool> manaPool = ritualStoneBlockEntity.acquireManaPool(4);
-        if(!isTotem(ritualItemStack) || manaPool.isPresent()) return null;
+        if (!isTotem(ritualItemStack) || manaPool.isPresent()) return null;
         return new TotemOfManaRitual(world, ritualStoneBlockEntity);
     }
 

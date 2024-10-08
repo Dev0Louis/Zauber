@@ -54,7 +54,7 @@ public class ManaArrowEntity extends PersistentProjectileEntity implements Polym
     }
 
     public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return TYPE;
+        if (Zauber.isClientModded(player)) return TYPE;
         return EntityType.ARROW;
     }
 }

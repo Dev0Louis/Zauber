@@ -29,7 +29,7 @@ public class ZauberPotionEffects {
     }
 
     private static void registerPotionEffects() {
-        MANA_INSTANT_EFFECT = register("instant_mana",  new InstantManaStatusEffect());
+        MANA_INSTANT_EFFECT = register("instant_mana", new InstantManaStatusEffect());
         MANA_REGENERATION_EFFECT = register("mana_regeneration", new ManaRegenerationStatusEffect());
     }
 
@@ -49,12 +49,9 @@ public class ZauberPotionEffects {
     }
 
 
-
-
     private static RegistryEntry.Reference<Potion> register(String path, Potion potion) {
         return Registry.registerReference(Registries.POTION, Identifier.of(Zauber.MOD_ID, path), potion);
     }
-
 
 
     private static RegistryEntry.Reference<StatusEffect> register(String path, StatusEffect entry) {

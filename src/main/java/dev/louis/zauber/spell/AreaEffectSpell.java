@@ -1,7 +1,8 @@
 package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.nebula.api.spell.SpellSource;
+import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -15,39 +16,37 @@ import net.minecraft.util.math.Vec3d;
 
 import static java.lang.Math.*;
 
-public abstract class AreaEffectSpell extends Spell {
+public abstract class AreaEffectSpell implements Spell<LivingEntity> {
     private final ParticleEffect particle;
     protected Box spellCastingBox;
 
     public AreaEffectSpell(
-            SpellType<? extends AreaEffectSpell> spellType,
-            PlayerEntity caster,
             ParticleEffect particle
     ) {
-        super(spellType, caster);
         this.particle = particle;
     }
 
     @Override
-    public void cast() {
-        this.spellCastingBox = getSpellCastingBox(this.getCaster());
+    public void cast(SpellSource<LivingEntity> source) {
+        //TODO: Add Entity way
+        //this.spellCastingBox = getSpellCastingBox(this.getCaster());
     }
 
-    @Override
     public void tick() {
-        super.tick();
-        if(this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
+        /*if (this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
             spawnParticles(serverPlayer.getServerWorld());
             BlockPos.stream(spellCastingBox).forEach(blockPos -> affect(serverPlayer.getServerWorld(), blockPos));
             serverPlayer.getWorld().getOtherEntities(getCaster(), spellCastingBox).forEach(this::affect);
-        }
+        }*/
     }
 
     /**
      * This method can be overridden to run something when an Entity is affected by the spell.
      */
     protected void affect(Entity entity) {
-        if(entity instanceof LivingEntity livingEntity && livingEntity.isMobOrPlayer()) entity.damage(getDamageSource(), this.getDamage());
+        if (entity instanceof LivingEntity livingEntity && livingEntity.isMobOrPlayer()) {
+            //entity.damage(getDamageSource(), this.getDamage());
+        }
     }
 
     protected int getDamage() {
@@ -71,7 +70,7 @@ public abstract class AreaEffectSpell extends Spell {
         final double threshold = 0.4;
         final double minLockRotation = 0.35;
 
-        if(absX + absZ < threshold) {
+        if (absX + absZ < threshold) {
             x = copySign(max(absX, minLockRotation), x);
             z = copySign(max(absZ, minLockRotation), z);
         }
@@ -92,7 +91,7 @@ public abstract class AreaEffectSpell extends Spell {
         }
     }
 
-    public DamageSource getDamageSource() {
-        return this.getCaster().getWorld().getDamageSources().playerAttack(this.getCaster());
-    }
+    //public DamageSource getDamageSource() {
+    //    return this.getCaster().getWorld().getDamageSources().playerAttack(this.getCaster());
+    //}
 }

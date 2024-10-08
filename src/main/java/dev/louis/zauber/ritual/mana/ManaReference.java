@@ -34,7 +34,7 @@ public class ManaReference {
 
     /**
      * @param applier the runnable to apply the mana being pulled out of the reference
-     * @param source the source where this mana reference came from
+     * @param source  the source where this mana reference came from
      */
     public ManaReference(int mana, World world, BlockPos source, IntConsumer applier) {
         this.mana = mana;

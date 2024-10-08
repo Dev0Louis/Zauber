@@ -1,91 +1,31 @@
 package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.Zauber;
-import dev.louis.zauber.config.ConfigManager;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
+import dev.louis.nebula.api.spell.SpellSource;
+import dev.louis.zauber.spell.effect.RewindSpellEffect;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.TeleportTarget;
 
-public class RewindSpell extends Spell {
-    private ServerWorld rewindWorld;
-    private TeleportTarget rewindTarget;
-
-    public RewindSpell(SpellType<?> spellType, PlayerEntity caster) {
-        super(spellType, caster);
-    }
+public class RewindSpell implements Spell<LivingEntity> {
+    private static final float COST = 3;
 
     @Override
-    public void cast() {
-        rewindWorld = (ServerWorld) getCaster().getWorld();
-        rewindTarget = new TeleportTarget(rewindWorld, getCaster().getPos(), getCaster().getVelocity(), getCaster().getYaw(), getCaster().getPitch(), TeleportTarget.NO_OP);
-        Zauber.LOGGER.debug("Player setting rewindTarget to " + rewindTarget.pos() + " and rewindWorld to " + rewindWorld.getRegistryKey().getValue());
-    }
+    public void cast(SpellSource<LivingEntity> source) {
+        if (source.getWorld().isClient()) return;
+        source.getManaPool().ifPresent(manaPool -> {
+            try (Transaction t1 = Transaction.openOuter()) {
+                if (manaPool.extractMana(COST, t1) < COST) return;
+                var caster = source.getCaster();
 
-    @Override
-    public void tick() {
-        super.tick();
-        if (this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            if(age % 10 == 0) playPingSound(serverPlayer);
-        }
-    }
+                var rewindWorld = (ServerWorld) source.getWorld();
+                var rewindTarget = new TeleportTarget(rewindWorld, caster.getPos(), caster.getVelocity(), caster.getYaw(), caster.getPitch(), TeleportTarget.NO_OP);
 
-    @Override
-    public void finish() {
-        if(!this.wasInterrupted && this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            double x = rewindTarget.pos().getX();
-            double y = rewindTarget.pos().getY();
-            double z = rewindTarget.pos().getY();
-
-            this.playRewindSound(serverPlayer);
-            rewindWorld.spawnParticles(
-                    ParticleTypes.REVERSE_PORTAL,
-                    x,
-                    y,
-                    z,
-                    2,
-                    0,
-                    0,
-                    0,
-                    0
-            );
-            Zauber.LOGGER.debug("Player is rewinding to " + rewindTarget.pos() + " in " + rewindWorld.getRegistryKey().getValue());
-            getCaster().teleportTo(rewindTarget);
-        }
-    }
-
-    @Override
-    public int getDuration() {
-        return ConfigManager.getServerConfig().rewindSpellDuration();
-    }
-
-    private void playPingSound(ServerPlayerEntity player) {
-        player.getServerWorld().playSound(
-                null,
-                player.getX(),
-                player.getY(),
-                player.getZ(),
-                SoundEvents.BLOCK_NOTE_BLOCK_BANJO.value(),
-                player.getSoundCategory(),
-                1,
-                -1
-        );
-    }
-
-    private void playRewindSound(ServerPlayerEntity player) {
-        player.getServerWorld().playSound(
-                null,
-                rewindTarget.pos().getX(),
-                rewindTarget.pos().getY(),
-                rewindTarget.pos().getZ(),
-                SoundEvents.ENTITY_ENDERMAN_TELEPORT,
-                player.getSoundCategory(),
-                1,
-                1
-        );
+                RewindSpellEffect spellEffect = new RewindSpellEffect(source.getCaster(), rewindTarget);
+                source.getCaster().startSpellEffect(spellEffect);
+                t1.commit();
+            }
+        });
     }
 }

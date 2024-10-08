@@ -96,7 +96,7 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
         }
         LOST_BOOKS.add(new LostBookType(id, List.of(pages)));
     }
-    
+
     public static LostBookType getRandom(Random random) {
         return LOST_BOOKS.get(random.nextInt(LOST_BOOKS.size()));
     }
@@ -148,7 +148,7 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
                 return super.onButtonClick(player, id);
             }
         };
-}
+    }
 
     @Override
     public Text getDisplayName() {

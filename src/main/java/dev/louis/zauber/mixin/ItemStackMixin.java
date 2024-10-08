@@ -19,18 +19,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin implements ItemStackJuggernautModeDuck, ComponentHolder {
-    @Shadow public abstract void setCount(int count);
+    @Shadow
+    public abstract void setCount(int count);
 
-    @Shadow @Nullable public abstract <T> T set(ComponentType<? super T> type, @Nullable T value);
+    @Shadow
+    @Nullable
+    public abstract <T> T set(ComponentType<? super T> type, @Nullable T value);
 
     @Inject(method = "inventoryTick", at = @At("TAIL"))
     public void removeAfterExpiration(World world, Entity entity, int slot, boolean selected, CallbackInfo ci) {
-        if(world instanceof ServerWorld serverWorld) {
-            if(zauber$isJuggernautItem() && zauber$isInValid(serverWorld)) {
+        if (world instanceof ServerWorld serverWorld) {
+            if (zauber$isJuggernautItem() && zauber$isInValid(serverWorld)) {
                 this.setCount(0);
             }
         }
     }
+
     @Override
     public void zauber$setJuggernautModeTick(long ticks) {
         this.set(ZauberDataComponentTypes.JUGGERNAUT_TICK, new JuggernautTickComponent(ticks));
@@ -55,8 +59,8 @@ public abstract class ItemStackMixin implements ItemStackJuggernautModeDuck, Com
 
     public boolean zauber$isValid(ServerWorld world) {
         long juggernautTicks = zauber$getJuggernautTick();
-        if(juggernautTicks == 0L)return false;
-        return (((ServerWorldAccessor) world).getWorldProperties().getTime()- zauber$getJuggernautTick()) < ConfigManager.getServerConfig().juggernautSpellDuration();
+        if (juggernautTicks == 0L) return false;
+        return (((ServerWorldAccessor) world).getWorldProperties().getTime() - zauber$getJuggernautTick()) < ConfigManager.getServerConfig().juggernautSpellDuration();
     }
 
 

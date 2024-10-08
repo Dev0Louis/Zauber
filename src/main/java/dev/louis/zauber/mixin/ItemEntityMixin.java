@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityMixin extends Entity {
-    @Shadow public abstract ItemStack getStack();
+    @Shadow
+    public abstract ItemStack getStack();
 
     public ItemEntityMixin(EntityType<?> type, World world) {
         super(type, world);

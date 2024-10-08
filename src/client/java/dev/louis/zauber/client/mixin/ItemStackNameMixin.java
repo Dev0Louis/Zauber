@@ -16,11 +16,11 @@ public abstract class ItemStackNameMixin implements ComponentHolder {
     @Inject(method = "getName", at = @At("HEAD"), cancellable = true)
     public void nameMixin(CallbackInfoReturnable<Text> cir) {
         var component = this.get(ZauberDataComponentTypes.STORED_SPELL_TYPE);
-        if(component != null) {
+        if (component != null) {
 
             var splitId = component.spellType().getIdAsString().split(":");
             if (splitId.length < 2) return;
-            cir.setReturnValue(Text.translatable("item."+ splitId[0] + "." + splitId[1] + "_spell_book"));
+            cir.setReturnValue(Text.translatable("item." + splitId[0] + "." + splitId[1] + "_spell_book"));
 
         }
     }

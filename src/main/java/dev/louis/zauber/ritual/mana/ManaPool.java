@@ -16,7 +16,7 @@ public record ManaPool(int expectedMana, Collection<ManaReference> manaReference
     }
 
     public boolean isValid() {
-       return manaReferences.stream().peek(ManaReference::check).noneMatch(ManaReference::isInvalid);
+        return manaReferences.stream().peek(ManaReference::check).noneMatch(ManaReference::isInvalid);
     }
 
     public void apply() {

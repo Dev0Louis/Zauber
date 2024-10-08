@@ -15,7 +15,10 @@ import dev.louis.zauber.client.render.entity.BlueArrowEntityRenderer;
 import dev.louis.zauber.client.render.entity.ManaHorseEntityRenderer;
 import dev.louis.zauber.client.screen.SpellTableScreen;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.entity.*;
+import dev.louis.zauber.entity.ManaArrowEntity;
+import dev.louis.zauber.entity.ManaHorseEntity;
+import dev.louis.zauber.entity.SpellArrowEntity;
+import dev.louis.zauber.entity.ThrownHeartOfTheIceEntity;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.OptionSyncCompletePayload;
 import dev.louis.zauber.networking.OptionSyncPayload;
@@ -42,7 +45,8 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ZauberClient implements ClientModInitializer {
@@ -89,7 +93,8 @@ public class ZauberClient implements ClientModInitializer {
                 });
 
                 if (!sortedList.isEmpty()) {
-                    if (client.currentScreen instanceof AbstractInventoryScreen<?> abstractInventoryScreen && abstractInventoryScreen.hideStatusEffectHud()) return;
+                    if (client.currentScreen instanceof AbstractInventoryScreen<?> abstractInventoryScreen && abstractInventoryScreen.hideStatusEffectHud())
+                        return;
                     RenderSystem.enableBlend();
                     int i = 0;
                     List<Runnable> list = Lists.newArrayListWithExpectedSize(sortedList.size());
@@ -202,7 +207,7 @@ public class ZauberClient implements ClientModInitializer {
             if (entity == null) {
                 return 0.0F;
             } else {
-                return entity.getActiveItem() != stack ? 0.0F : (float)(stack.getMaxUseTime(entity) - entity.getItemUseTimeLeft()) / 20.0F;
+                return entity.getActiveItem() != stack ? 0.0F : (float) (stack.getMaxUseTime(entity) - entity.getItemUseTimeLeft()) / 20.0F;
             }
         });
         ModelPredicateProviderRegistry.register(
@@ -245,7 +250,7 @@ public class ZauberClient implements ClientModInitializer {
         });
     }
 
-    public static void createSpellKeyBind(SpellType<?> spellType, boolean hides){
+    public static void createSpellKeyBind(SpellType<?> spellType, boolean hides) {
         var keybind = KeyBindingHelper.registerKeyBinding(new SpellKeyBinding(spellType, hides));
 
         getSpellKeybindManager().setSpellKeyBinding(spellType, keybind);

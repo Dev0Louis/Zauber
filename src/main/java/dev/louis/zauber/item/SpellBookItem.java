@@ -32,11 +32,11 @@ public class SpellBookItem extends Item implements PolymerItem, PolymerKeepModel
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
         ItemStack itemStack = playerEntity.getStackInHand(hand);
-        if(world.isClient())return TypedActionResult.pass(itemStack);
-        if(hand != Hand.MAIN_HAND)return TypedActionResult.pass(itemStack);
+        if (world.isClient()) return TypedActionResult.pass(itemStack);
+        if (hand != Hand.MAIN_HAND) return TypedActionResult.pass(itemStack);
 
         Optional<RegistryEntry<SpellType<?>>> optionalSpellType = getSpellType(itemStack);
-        if(optionalSpellType.isPresent()) {
+        if (optionalSpellType.isPresent()) {
             playerEntity.getSpellManager().learnSpell(optionalSpellType.get().value());
             itemStack.decrement(1);
             return TypedActionResult.consume(itemStack);
@@ -57,13 +57,13 @@ public class SpellBookItem extends Item implements PolymerItem, PolymerKeepModel
     }
 
     public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return itemStack.getItem();
+        if (Zauber.isClientModded(player)) return itemStack.getItem();
         return Items.BOOK;
     }
 
 
     public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return itemStack;
+        if (Zauber.isClientModded(player)) return itemStack;
         return PolymerItemUtils.createItemStack(itemStack, lookup, player);
     }
 }

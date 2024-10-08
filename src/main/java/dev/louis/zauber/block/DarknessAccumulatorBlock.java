@@ -114,10 +114,10 @@ public class DarknessAccumulatorBlock extends TransparentBlock implements Polyme
 
         @Override
         protected void onTick() {
-            darkness.setBlockState(this.getDarknessState(((BlockBoundAttachment)this.getAttachment()).getBlockState()));
+            darkness.setBlockState(this.getDarknessState(((BlockBoundAttachment) this.getAttachment()).getBlockState()));
             var size = 0.97f;
             darkness.setScale(new Vector3f(size));
-            darkness.setOffset(new Vec3d(-size / 2f , -0.48, -size / 2f));
+            darkness.setOffset(new Vec3d(-size / 2f, -0.48, -size / 2f));
             size = 0.9f;
             this.sculkFloor.setScale(new Vector3f(0.9f, 0.1f, 0.9f));
             this.sculkFloor.setOffset(new Vec3d(-size / 2, -0.49, -size / 2));

@@ -18,15 +18,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
 public abstract class InGameHudMixin {
-    @Shadow protected abstract PlayerEntity getCameraPlayer();
+    @Shadow
+    protected abstract PlayerEntity getCameraPlayer();
 
-    @Shadow @Final private MinecraftClient client;
+    @Shadow
+    @Final
+    private MinecraftClient client;
 
     @Inject(at = @At("RETURN"), method = "renderStatusBars")
-    public void renderStatusBar(DrawContext context, CallbackInfo ci){
+    public void renderStatusBar(DrawContext context, CallbackInfo ci) {
         var playerEntity = this.getCameraPlayer();
         int mana = client.player.getManaManager().getMana();
-        if(isInWater(playerEntity) && mana <= 0) {
+        if (isInWater(playerEntity) && mana <= 0) {
             return;
         }
         var scaledWidth = context.getScaledWindowWidth();
@@ -37,11 +40,11 @@ public abstract class InGameHudMixin {
         int x;
         int y = (scaledHeight - 39 - 10);
 
-        for(int w = 0; w < 10; ++w) {
+        for (int w = 0; w < 10; ++w) {
             x = calculatePosition(mid, n, w);
             ManaDrawer.renderMana(ManaDrawer.RenderType.EMPTY, context, x, y);
 
-            if((w * 2 + 1 < mana)) {
+            if ((w * 2 + 1 < mana)) {
                 ManaDrawer.renderMana(ManaDrawer.RenderType.FULL, context, x, y);
             }
 
@@ -53,9 +56,9 @@ public abstract class InGameHudMixin {
     }
 
     private int calculatePosition(int mid, int n, int w) {
-        if(ConfigManager.getClientConfig().manaDirection() == ManaDirection.RIGHT) {
+        if (ConfigManager.getClientConfig().manaDirection() == ManaDirection.RIGHT) {
             return mid + w * 8 - 9;
-        }else {
+        } else {
             return n - w * 8 - 9;
         }
     }
@@ -70,7 +73,7 @@ public abstract class InGameHudMixin {
 
     @ModifyArg(method = "renderStatusBars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;getHeartRows(I)I"))
     public int modifyVariable(int heartCount) {
-        if(!(MinecraftClient.getInstance().player.getManaManager().getMana()<=0)) {
+        if (!(MinecraftClient.getInstance().player.getManaManager().getMana() <= 0)) {
             heartCount = heartCount + 10;
         }
         return heartCount;

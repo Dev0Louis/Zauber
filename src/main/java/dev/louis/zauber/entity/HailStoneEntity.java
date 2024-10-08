@@ -1,6 +1,5 @@
 package dev.louis.zauber.entity;
 
-import dev.louis.zauber.Zauber;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Blocks;
@@ -64,7 +63,7 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
 
     private void makeBreakEffect() {
         this.playSound(SoundEvents.BLOCK_GLASS_BREAK, 0.03f, 1.1f);
-        ((ServerWorld)this.getWorld()).spawnParticles(
+        ((ServerWorld) this.getWorld()).spawnParticles(
                 new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.ICE.getDefaultState()),
                 this.getX(),
                 this.getY(),
@@ -81,11 +80,11 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
         var damageSource = entity.getDamageSources().create(entity.getDamageSources().freeze().getTypeRegistryEntry().getKey().get(), this.getOwner());
         float damage = BASE_DAMAGE;
 
-        if(entity.getWorld().getBiome(entity.getBlockPos()).value().isCold(entity.getBlockPos())) {
+        if (entity.getWorld().getBiome(entity.getBlockPos()).value().isCold(entity.getBlockPos())) {
             damage = damage * 2;
         }
 
-        if(castedWithIceTotem) {
+        if (castedWithIceTotem) {
             damage = damage * 2;
         }
 

@@ -72,7 +72,7 @@ public class ExtinguishedWallTorchBlock extends ExtinguishedTorchBlock {
         BlockPos blockPos = ctx.getBlockPos();
         Direction[] directions = ctx.getPlacementDirections();
 
-        for(Direction direction : directions) {
+        for (Direction direction : directions) {
             if (direction.getAxis().isHorizontal()) {
                 Direction direction2 = direction.getOpposite();
                 blockState = blockState.with(FACING, direction2);
@@ -113,7 +113,7 @@ public class ExtinguishedWallTorchBlock extends ExtinguishedTorchBlock {
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return state;
+        if (Zauber.isClientModded(player)) return state;
         return Blocks.WALL_TORCH.getDefaultState();
     }
 

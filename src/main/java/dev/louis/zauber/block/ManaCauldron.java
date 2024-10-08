@@ -16,7 +16,10 @@ import net.minecraft.block.*;
 import net.minecraft.block.cauldron.CauldronBehavior;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
+import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -136,7 +139,7 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
         public CustomHolder(BlockState initialBlockState) {
             this.manaFill = this.addElement(new BlockDisplayElement(MANA_FILL_STATE));
             this.manaFill.setOffset(new Vec3d(-0.375, 0, -0.375));
-            this.manaFill.setScale(new Vector3f(0.75f, 0.2f * initialBlockState.get(MANA_LEVEL) + (float)Math.sin(age / 50f) * 0.05f, 0.75f));
+            this.manaFill.setScale(new Vector3f(0.75f, 0.2f * initialBlockState.get(MANA_LEVEL) + (float) Math.sin(age / 50f) * 0.05f, 0.75f));
             this.manaFill.setBlockState(MANA_FILL_STATE);
             this.manaFill.setGlowing(false);
         }
@@ -148,10 +151,10 @@ public class ManaCauldron extends AbstractCauldronBlock implements PolymerBlock,
             this.age++;
             var attachment = this.getAttachment();
             if (attachment == null) throw new IllegalStateException("Attachment is null");
-            var blockBoundAttachment = ((BlockBoundAttachment)attachment);
+            var blockBoundAttachment = ((BlockBoundAttachment) attachment);
             var blockPos = blockBoundAttachment.getBlockPos();
             int manaLevel = blockBoundAttachment.getBlockState().get(MANA_LEVEL);
-            var yOffset = (float)Math.sin(age / 50f) * 0.05f;
+            var yOffset = (float) Math.sin(age / 50f) * 0.05f;
             this.manaFill.setScale(new Vector3f(0.75f, 0.2f * manaLevel + yOffset, 0.75f));
 
             var world = attachment.getWorld();

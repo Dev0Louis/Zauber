@@ -127,7 +127,7 @@ public class HeartOfDarknessRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var darknessAccumulators = ritualStoneBlockEntity.getFilledDarknessAccumulators().collect(Collectors.toList());
-        if(!(ritualItemStack.isOf(Items.HEART_OF_THE_SEA)) || darknessAccumulators.isEmpty()) return null;
+        if (!(ritualItemStack.isOf(Items.HEART_OF_THE_SEA)) || darknessAccumulators.isEmpty()) return null;
         return new HeartOfDarknessRitual(world, ritualStoneBlockEntity, darknessAccumulators);
     }
 }

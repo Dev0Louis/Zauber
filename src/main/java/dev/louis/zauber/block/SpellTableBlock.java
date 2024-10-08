@@ -34,6 +34,7 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
     public static final int MAX_CHARGE = 32;
     public static final int MIN_CHARGE = 0;
     public static final IntProperty CHARGE = IntProperty.of("charge", MIN_CHARGE, MAX_CHARGE);
+
     public SpellTableBlock(AbstractBlock.Settings settings) {
         super(settings);
         setDefaultState(this.getStateManager().getDefaultState().with(CHARGE, MIN_CHARGE));
@@ -44,7 +45,7 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
         if (world.isClient) return ActionResult.SUCCESS;
 
         boolean isModded = Zauber.isClientModded((ServerPlayerEntity) player);
-        if(isModded) player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+        if (isModded) player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
         return ActionResult.CONSUME;
     }
 
@@ -75,9 +76,9 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
     @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         final int charge = state.get(CHARGE);
-        if(charge == MIN_CHARGE)return;
+        if (charge == MIN_CHARGE) return;
         final int r = random.nextInt(MAX_CHARGE);
-        if(r <= charge) {
+        if (r <= charge) {
             spawnRandomParticle(random, world, pos);
             spawnRandomParticle(random, world, pos);
             spawnRandomParticle(random, world, pos);
@@ -89,8 +90,9 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
         double offsetX = random.nextTriangular(0.5, 0.25);
         double offsetZ = random.nextTriangular(0.5, 0.25);
 
-        world.addParticle(ParticleTypes.SOUL, pos.getX()+offsetX, pos.getY()+0.75, pos.getZ()+offsetZ, 0, 0.2*random.nextDouble(), 0);
+        world.addParticle(ParticleTypes.SOUL, pos.getX() + offsetX, pos.getY() + 0.75, pos.getZ() + offsetZ, 0, 0.2 * random.nextDouble(), 0);
     }
+
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
@@ -112,7 +114,7 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-        if(Zauber.isClientModded(player)) return state;
+        if (Zauber.isClientModded(player)) return state;
         return this.getPolymerBlockState(state);
     }
 
