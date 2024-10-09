@@ -9,20 +9,17 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
-public class AreaEffectSpellEntity extends Entity {
-    public static final EntityType<AreaEffectSpellEntity> TYPE = EntityType.Builder
-            .<AreaEffectSpellEntity>create(AreaEffectSpellEntity::new, SpawnGroup.MISC)
+public class AreaSpellEffectEntity extends Entity {
+    public static final EntityType<AreaSpellEffectEntity> TYPE = EntityType.Builder
+            .<AreaSpellEffectEntity>create(AreaSpellEffectEntity::new, SpawnGroup.MISC)
             .dimensions(3, 1)
             .build();
 
@@ -86,12 +83,13 @@ public class AreaEffectSpellEntity extends Entity {
     //Default type
     private Type type = Type.ICE;
 
-    public AreaEffectSpellEntity(EntityType<? extends AreaEffectSpellEntity> entityType, World world) {
+    public AreaSpellEffectEntity(EntityType<? extends AreaSpellEffectEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    public AreaEffectSpellEntity(World world) {
+    public AreaSpellEffectEntity(World world, Type type) {
         super(TYPE, world);
+        this.type = type;
     }
 
     @Override
@@ -104,6 +102,20 @@ public class AreaEffectSpellEntity extends Entity {
         var box = this.getBoundingBox();
         BlockPos.stream(box).forEach(blockPos -> type.affectBlock(this.getWorld(), blockPos));
         this.getWorld().getOtherEntities(this, box).stream().filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast).forEach(this::affect);
+        if (this.getWorld() instanceof ServerWorld serverWorld) {
+            spawnParticles(serverWorld);
+        }
+    }
+
+    protected void spawnParticles(ServerWorld world) {
+        var spellCastingBox = this.getBoundingBox();
+        for (double x = spellCastingBox.minX; x < spellCastingBox.maxX; x = x + 0.7) {
+            for (double y = spellCastingBox.minY; y < spellCastingBox.maxY; y = y + 0.7) {
+                for (double z = spellCastingBox.minZ; z < spellCastingBox.maxZ; z = z + 0.7) {
+                    world.spawnParticles(type.particleEffect, x, y, z, 1, 0.1, 0.1, 0.1, 0.01);
+                }
+            }
+        }
     }
 
     private void affect(LivingEntity entity) {

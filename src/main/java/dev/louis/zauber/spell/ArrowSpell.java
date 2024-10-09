@@ -4,6 +4,7 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
 import dev.louis.nebula.api.spell.quick.SpellException;
 import dev.louis.zauber.entity.SpellArrowEntity;
+import dev.louis.zauber.spell.type.SpellType;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -13,9 +14,13 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class ArrowSpell implements Spell<LivingEntity> {
+public class ArrowSpell extends ZauberSpell<LivingEntity> {
 
     private static final float MANA_CONSUMPTION_PER_ARROW = 0.05f;
+
+    public ArrowSpell() {
+        super(SpellType.SUPERNOVA);
+    }
 
     @Override
     public void cast(SpellSource<LivingEntity> spellSource) throws SpellException {

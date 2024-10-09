@@ -2,7 +2,8 @@ package dev.louis.zauber.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.item.SpellBookItem;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;

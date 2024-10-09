@@ -1,38 +1,30 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.nebula.api.spell.SpellSource;
+import dev.louis.zauber.spell.type.SpellType;
+
+import dev.louis.nebula.api.spell.quick.SpellException;
 import dev.louis.zauber.config.ConfigManager;
-import net.minecraft.entity.player.PlayerEntity;
+import dev.louis.zauber.spell.type.SpellType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 
-public abstract class BlockTargetingSpell extends Spell {
-    protected final BlockPos pos;
+import java.util.Optional;
 
-    public BlockTargetingSpell(SpellType<?> spellType, PlayerEntity caster) {
-        super(spellType, caster);
+public abstract class BlockTargetingSpell extends ZauberSpell<LivingEntity> {
+
+    public BlockTargetingSpell(SpellType<? extends BlockTargetingSpell> spellType) {
+        super(spellType);
+    }
+
+    public BlockHitResult raycastOrThrow(SpellSource<LivingEntity> source) throws SpellException {
+        var caster = source.getCaster();
         var hitResult = caster.raycast(ConfigManager.getServerConfig().blockTargetingDistance(), 0, false);
-        if (hitResult.getType() == HitResult.Type.BLOCK)
-            pos = ((BlockHitResult) hitResult).getBlockPos().offset(((BlockHitResult) hitResult).getSide());
-            //Don't annoy me java!
-        else pos = null;
+        if (hitResult.getType() == HitResult.Type.BLOCK) {
+            return (BlockHitResult) hitResult;
+        }
+        throw new SpellException();
     }
 
-
-    @Override
-    public void cast() {
-
-    }
-
-    //Is not null in cast.
-    public BlockPos pos() {
-        return pos;
-    }
-
-    @Override
-    public boolean isCastable() {
-        return pos() != null && super.isCastable();
-    }
 }

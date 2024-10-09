@@ -4,7 +4,8 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.PlayerTotemData;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;

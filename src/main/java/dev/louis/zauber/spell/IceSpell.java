@@ -1,45 +1,10 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.SpellType;
-import dev.louis.zauber.Zauber;
-import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.entity.TotemOfIceEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import dev.louis.zauber.entity.AreaSpellEffectEntity;
+import dev.louis.zauber.spell.type.SpellType;
 
 public class IceSpell extends AreaEffectSpell {
-    public IceSpell(SpellType<? extends AreaEffectSpell> spellType, PlayerEntity caster) {
-        super(spellType, caster, ParticleTypes.SNOWFLAKE);
-    }
-
-    @Override
-    protected void affect(Entity entity) {
-
-    }
-
-    @Override
-    protected int getDamage() {
-        return Zauber.hasTotem(this.caster, TotemOfIceEntity.TYPE) ? 3 : 1;
-    }
-
-    @Override
-    protected void affect(ServerWorld serverWorld, BlockPos blockPos) {
-        var blockState = serverWorld.getFluidState(blockPos);
-        if (blockState.isIn(FluidTags.WATER)) {
-            serverWorld.setBlockState(blockPos, Blocks.FROSTED_ICE.getDefaultState(), Block.NOTIFY_ALL);
-        }
-        super.affect(serverWorld, blockPos);
-    }
-
-    @Override
-    public int getDuration() {
-        return ConfigManager.getServerConfig().iceSpellDuration();
+    public IceSpell() {
+        super(SpellType.ICE, AreaSpellEffectEntity.Type.ICE);
     }
 }

@@ -1,6 +1,7 @@
 package dev.louis.zauber.client.model;
 
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.Zauber;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.Baker;

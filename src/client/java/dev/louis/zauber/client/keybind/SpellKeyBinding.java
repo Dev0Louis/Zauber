@@ -1,6 +1,7 @@
 package dev.louis.zauber.client.keybind;
 
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.Zauber;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;

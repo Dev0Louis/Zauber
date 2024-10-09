@@ -1,10 +1,9 @@
 package dev.louis.zauber;
 
 import com.mojang.logging.LogUtils;
-import dev.louis.nebula.api.event.SpellCastCallback;
 import dev.louis.nebula.api.event.SpellCastEvent;
-import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.block.TrappingBedBlock;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.component.ZauberDataComponentTypes;
@@ -16,7 +15,6 @@ import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.item.*;
 import dev.louis.zauber.mana.effect.ZauberPotionEffects;
-import dev.louis.zauber.networking.ICanHasZauberPayload;
 import dev.louis.zauber.networking.OptionSyncCompletePayload;
 import dev.louis.zauber.networking.OptionSyncPayload;
 import dev.louis.zauber.networking.OptionSyncTask;
@@ -25,10 +23,8 @@ import dev.louis.zauber.recipe.ZauberRecipes;
 import dev.louis.zauber.resource.SpellStructureResourceReloadListener;
 import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.spell.*;
+import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import dev.louis.zauber.tag.ZauberPotionTags;
-import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
-import eu.pb4.polymer.networking.api.PolymerNetworking;
-import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -44,6 +40,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -64,7 +62,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -129,7 +126,6 @@ public class Zauber implements ModInitializer {
     @Override
     public void onInitialize() {
         ConfigManager.loadServerConfig();
-        ResourcePackManager.init();
 
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
             //TODO:REMOVE
@@ -173,10 +169,11 @@ public class Zauber implements ModInitializer {
         ZauberPointOfInterestTypes.init();
 
         SpellCastEvent.AFTER.register((playerEntity, spell) -> {
-            if (playerEntity instanceof ServerPlayerEntity serverPlayer) {
-                ZauberCriteria.SPELL_CAST.trigger(serverPlayer, spell.getType());
+            if (spell instanceof ZauberSpell<?> zauberSpell) {
+                if (playerEntity instanceof ServerPlayerEntity serverPlayer) {
+                    ZauberCriteria.SPELL_CAST.trigger(serverPlayer, zauberSpell.getType());
+                }
             }
-            return ActionResult.PASS;
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
@@ -222,18 +219,21 @@ public class Zauber implements ModInitializer {
         registerEntity("mana_horse", ManaHorseEntity.TYPE);
         registerEntity("thrown_heart_of_the_ice", ThrownHeartOfTheIceEntity.TYPE);
         registerEntity("mana_arrow", ManaArrowEntity.TYPE);
+        registerEntity("area_effect_spell", AreaSpellEffectEntity.TYPE);
+        registerEntity("hail_storm", HailStormEntity.TYPE);
         FabricDefaultAttributeRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntity.createBaseHorseAttributes());
         //FabricDefaultAttributeRegistry.register(HauntingSword.TYPE, HauntingSword.createBaseAttributes());
         //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_rune"), ZauberParticleTypes.MANA_RUNE);
         //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion"), ZauberParticleTypes.MANA_EXPLOSION);
         //Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "mana_explosion_emitter"), ZauberParticleTypes.MANA_EXPLOSION_EMITTER);
 
+        SpellEffectTypes.init();
         Ritual.init();
         ZauberPotionEffects.init();
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SpellStructureResourceReloadListener());
 
-        Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> SpellBookItem.createSpellBook(Spells.SUPERNOVA)).displayName(Text.of("Zauber"))/*.entries((displayContext, entries) -> {
+        Registry.register(Registries.ITEM_GROUP, Identifier.of(MOD_ID, "zauber"), FabricItemGroup.builder().icon(() -> SpellBookItem.createSpellBook(SpellType.SUPERNOVA)).displayName(Text.of("Zauber")).entries((displayContext, entries) -> {
             ItemStack itemStack = ZauberItems.SOUL_HORN.getDefaultStack();
             NbtComponent nbtComponent = NbtComponent.DEFAULT.apply(nbt -> nbt.putString("id", "zauber:mana_horse"));
 
@@ -241,7 +241,7 @@ public class Zauber implements ModInitializer {
             entries.add(itemStack);
             ZauberItems.IN_CREATIVE_INVENTORY.forEach(entries::add);
             Spells.SPELLBOOKS.forEach(entries::add);
-        })*/.build());
+        }).build());
 
         LostBookType.init();
 
@@ -294,16 +294,12 @@ public class Zauber implements ModInitializer {
 
 
         public static void init() {
-            targetingSpells = List.of(Spells.PULL, Spells.PUSH, Spells.TELEPORT);
+            targetingSpells = List.of(SpellType.PULL, SpellType.PUSH, SpellType.TELEPORT);
         }
     }
 
     public static boolean isClientModded(@Nullable ServerPlayerEntity player) {
-        if (player != null && player.networkHandler != null) {
-            var version = PolymerServerNetworking.getSupportedVersion(player.networkHandler, ICanHasZauberPayload.ID.id());
-            return version == POLYMER_NETWORK_VERSION;
-        }
-        return false;
+        return true;
     }
 
     public static boolean isTrappingBed(World world, BlockPos pos) {

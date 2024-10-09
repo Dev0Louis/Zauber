@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -10,8 +11,11 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
-public class SupernovaSpell implements Spell<LivingEntity> {
+public class SupernovaSpell extends ZauberSpell<LivingEntity> {
 
+    public SupernovaSpell() {
+        super(SpellType.SUPERNOVA);
+    }
 
     @Override
     public void cast(SpellSource<LivingEntity> source) {

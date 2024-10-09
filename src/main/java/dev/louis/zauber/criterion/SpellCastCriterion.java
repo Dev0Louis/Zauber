@@ -2,7 +2,8 @@ package dev.louis.zauber.criterion;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.component.type.StoredSpellComponent;
 import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.advancement.AdvancementCriterion;

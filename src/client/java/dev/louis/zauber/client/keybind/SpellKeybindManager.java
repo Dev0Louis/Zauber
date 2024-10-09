@@ -2,7 +2,8 @@ package dev.louis.zauber.client.keybind;
 
 
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.option.KeyBinding;

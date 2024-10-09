@@ -1,6 +1,7 @@
 package dev.louis.zauber.client.mixin;
 
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.client.ZauberClient;
 import dev.louis.zauber.config.ConfigManager;
 import net.minecraft.client.MinecraftClient;

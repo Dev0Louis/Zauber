@@ -2,11 +2,16 @@ package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
+import dev.louis.zauber.spell.type.SpellType;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 
 public class PushSpell extends EntitiyTargetingSpell {
+    public PushSpell() {
+        super(SpellType.PUSH);
+    }
+
     @Override
     public void cast(SpellSource<LivingEntity> source) {
         source.getManaPool().ifPresent(manaPool -> {

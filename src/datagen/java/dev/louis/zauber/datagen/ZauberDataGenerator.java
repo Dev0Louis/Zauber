@@ -1,7 +1,8 @@
 package dev.louis.zauber.datagen;
 
 import com.google.common.hash.HashCode;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.criterion.RitualFinishedCriterion;

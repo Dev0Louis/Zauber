@@ -3,6 +3,7 @@ package dev.louis.zauber.spell;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -13,7 +14,11 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public abstract class EntitiyTargetingSpell implements Spell<LivingEntity> {
+public abstract class EntitiyTargetingSpell extends ZauberSpell<LivingEntity> {
+
+    public EntitiyTargetingSpell(SpellType<?> type) {
+        super(type);
+    }
 
     public Optional<Entity> getTargetedEntity(SpellSource<LivingEntity> source) {
         if (source.getCaster() instanceof LivingEntity entity) {

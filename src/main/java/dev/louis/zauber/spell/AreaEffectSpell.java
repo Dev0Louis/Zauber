@@ -2,65 +2,37 @@ package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
+import dev.louis.nebula.api.spell.quick.SpellException;
+import dev.louis.zauber.entity.AreaSpellEffectEntity;
 import dev.louis.zauber.spell.type.SpellType;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import static java.lang.Math.*;
 
-public abstract class AreaEffectSpell implements Spell<LivingEntity> {
-    private final ParticleEffect particle;
-    protected Box spellCastingBox;
+public abstract class AreaEffectSpell extends ZauberSpell<LivingEntity> {
+    private final AreaSpellEffectEntity.Type type;
 
     public AreaEffectSpell(
-            ParticleEffect particle
+            SpellType<? extends AreaEffectSpell> spellType,
+            AreaSpellEffectEntity.Type type
     ) {
-        this.particle = particle;
+        super(spellType);
+        this.type = type;
     }
 
     @Override
-    public void cast(SpellSource<LivingEntity> source) {
-        //TODO: Add Entity way
-        //this.spellCastingBox = getSpellCastingBox(this.getCaster());
+    public void cast(SpellSource<LivingEntity> source) throws SpellException {
+        var manaPool = source.getManaPool().orElseThrow(SpellException::new);
+        Spell.drainMana(manaPool, 4);
+        var pos = AreaEffectSpell.getSpellCastingPos(source.getCaster());
+        AreaSpellEffectEntity areaSpellEffectEntity = new AreaSpellEffectEntity(source.getWorld(), type);
+        areaSpellEffectEntity.setPosition(pos);
+        source.getWorld().spawnEntity(areaSpellEffectEntity);
     }
 
-    public void tick() {
-        /*if (this.getCaster() instanceof ServerPlayerEntity serverPlayer) {
-            spawnParticles(serverPlayer.getServerWorld());
-            BlockPos.stream(spellCastingBox).forEach(blockPos -> affect(serverPlayer.getServerWorld(), blockPos));
-            serverPlayer.getWorld().getOtherEntities(getCaster(), spellCastingBox).forEach(this::affect);
-        }*/
-    }
-
-    /**
-     * This method can be overridden to run something when an Entity is affected by the spell.
-     */
-    protected void affect(Entity entity) {
-        if (entity instanceof LivingEntity livingEntity && livingEntity.isMobOrPlayer()) {
-            //entity.damage(getDamageSource(), this.getDamage());
-        }
-    }
-
-    protected int getDamage() {
-        return 1;
-    }
-
-    /**
-     * This method can be overridden to run something when an Entity is affected by the spell.
-     */
-    protected void affect(ServerWorld serverWorld, BlockPos blockPos) {
-    }
-
-    private static Box getSpellCastingBox(PlayerEntity player) {
-        Vec3d playerRotation = player.getRotationVec(1.0f).normalize();
+    private static Vec3d getSpellCastingPos(LivingEntity entity) {
+        Vec3d playerRotation = entity.getRotationVec(1.0f).normalize();
         double x = playerRotation.x;
         double z = playerRotation.z;
 
@@ -78,20 +50,6 @@ public abstract class AreaEffectSpell implements Spell<LivingEntity> {
         final double multiplier = 3;
         final double yOffset = -0.35;
 
-        return player.getBoundingBox().stretch(adjustedRotation).expand(1.0, -0.5, 1.0).offset(adjustedRotation.multiply(multiplier).add(0, yOffset, 0));
+        return entity.getPos().add(adjustedRotation.multiply(multiplier)).add(0, yOffset, 0);
     }
-
-    protected void spawnParticles(ServerWorld world) {
-        for (double x = spellCastingBox.minX; x < spellCastingBox.maxX; x = x + 0.7) {
-            for (double y = spellCastingBox.minY; y < spellCastingBox.maxY; y = y + 0.7) {
-                for (double z = spellCastingBox.minZ; z < spellCastingBox.maxZ; z = z + 0.7) {
-                    world.spawnParticles(particle, x, y, z, 1, 0.1, 0.1, 0.1, 0.01);
-                }
-            }
-        }
-    }
-
-    //public DamageSource getDamageSource() {
-    //    return this.getCaster().getWorld().getDamageSources().playerAttack(this.getCaster());
-    //}
 }

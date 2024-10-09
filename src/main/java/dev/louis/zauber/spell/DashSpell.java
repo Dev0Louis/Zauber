@@ -1,7 +1,8 @@
 package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.helper.SoundHelper;
 import net.minecraft.entity.player.PlayerEntity;

@@ -1,7 +1,8 @@
 package dev.louis.zauber.spell;
 
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.nebula.api.spell.SpellType;
+import dev.louis.zauber.spell.type.SpellType;
+
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.entity.TotemOfDarknessEntity;
 import net.minecraft.entity.mob.EvokerFangsEntity;
