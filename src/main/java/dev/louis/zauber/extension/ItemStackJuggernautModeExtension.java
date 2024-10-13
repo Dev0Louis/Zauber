@@ -1,4 +1,4 @@
-package dev.louis.zauber.duck;
+package dev.louis.zauber.extension;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;

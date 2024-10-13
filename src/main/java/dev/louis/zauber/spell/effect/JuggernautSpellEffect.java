@@ -2,7 +2,7 @@ package dev.louis.zauber.spell.effect;
 
 import com.google.common.collect.ImmutableList;
 import dev.louis.nebula.api.spell.SpellEffect;
-import dev.louis.zauber.duck.ItemStackJuggernautModeExtension;
+import dev.louis.zauber.extension.ItemStackJuggernautModeExtension;
 import dev.louis.zauber.mixin.ServerWorldAccessor;
 import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;

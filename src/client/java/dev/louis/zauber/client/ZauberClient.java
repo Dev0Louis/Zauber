@@ -7,7 +7,7 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.render.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
-import dev.louis.zauber.duck.PlayerEntityExtension;
+import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.networking.TelekinesisPayload;
 import dev.louis.zauber.spell.type.SpellType;
@@ -53,7 +53,6 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

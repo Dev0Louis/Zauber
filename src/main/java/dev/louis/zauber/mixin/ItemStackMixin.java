@@ -3,7 +3,7 @@ package dev.louis.zauber.mixin;
 import dev.louis.zauber.component.item.ZauberDataComponentTypes;
 import dev.louis.zauber.component.item.type.JuggernautTickComponent;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.duck.ItemStackJuggernautModeExtension;
+import dev.louis.zauber.extension.ItemStackJuggernautModeExtension;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentType;
 import net.minecraft.entity.Entity;

@@ -6,6 +6,7 @@
   "mixins": [
     "BowItemMixin",
     "CauldronBehaviorMixin",
+    "EntityMixin",
     "ItemEntityMixin",
     "ItemStackComponentizationFixMixin",
     "ItemStackMixin",

@@ -1,9 +1,11 @@
 package dev.louis.zauber.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.holder.SpellEffectHolder;
+import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -13,11 +15,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Pair;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Slice;
 
+@Debug(export = true)
 @Mixin(value = LivingEntity.class, priority = 1001)
 public abstract class LivingEntityMixin extends Entity {
 
@@ -80,5 +84,13 @@ public abstract class LivingEntityMixin extends Entity {
             }
         }
         return itemStack;
+    }
+
+    @ModifyExpressionValue(
+            method = "computeFallDamage",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;isIn(Lnet/minecraft/registry/tag/TagKey;)Z")
+    )
+    public boolean a(boolean isImmune) {
+        return isImmune || ((EntityExtension) this).isTelekinesed();
     }
 }

@@ -1,6 +1,6 @@
 package dev.louis.zauber.entity;
 
-import dev.louis.zauber.duck.EntityWithFollowingEntities;
+import dev.louis.zauber.extension.EntityWithFollowingEntities;
 import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ItemStack;

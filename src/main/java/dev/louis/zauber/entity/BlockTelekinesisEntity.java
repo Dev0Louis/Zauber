@@ -1,5 +1,6 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.extension.PlayerEntityExtension;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -55,7 +56,7 @@ public class BlockTelekinesisEntity extends TelekinesisEntity implements Ownable
         if (this.getWorld().isClient()) return;
 
         //System.out.println(state);
-        if (owner == null) {
+        if (owner == null || ((PlayerEntityExtension) owner).zauber$getTelekinesisAffected().map(entity -> entity != BlockTelekinesisEntity.this).orElse(true)) {
             FallingBlockEntity fallingBlockEntity = new FallingBlockEntity(
                     this.getWorld(),
                     this.getX(),
@@ -66,15 +67,14 @@ public class BlockTelekinesisEntity extends TelekinesisEntity implements Ownable
             fallingBlockEntity.setFallingBlockPos(this.getBlockPos());
             this.getWorld().spawnEntity(fallingBlockEntity);
             this.discard();
-            return;
         }
 
 
-        var target = this.owner.getEyePos().add(this.owner.getRotationVector().normalize().multiply(6).add(0, -.5, 0));
+        /*var target = this.owner.getEyePos().add(this.owner.getRotationVector().normalize().multiply(6).add(0, -.5, 0));
         this.setVelocity(this.getVelocity().multiply(0.75));
         var vel = target.subtract(this.getPos()).multiply(0.1);
         this.addVelocity(vel);
-        this.move(MovementType.SELF, this.getVelocity());
+        this.move(MovementType.SELF, this.getVelocity());*/
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.mojang.datafixers.util.Either;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.criterion.ZauberCriteria;
-import dev.louis.zauber.duck.EntityWithFollowingEntities;
+import dev.louis.zauber.extension.EntityWithFollowingEntities;
 import dev.louis.zauber.entity.FollowingEntity;
 import dev.louis.zauber.helper.SoundHelper;
 import net.minecraft.entity.player.PlayerEntity;

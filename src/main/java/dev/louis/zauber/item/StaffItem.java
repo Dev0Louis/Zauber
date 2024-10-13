@@ -1,6 +1,7 @@
 package dev.louis.zauber.item;
 
-import dev.louis.zauber.duck.PlayerEntityExtension;
+import dev.louis.zauber.extension.EntityExtension;
+import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.entity.BlockTelekinesisEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,25 +25,25 @@ public class StaffItem extends Item {
             var ext = (PlayerEntityExtension) user;
 
             if (!user.isSneaking()) {
-                var optional = ext.getStaffTargetedBlock();
-                if (optional.isPresent()) {
-                    var cBlockPos = optional.get();
-                    var blockPos = cBlockPos.getBlockPos();
-                    var realState = cBlockPos.getBlockState();
-                    var state = realState.contains(Properties.WATERLOGGED) ? realState.with(Properties.WATERLOGGED, Boolean.FALSE) : realState;
-
-                    world.setBlockState(blockPos, realState.getFluidState().getBlockState(), Block.NOTIFY_ALL);
-
-                    BlockTelekinesisEntity blockTelekinesisEntity = new BlockTelekinesisEntity(world, blockPos.toCenterPos(), state, cBlockPos.getBlockEntity(), user);
-                    ((PlayerEntityExtension) user).zauber$startTelekinesisOn(blockTelekinesisEntity);
-                    world.spawnEntity(blockTelekinesisEntity);
+                var optional1 = ext.getStaffTargetedEntity();
+                if (optional1.isPresent()) {
+                    var entity = optional1.get();
+                    ((PlayerEntityExtension) user).zauber$startTelekinesisOn(entity);
                     return TypedActionResult.success(stack);
                 } else {
-                    var optional1 = ext.getStaffTargetedEntity();
-                    if (optional1.isPresent()) {
-                        var entity = optional1.get();
-                        ((PlayerEntityExtension) user).zauber$startTelekinesisOn(entity);
+                    var optional = ext.getStaffTargetedBlock();
+                    if (optional.isPresent()) {
+                        var cBlockPos = optional.get();
+                        var blockPos = cBlockPos.getBlockPos();
+                        var realState = cBlockPos.getBlockState();
+                        var state = realState.contains(Properties.WATERLOGGED) ? realState.with(Properties.WATERLOGGED, Boolean.FALSE) : realState;
 
+                        world.setBlockState(blockPos, realState.getFluidState().getBlockState(), Block.NOTIFY_ALL);
+
+                        BlockTelekinesisEntity blockTelekinesisEntity = new BlockTelekinesisEntity(world, blockPos.toCenterPos(), state, cBlockPos.getBlockEntity(), user);
+                        ((PlayerEntityExtension) user).zauber$startTelekinesisOn(blockTelekinesisEntity);
+                        world.spawnEntity(blockTelekinesisEntity);
+                        return TypedActionResult.success(stack);
                     }
                 }
             }

@@ -3,7 +3,7 @@ package dev.louis.zauber.client.render;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.client.extension.BlockRenderManagerExtension;
 import dev.louis.zauber.client.model.StaffItemModel;
-import dev.louis.zauber.duck.PlayerEntityExtension;
+import dev.louis.zauber.extension.PlayerEntityExtension;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.BlockState;
@@ -20,9 +20,11 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Unit;
 
 public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer, SimpleSynchronousResourceReloadListener {
 
@@ -45,17 +47,24 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
         boolean renderAsItem = mode == ModelTransformationMode.GUI
                 || mode == ModelTransformationMode.GROUND
                 || mode == ModelTransformationMode.FIXED;
-
         if (renderAsItem) {
             itemRenderer.renderItem(stack, mode, false, matrices, vertexConsumers, light, overlay, this.inventoryModel);
         } else {
-            var clientPlayer = (PlayerEntityExtension) MinecraftClient.getInstance().player;
-            clientPlayer.zauber$getTelekinesisAffected().ifPresent(entity -> {
-                renderEntity(matrices, vertexConsumers, light, entity);
-            });
-            /*clientPlayer.getStaffTargetedEntity().ifPresentOrElse(
+            if (UnsafeItemRendererContext.IN_STAFF_RENDERING.get() == null) {
+                var unsafeEntity = UnsafeItemRendererContext.RENDERER_ENTITY.get();
+                if (unsafeEntity instanceof PlayerEntity player) {
+                    var extension = (PlayerEntityExtension) player;
+                    extension.zauber$getTelekinesisAffected().ifPresent(entity -> {
+                        UnsafeItemRendererContext.IN_STAFF_RENDERING.set(Unit.INSTANCE);
+                        renderEntity(matrices, vertexConsumers, light, entity);
+                        UnsafeItemRendererContext.IN_STAFF_RENDERING.remove();
+                    });
+                }
+            }
+
+            /*extension.getStaffTargetedEntity().ifPresentOrElse(
                     entity  -> renderEntity(matrices, vertexConsumers, light, entity),
-                    ()      -> clientPlayer.getStaffTargetedBlock().ifPresent(cachedBlockPosition -> renerBlock(matrices, vertexConsumers, light, overlay, cachedBlockPosition))
+                    ()      -> extension.getStaffTargetedBlock().ifPresent(cachedBlockPosition -> renerBlock(matrices, vertexConsumers, light, overlay, cachedBlockPosition))
             );*/
 
             matrices.push();

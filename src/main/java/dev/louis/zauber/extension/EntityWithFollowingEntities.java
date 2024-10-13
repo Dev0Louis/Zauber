@@ -1,4 +1,4 @@
-package dev.louis.zauber.duck;
+package dev.louis.zauber.extension;
 
 import dev.louis.zauber.entity.FollowingEntity;
 import org.jetbrains.annotations.NotNull;

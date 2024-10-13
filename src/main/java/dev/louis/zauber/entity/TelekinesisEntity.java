@@ -15,12 +15,12 @@ public abstract class TelekinesisEntity extends Entity {
 
     @Override
     public void tick() {
-        if (this.getWorld().isClient()) {
+        /*if (this.getWorld().isClient()) {
             Vec3d vec3d = this.getVelocity();
             double dX = this.getX() + vec3d.x;
             double dY = this.getY() + vec3d.y;
             double dZ = this.getZ() + vec3d.z;
             this.setPosition(dX, dY, dZ);
-        }
+        }*/
     }
 }

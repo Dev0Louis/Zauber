@@ -1,7 +1,8 @@
 package dev.louis.zauber.mixin;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.duck.PlayerEntityExtension;
+import dev.louis.zauber.extension.EntityExtension;
+import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.entity.BlockTelekinesisEntity;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
@@ -12,11 +13,11 @@ import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
@@ -28,7 +29,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -42,12 +42,18 @@ import java.util.function.Predicate;
 @SuppressWarnings("UnreachableCode")
 @Mixin(value = PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEntityExtension {
-    @Shadow @Final public PlayerScreenHandler playerScreenHandler;
 
     @Shadow public abstract void playSound(SoundEvent sound, float volume, float pitch);
 
+    private static final int TARGETING_DISTANCE = 20;
     @Nullable
     private Entity telekinesisEntity;
+
+
+    @Nullable
+    private LivingEntity staffTargetedEntity;
+    @Nullable
+    private CachedBlockPosition staffTargetedBlock;
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -75,26 +81,24 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     }
 
     @Override
-    public void zauber$startTelekinesisOn(Entity telekinesisEntity) {
+    public void zauber$startTelekinesisOn(@Nullable Entity newTelekinesisEntity) {
         if (this.telekinesisEntity != null && !this.getWorld().isClient()) {
+            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
+            //TODO: Remove special caseing
             if (this.telekinesisEntity instanceof BlockTelekinesisEntity blockTelekinesisEntity) {
                 blockTelekinesisEntity.loseOwner();
             }
         }
 
-
-        this.telekinesisEntity = telekinesisEntity;
+        this.telekinesisEntity = newTelekinesisEntity;
+        if (newTelekinesisEntity != null) {
+            ((EntityExtension) newTelekinesisEntity).setTelekineser((PlayerEntity) (Object) this);
+        }
 
         if (!this.getWorld().isClient()) {
             syncTelekinesisState();
         }
     }
-
-    private static final int TARGETING_DISTANCE = 20;
-    @Nullable
-    private LivingEntity staffTargetedEntity;
-    @Nullable
-    private CachedBlockPosition staffTargetedBlock;
 
     @Inject(
             method = "tick",
@@ -103,6 +107,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     public void staffStuff(CallbackInfo ci) {
         staffTargetedEntity = null;
         staffTargetedBlock = null;
+        if (telekinesisEntity != null && (!telekinesisEntity.isAlive())) {
+            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
+            telekinesisEntity = null;
+            if (!this.getWorld().isClient()) {
+                this.syncTelekinesisState();
+            }
+        }
+
         if (this.getStackInHand(this.getActiveHand()).isOf(ZauberItems.STAFF)) {
             getTargetedEntity(TARGETING_DISTANCE)
                     .filter(LivingEntity.class::isInstance)
@@ -115,6 +127,25 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
                 var pos = ((BlockHitResult) rayCast).getBlockPos();
                 staffTargetedBlock = new CachedBlockPosition(world, pos, false);
             }
+
+            //System.out.println(this.getWorld().isClient() + " " + newTelekinesisEntity);
+
+            if (telekinesisEntity != null) {
+                if (!this.getWorld().isClient()) {
+                    var target = this.getEyePos().add(this.getRotationVector().normalize().multiply(6).add(0, -.5, 0));
+                    telekinesisEntity.setVelocity(telekinesisEntity.getVelocity().multiply(0.75));
+                    var vel = target.subtract(telekinesisEntity.getPos()).multiply(0.1);
+                    telekinesisEntity.velocityModified = true;
+                    telekinesisEntity.addVelocity(vel);
+                    telekinesisEntity.move(MovementType.SELF, telekinesisEntity.getVelocity());
+                } else {
+                    Vec3d vec3d = telekinesisEntity.getVelocity();
+                    double dX = telekinesisEntity.getX() + vec3d.x;
+                    double dY = telekinesisEntity.getY() + vec3d.y;
+                    double dZ = telekinesisEntity.getZ() + vec3d.z;
+                    telekinesisEntity.setPosition(dX, dY, dZ);
+                }
+            }
         }
     }
 
@@ -124,7 +155,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         Vec3d start = eyePos.add(rotation);
         Box box = this.getBoundingBox().stretch(rotation).expand(1.0);
         int maxDistanceSquared = maxDistance * maxDistance;
-        Predicate<Entity> predicate = entityx -> !entityx.isSpectator() && entityx.canHit();
+        Predicate<Entity> predicate = entityx -> !entityx.isSpectator() && entityx.canHit() && entityx.getVehicle() == null;
         EntityHitResult entityHitResult = ProjectileUtil.raycast(this, eyePos, start, box, predicate, maxDistanceSquared);
         if (entityHitResult == null) {
             return Optional.empty();
@@ -147,7 +178,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         for (int j = 0; j < serverWorld.getPlayers().size(); j++) {
             ServerPlayerEntity player = serverWorld.getPlayers().get(j);
             serverWorld.sendToPlayerIfNearby(player, false, this.getX(), this.getY(), this.getZ(), ServerPlayNetworking.createS2CPacket(payload));
-            System.out.println("Send: " + payload);
+                System.out.println("Send: " + payload);
         }
     }
 
@@ -170,6 +201,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
                 telekinesisEntity.setVelocity(telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
             }
 
+            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
             telekinesisEntity = null;
         }
 
@@ -185,6 +217,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
                 blockTelekinesisEntity.loseOwner();
             }
 
+            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
             telekinesisEntity = null;
         }
 

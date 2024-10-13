@@ -11,7 +11,7 @@ import dev.louis.zauber.component.item.ZauberDataComponentTypes;
 import dev.louis.zauber.component.item.type.LostBookIdComponent;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.criterion.ZauberCriteria;
-import dev.louis.zauber.duck.EntityWithFollowingEntities;
+import dev.louis.zauber.extension.EntityWithFollowingEntities;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.item.*;
