@@ -6,7 +6,7 @@ import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.entity.BlockTelekinesisEntity;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.networking.play.s2c.TelekinesisPayload;
+import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.tag.ZauberItemTags;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.pattern.CachedBlockPosition;
@@ -25,6 +25,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -53,7 +54,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     @Nullable
     private LivingEntity staffTargetedEntity;
     @Nullable
-    private CachedBlockPosition staffTargetedBlock;
+    private BlockPos staffTargetedBlock;
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -123,9 +124,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
 
             var rayCast = this.raycast(TARGETING_DISTANCE, 0, false);
             if (rayCast.getType() == HitResult.Type.BLOCK) {
-                var world = this.getWorld();
-                var pos = ((BlockHitResult) rayCast).getBlockPos();
-                staffTargetedBlock = new CachedBlockPosition(world, pos, false);
+                staffTargetedBlock = ((BlockHitResult) rayCast).getBlockPos();
             }
 
             //System.out.println(this.getWorld().isClient() + " " + newTelekinesisEntity);
@@ -167,14 +166,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     @Override
     public void onStartedTrackingBy(ServerPlayerEntity player) {
         super.onStartedTrackingBy(player);
-        TelekinesisPayload payload = new TelekinesisPayload((PlayerEntity) (Object) this, telekinesisEntity);
+        TelekinesisStatePayload payload = new TelekinesisStatePayload((PlayerEntity) (Object) this, telekinesisEntity);
         ServerPlayNetworking.send(player, payload);
     }
 
     @Unique
     private void syncTelekinesisState() {
         var serverWorld = (ServerWorld) this.getWorld();
-        TelekinesisPayload payload = new TelekinesisPayload((PlayerEntity) (Object) this, telekinesisEntity);
+        TelekinesisStatePayload payload = new TelekinesisStatePayload((PlayerEntity) (Object) this, telekinesisEntity);
         for (int j = 0; j < serverWorld.getPlayers().size(); j++) {
             ServerPlayerEntity player = serverWorld.getPlayers().get(j);
             serverWorld.sendToPlayerIfNearby(player, false, this.getX(), this.getY(), this.getZ(), ServerPlayNetworking.createS2CPacket(payload));
@@ -188,7 +187,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     }
 
     @Override
-    public Optional<CachedBlockPosition> getStaffTargetedBlock() {
+    public Optional<BlockPos> getStaffTargetedBlock() {
         return Optional.ofNullable(staffTargetedBlock);
     }
 

@@ -2,11 +2,14 @@ package dev.louis.zauber;
 
 import com.mojang.logging.LogUtils;
 import dev.louis.nebula.api.event.SpellCastEvent;
+import dev.louis.zauber.networking.ZauberPlayNetworkHandler;
 import dev.louis.zauber.networking.configuration.c2s.OptionSyncCompletePayload;
 import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
 import dev.louis.zauber.networking.configuration.task.OptionSyncTask;
+import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
+import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
-import dev.louis.zauber.networking.play.s2c.TelekinesisPayload;
+import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.spell.type.SpellType;
 
 import dev.louis.zauber.block.TrappingBedBlock;
@@ -166,16 +169,15 @@ public class Zauber implements ModInitializer {
         });
 
         PayloadTypeRegistry.playC2S().register(ThrowBlockPayload.ID, ThrowBlockPayload.CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(ThrowBlockPayload.ID, ((payload, context) -> {
-            var player = context.player();
-            var stack = player.getStackInHand(player.getActiveHand());
-            var hasStaff = stack.isOf(ZauberItems.STAFF);
-            if (hasStaff) {
-                ((StaffItem) stack.getItem()).throwBlock(player.getWorld(), player, stack);
-            }
-        }));
+        ServerPlayNetworking.registerGlobalReceiver(ThrowBlockPayload.ID, ZauberPlayNetworkHandler::onThrowBlock);
 
-        PayloadTypeRegistry.playS2C().register(TelekinesisPayload.ID, TelekinesisPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(StartTelekinesisPayload.ID, StartTelekinesisPayload.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(StartTelekinesisPayload.ID, ZauberPlayNetworkHandler::onStartTelekinesis);
+
+        PayloadTypeRegistry.playC2S().register(StopTelekinesisPayload.ID, StopTelekinesisPayload.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(StopTelekinesisPayload.ID, ZauberPlayNetworkHandler::onStopTelekinesis);
+
+        PayloadTypeRegistry.playS2C().register(TelekinesisStatePayload.ID, TelekinesisStatePayload.CODEC);
 
 
         Spells.init();

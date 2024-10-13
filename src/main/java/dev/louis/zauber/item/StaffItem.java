@@ -1,6 +1,5 @@
 package dev.louis.zauber.item;
 
-import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.entity.BlockTelekinesisEntity;
 import net.minecraft.block.Block;
@@ -13,6 +12,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class StaffItem extends Item {
+    public static ClientAction CLIENT_ACTION = ((world, user, hand) -> TypedActionResult.pass(user.getStackInHand(hand)));
 
     public StaffItem(Settings settings) {
         super(settings);
@@ -20,42 +20,19 @@ public class StaffItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        var stack = user.getStackInHand(hand);
-        if (!world.isClient() && stack.isOf(ZauberItems.STAFF)) {
-            var ext = (PlayerEntityExtension) user;
-
-            if (!user.isSneaking()) {
-                var optional1 = ext.getStaffTargetedEntity();
-                if (optional1.isPresent()) {
-                    var entity = optional1.get();
-                    ((PlayerEntityExtension) user).zauber$startTelekinesisOn(entity);
-                    return TypedActionResult.success(stack);
-                } else {
-                    var optional = ext.getStaffTargetedBlock();
-                    if (optional.isPresent()) {
-                        var cBlockPos = optional.get();
-                        var blockPos = cBlockPos.getBlockPos();
-                        var realState = cBlockPos.getBlockState();
-                        var state = realState.contains(Properties.WATERLOGGED) ? realState.with(Properties.WATERLOGGED, Boolean.FALSE) : realState;
-
-                        world.setBlockState(blockPos, realState.getFluidState().getBlockState(), Block.NOTIFY_ALL);
-
-                        BlockTelekinesisEntity blockTelekinesisEntity = new BlockTelekinesisEntity(world, blockPos.toCenterPos(), state, cBlockPos.getBlockEntity(), user);
-                        ((PlayerEntityExtension) user).zauber$startTelekinesisOn(blockTelekinesisEntity);
-                        world.spawnEntity(blockTelekinesisEntity);
-                        return TypedActionResult.success(stack);
-                    }
-                }
-            }
-
-            ext.zauber$stopTelekinesis();
+        if (world.isClient()) {
+            CLIENT_ACTION.use(world, user, hand);
         }
 
-        return TypedActionResult.pass(stack);
+        return TypedActionResult.success(user.getStackInHand(hand));
     }
 
     //called on server only
     public void throwBlock(World world, PlayerEntity player, ItemStack stack) {
         ((PlayerEntityExtension) player).zauber$throwTelekinesis();
+    }
+
+    public interface ClientAction {
+        TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand);
     }
 }

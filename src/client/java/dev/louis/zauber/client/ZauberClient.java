@@ -5,11 +5,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.zauber.client.model.StaffItemModel;
+import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
 import dev.louis.zauber.client.render.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
-import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.entity.*;
-import dev.louis.zauber.networking.play.s2c.TelekinesisPayload;
+import dev.louis.zauber.extension.PlayerEntityExtension;
+import dev.louis.zauber.item.StaffItem;
+import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
+import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.spell.type.SpellType;
 
 import dev.louis.zauber.PlayerTotemData;
@@ -51,6 +54,7 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +62,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class ZauberClient implements ClientModInitializer {
@@ -264,24 +269,32 @@ public class ZauberClient implements ClientModInitializer {
             });
             pluginContext.addModels(Zauber.ZAUBER_SPELLS.stream().map(RegistryEntry::getKey).filter(Optional::isPresent).map(Optional::get).map(key -> key.getValue().withPrefixedPath("item/").withSuffixedPath("_spell_book")).toList());
         });
-        ClientPlayNetworking.registerGlobalReceiver(TelekinesisPayload.ID, ((payload, context) -> {
-            System.out.println("Got: " + payload);
 
-            var entity = context.client().world.getEntityById(payload.playerId());
-            if (entity instanceof PlayerEntity player) {
-                payload.telekinesedEntityId().ifPresentOrElse(
-                        (telekinesedId) -> {
-                            context.client().executeSync(() -> {
-                                var telekinesed = context.client().world.getEntityById(telekinesedId);
-                                if (telekinesed == null) Zauber.LOGGER.error("Couldn't find telekinsed Entity for " + player.getName().getString() + "?");
-                                ((PlayerEntityExtension) player).zauber$startTelekinesisOn(telekinesed);
-                            });
-                            },
-                        () -> ((PlayerEntityExtension) player).zauber$startTelekinesisOn(null)
-                );
+        ClientPlayNetworking.registerGlobalReceiver(TelekinesisStatePayload.ID, ZauberClientPlayNetworkHandler::onTelekinesisState);
+        StaffItem.CLIENT_ACTION = ((world, user, hand) -> {
+            var stack = user.getStackInHand(hand);
+            if (stack.isOf(ZauberItems.STAFF)) {
+                var ext = (PlayerEntityExtension) user;
 
+                if (!user.isSneaking()) {
+                    AtomicBoolean shouldReturn = new AtomicBoolean();
+                    ext.getStaffTargetedEntity().ifPresent(entity -> {
+                        ClientPlayNetworking.send(new StartTelekinesisPayload(entity));
+                        shouldReturn.set(true);
+                    });
+                    ext.getStaffTargetedBlock().ifPresent(pos -> {
+                        ClientPlayNetworking.send(new StartTelekinesisPayload(pos));
+                        shouldReturn.set(true);
+                    });
+                    if (shouldReturn.get()) {
+                        return TypedActionResult.success(stack);
+                    }
+                }
+
+                ext.zauber$stopTelekinesis();
             }
-        }));
+            return TypedActionResult.pass(stack);
+        });
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides) {

@@ -28,13 +28,12 @@ public class EntityMixin implements EntityExtension {
     }
 
     @Override
-    public void setTelekineser(PlayerEntity player) {
-        var oldTelekineser = telekineser;
-        telekineser = player;
-
-        if (oldTelekineser != null) {
-            ((PlayerEntityExtension) oldTelekineser).zauber$stopTelekinesis();
+    public void setTelekineser(PlayerEntity newTelekineser) {
+        if (telekineser != null && telekineser != newTelekineser) {
+            ((PlayerEntityExtension) telekineser).zauber$stopTelekinesis();
         }
+
+        telekineser = newTelekineser;
     }
 
     @Override
