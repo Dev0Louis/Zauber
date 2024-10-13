@@ -3,13 +3,11 @@ package dev.louis.zauber.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketsApi;
-import dev.louis.nebula.api.NebulaPlayer;
-import dev.louis.zauber.Zauber;
-import dev.louis.zauber.spell.VengeanceSpell;
+import dev.louis.nebula.api.spell.holder.SpellEffectHolder;
+import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -17,10 +15,8 @@ import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Slice;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = LivingEntity.class, priority = 1001)
 public abstract class LivingEntityMixin extends Entity {
@@ -32,10 +28,11 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyReturnValue(
             method = "isPushable", at = @At("RETURN"))
     public boolean dashingPlayersAreNotPushable(boolean original) {
-        return original || ((Object) this instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(Zauber.Spells.DASH));
+        //TODO: Add Nebula way to check for Type
+        return original && !((Object) this instanceof SpellEffectHolder spellEffectHolder && spellEffectHolder.getSpellEffects().stream().anyMatch(spellEffect -> spellEffect.getType().equals(SpellEffectTypes.DASH)));
     }
 
-    @Inject(
+    /*@Inject(
             method = "applyDamage",
             at = @At("HEAD"),
             cancellable = true
@@ -49,7 +46,7 @@ public abstract class LivingEntityMixin extends Entity {
                 ci.cancel();
             }
         }
-    }
+    }*/
 
     @SuppressWarnings({"InvalidInjectorMethodSignature", "UnreachableCode"})
     @ModifyVariable(

@@ -1,8 +1,5 @@
 package dev.louis.zauber.entity;
 
-import dev.louis.zauber.Zauber;
-import eu.pb4.polymer.core.api.entity.PolymerEntity;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -16,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -25,10 +21,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
-public class HauntingDamageEntity extends PersistentProjectileEntity implements PolymerEntity {
+public class HauntingDamageEntity extends PersistentProjectileEntity {
     private static final int TICKS_TILL_IMPACT = 20 * 30;
-    public static final EntityType<HauntingDamageEntity> TYPE = FabricEntityTypeBuilder
-            .create(SpawnGroup.MISC, HauntingDamageEntity::new)
+    public static final EntityType<HauntingDamageEntity> TYPE = EntityType.Builder
+            .create(HauntingDamageEntity::new, SpawnGroup.MISC)
             .build();
     private static final ItemStack STACK = new ItemStack(Items.TRIDENT);
     private DamageSource damageSource;
@@ -47,7 +43,7 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
             return;
         }
 
-        var target = owner.getPos().add(0, owner.getHeight(), 0).add(this.getOffset());
+        var target = owner.getPos().add(0, owner.getHeight(), 0)/*.add(this.getOffset())*/;
         var vec = target.subtract(this.getPos()).multiply(0.2);
         //if (vec.lengthSquared() < 0.8) vec.normalize();
         this.setVelocity(vec);
@@ -157,21 +153,16 @@ public class HauntingDamageEntity extends PersistentProjectileEntity implements 
     protected ItemStack getDefaultItemStack() {
         return STACK;
     }
-
+/*
     public Vec3d getOffset() {
         var owner = this.getOwner();
-        if (age < TICKS_TILL_IMPACT && owner instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(Zauber.Spells.VENGEANCE)) {
+        if (age < TICKS_TILL_IMPACT && owner instanceof PlayerEntity player && player.getSpellManager().isSpellTypeActive(SpellType.VENGEANCE)) {
             var i = age / 10f;
             return new Vec3d(Math.sin(i) * 10, (Math.cos(i / 5f) + Math.sin(i / 5f)) / 2, Math.cos(i) * 10);
         } else {
             return Vec3d.ZERO;
         }
-    }
-
-    @Override
-    public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        return EntityType.TRIDENT;
-    }
+    }*/
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {

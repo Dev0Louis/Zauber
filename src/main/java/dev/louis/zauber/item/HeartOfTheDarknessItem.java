@@ -1,12 +1,8 @@
 package dev.louis.zauber.item;
 
-import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
-import eu.pb4.polymer.core.api.item.PolymerItem;
-import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
-import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalFacingBlock;
@@ -15,11 +11,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -27,13 +20,12 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
 
-public class HeartOfTheDarknessItem extends Item implements PolymerItem, PolymerKeepModel, PolymerClientDecoded {
+public class HeartOfTheDarknessItem extends Item {
     public static int MAX_BRIGHTNESS = 8;
     public static Collection<Block> SIMPLE_DESTROYABLE = List.of(Blocks.SEA_LANTERN, Blocks.GLOWSTONE, Blocks.LANTERN, Blocks.SHROOMLIGHT);
 
@@ -83,11 +75,5 @@ public class HeartOfTheDarknessItem extends Item implements PolymerItem, Polymer
                 world.setBlockState(blockPos, ZauberBlocks.EXTINGUISHED_WALL_TORCH.getDefaultState().with(WallTorchBlock.FACING, blockState.get(WallTorchBlock.FACING)));
             }
         });
-    }
-
-    @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return this;
-        return Items.HEART_OF_THE_SEA.asItem();
     }
 }

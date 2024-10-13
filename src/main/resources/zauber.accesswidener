@@ -20,3 +20,4 @@ accessible method net/minecraft/entity/LivingEntity applyDamage (Lnet/minecraft/
 accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
 accessible class net/minecraft/client/font/FontManager$Providers
 accessible method net/minecraft/client/font/FontManager$Providers <init> (Ljava/util/List;)V
+accessible method net/minecraft/entity/FallingBlockEntity <init> (Lnet/minecraft/world/World;DDDLnet/minecraft/block/BlockState;)V

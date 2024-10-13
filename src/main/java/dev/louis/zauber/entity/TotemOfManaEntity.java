@@ -1,16 +1,11 @@
 package dev.louis.zauber.entity;
 
-import dev.emi.trinkets.api.TrinketsApi;
-import dev.louis.nebula.api.NebulaPlayer;
 import dev.louis.zauber.item.TotemOfIceItem;
 import dev.louis.zauber.item.ZauberItems;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 
 public class TotemOfManaEntity extends FollowingEntity {
@@ -26,7 +21,8 @@ public class TotemOfManaEntity extends FollowingEntity {
     public void tick() {
         if (!this.getWorld().isClient()) {
             super.tick();
-            if (this.age % 20 == 0 && (this.getOwner() instanceof NebulaPlayer player) && player.getManaManager().getMana() < player.getManaManager().getMaxMana()) {
+            //TODO: MOve to Mixin into Nebula
+            /*if (this.age % 20 == 0 && (this.getOwner() instanceof ManaPoolHolder poolHolder) && poolHolder.getManaPool().getMana() < player.getManaManager().getMaxMana()) {
                 TrinketsApi.getTrinketComponent(this.getOwner()).ifPresent(component -> {
                     component.getEquipped(ZauberItems.TOTEM_OF_MANA)
                             .stream().map(Pair::getRight).filter(stack -> stack.getDamage() + 1 < stack.getMaxDamage()).findAny().ifPresent(stack -> {
@@ -35,7 +31,7 @@ public class TotemOfManaEntity extends FollowingEntity {
                                 player.getManaManager().addMana(1);
                             });
                 });
-            }
+            }*/
         }
     }
 

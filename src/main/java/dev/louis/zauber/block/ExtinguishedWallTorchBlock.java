@@ -3,10 +3,8 @@ package dev.louis.zauber.block;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.MapCodec;
-import dev.louis.zauber.Zauber;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.BlockMirror;
@@ -109,16 +107,5 @@ public class ExtinguishedWallTorchBlock extends ExtinguishedTorchBlock {
 
     public MapCodec<? extends ExtinguishedWallTorchBlock> getCodec() {
         return CODEC;
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return state;
-        return Blocks.WALL_TORCH.getDefaultState();
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state) {
-        return Blocks.WALL_TORCH.getDefaultState();
     }
 }

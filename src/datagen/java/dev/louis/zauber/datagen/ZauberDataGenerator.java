@@ -107,7 +107,7 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
         public void generateAdvancement(RegistryWrapper.WrapperLookup registryLookup, Consumer<AdvancementEntry> consumer) {
             var rootEntry = Advancement.Builder.create()
                     .display(
-                            SpellBookItem.createSpellBook(Zauber.Spells.SUPERNOVA),
+                            SpellBookItem.createSpellBook(SpellType.SUPERNOVA),
                             Text.translatable("advancements.zauber.root"),
                             Text.translatable("advancements.zauber.root.description"),
                             Identifier.ofVanilla("textures/gui/advancements/backgrounds/adventure.png"),
@@ -278,18 +278,19 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                     .build(consumer, "zauber/spell_table");
 
 
-            registerSpellTypeAdvancement(Zauber.Spells.REWIND, spellTableAdvancement, AdvancementFrame.CHALLENGE, consumer);
-            registerSpellTypeAdvancement(Zauber.Spells.FIRE, spellTableAdvancement, AdvancementFrame.CHALLENGE, consumer);
-            var iceSpell = registerSpellTypeAdvancement(Zauber.Spells.ICE, spellTableAdvancement, AdvancementFrame.TASK, consumer);
-            registerSpellTypeAdvancement(Zauber.Spells.HAIL_STORM, iceSpell, AdvancementFrame.CHALLENGE, consumer);
+            registerSpellTypeAdvancement(SpellType.REWIND, spellTableAdvancement, AdvancementFrame.CHALLENGE, consumer);
+            registerSpellTypeAdvancement(SpellType.FIRE, spellTableAdvancement, AdvancementFrame.CHALLENGE, consumer);
+            var iceSpell = registerSpellTypeAdvancement(SpellType.ICE, spellTableAdvancement, AdvancementFrame.TASK, consumer);
+            registerSpellTypeAdvancement(SpellType.HAIL_STORM, iceSpell, AdvancementFrame.CHALLENGE, consumer);
         }
 
         public AdvancementEntry registerSpellTypeAdvancement(SpellType<?> spellType, AdvancementEntry parent, AdvancementFrame frame, Consumer<AdvancementEntry> consumer) {
+            var spellId = SpellType.REGISTRY.getId(spellType);
             return Advancement.Builder.create()
                     .display(
                             SpellBookItem.createSpellBook(spellType),
-                            Text.translatable("advancements.zauber.spell_cast_" + spellType.getId().getPath()),
-                            Text.translatable("advancements.zauber.spell_cast_" + spellType.getId().getPath() + ".description"),
+                            Text.translatable("advancements.zauber.spell_cast_" + spellId.getPath()),
+                            Text.translatable("advancements.zauber.spell_cast_" + spellId.getPath() + ".description"),
                             null,
                             frame,
                             true,
@@ -297,8 +298,8 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
                             true
                     )
                     .parent(parent)
-                    .criterion("spell_cast_" + spellType.getId().getPath(), SpellCastCriterion.Conditions.create(SpellType.REGISTRY.getEntry(spellType)))
-                    .build(consumer, "zauber/spell_cast_" + spellType.getId().getPath());
+                    .criterion("spell_cast_" + spellId.getPath(), SpellCastCriterion.Conditions.create(SpellType.REGISTRY.getEntry(spellType)))
+                    .build(consumer, "zauber/spell_cast_" + spellId.getPath());
         }
 
 

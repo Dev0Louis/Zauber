@@ -6,7 +6,6 @@ import dev.louis.zauber.spell.type.SpellType;
 
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.item.SpellBookItem;
-import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.RegistryByteBuf;
@@ -22,7 +21,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Recipe<RecipeInput>, PolymerRecipe {
+public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Recipe<RecipeInput> {
     public static final SpellRecipe EMPTY = new SpellRecipe(Ingredient.empty(), ItemStack.EMPTY);
 
     @Override
@@ -86,7 +85,7 @@ public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Re
                         Ingredient.PACKET_CODEC.encode(buf, recipe.ingredient);
                     }
 
-                    buf.writeIdentifier(spellType.value().getId());
+                    buf.writeIdentifier(Identifier.tryParse(spellType.getIdAsString()));
                 });
             }
         };
@@ -109,10 +108,5 @@ public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Re
         public PacketCodec<RegistryByteBuf, SpellRecipe> packetCodec() {
             return PACKET_CODEC;
         }
-    }
-
-    public Recipe<?> getPolymerReplacement(ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return this;
-        return PolymerRecipe.createStonecuttingRecipe(this);
     }
 }

@@ -1,12 +1,12 @@
 package dev.louis.zauber.ritual.spell;
 
-import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.item.SpellBookItem;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.ritual.Ritual;
+import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -44,7 +44,7 @@ public class HailSpellRitual extends Ritual {
             EffectHelper.playBreakItemEffect(itemSacrificer);
             itemSacrificer.setStoredStack(ItemStack.EMPTY);
 
-            ritualStoneBlockEntity.setStoredStack(SpellBookItem.createSpellBook(Zauber.Spells.HAIL_STORM));
+            ritualStoneBlockEntity.setStoredStack(SpellBookItem.createSpellBook(SpellType.HAIL_STORM));
         });
     }
 
@@ -62,7 +62,7 @@ public class HailSpellRitual extends Ritual {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var optionalItemSacrificer = ritualStoneBlockEntity.getItemSacrificers().filter(itemSacrificer -> itemSacrificer.getStoredStack().isOf(ZauberItems.HEART_OF_THE_ICE)).findAny();
-        if (!SpellBookItem.getSpellType(ritualItemStack).map(spellType -> spellType.equals(Zauber.Spells.ICE)).orElse(false) || optionalItemSacrificer.isEmpty())
+        if (!SpellBookItem.getSpellType(ritualItemStack).map(spellType -> spellType.value().equals(SpellType.ICE)).orElse(false) || optionalItemSacrificer.isEmpty())
             return null;
         return new HailSpellRitual(world, ritualStoneBlockEntity, optionalItemSacrificer.get().getPos());
     }

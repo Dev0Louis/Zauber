@@ -8,8 +8,8 @@ import net.minecraft.entity.LivingEntity;
 
 public class SproutSpell extends ZauberSpell<LivingEntity> {
 
-    public SproutSpell(SpellType<?> type) {
-        super(type);
+    public SproutSpell() {
+        super(SpellType.SPROUT);
     }
 
     @Override

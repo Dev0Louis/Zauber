@@ -1,6 +1,6 @@
 package dev.louis.zauber.client.mixin;
 
-import dev.louis.zauber.component.ZauberDataComponentTypes;
+import dev.louis.zauber.component.item.ZauberDataComponentTypes;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;

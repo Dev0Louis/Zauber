@@ -1,0 +1,11 @@
+package dev.louis.zauber.component.cca;
+
+import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
+
+public class ZauberCCA implements EntityComponentInitializer {
+    @Override
+    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+        registry.registerForPlayers();
+    }
+}

@@ -28,7 +28,7 @@ public abstract class InGameHudMixin {
     @Inject(at = @At("RETURN"), method = "renderStatusBars")
     public void renderStatusBar(DrawContext context, CallbackInfo ci) {
         var playerEntity = this.getCameraPlayer();
-        int mana = client.player.getManaManager().getMana();
+        float mana = client.player.getManaManager().getMana();
         if (isInWater(playerEntity) && mana <= 0) {
             return;
         }

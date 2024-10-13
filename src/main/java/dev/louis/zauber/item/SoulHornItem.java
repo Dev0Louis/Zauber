@@ -2,16 +2,12 @@ package dev.louis.zauber.item;
 
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.entity.ManaHorseEntity;
-import eu.pb4.polymer.core.api.item.PolymerItem;
-import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
-import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,9 +18,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import org.jetbrains.annotations.Nullable;
 
-public class SoulHornItem extends Item implements PolymerItem, PolymerKeepModel, PolymerClientDecoded {
+public class SoulHornItem extends Item {
     private static final Identifier GOAT_HORN_ID = Identifier.tryParse("call_goat_horn");
 
     public SoulHornItem(Settings settings) {
@@ -53,11 +48,6 @@ public class SoulHornItem extends Item implements PolymerItem, PolymerKeepModel,
         return TypedActionResult.fail(user.getStackInHand(hand));
     }
 
-    @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return this;
-        return Items.GOAT_HORN;
-    }
 
     private static void playSound(World world, PlayerEntity player) {
         SoundEvent soundEvent = Registries.INSTRUMENT.get(GOAT_HORN_ID).soundEvent().value();

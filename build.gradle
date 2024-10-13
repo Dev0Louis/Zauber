@@ -117,14 +117,13 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
     modCompileOnly "dev.emi:trinkets:${project.trinkets_version}"
-    modRuntimeOnly files('lib/trinkets-3.10.0.jar')
-    modImplementation files('lib/cardinal-components-base-6.1.0.jar')
-    modImplementation files('lib/cardinal-components-entity-6.1.0.jar')
-}
+    //TODO: Switch to accessories
+    modImplementation files('lib/trinkets-3.10.0.jar')
 
-remapJar {
-    //Till Trinkets updated :)
-    nestedJars.from(file('lib/trinkets-3.10.0.jar'))
+    modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cca_version}"
+    modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
+    //include "org.ladysnake.cardinal-components-api:cardinal-components-base:${project.cca_version}"
+    //include "org.ladysnake.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
 }
 
 processResources {

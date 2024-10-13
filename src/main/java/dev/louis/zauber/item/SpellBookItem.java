@@ -1,21 +1,15 @@
 package dev.louis.zauber.item;
 
-import dev.louis.zauber.Zauber;
-import dev.louis.zauber.component.ZauberDataComponentTypes;
-import dev.louis.zauber.component.type.StoredSpellComponent;
+import dev.louis.zauber.component.item.ZauberDataComponentTypes;
+import dev.louis.zauber.component.item.type.StoredSpellComponent;
 import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -33,7 +27,8 @@ public class SpellBookItem extends Item {
 
         Optional<RegistryEntry<SpellType<?>>> optionalSpellType = getSpellType(itemStack);
         if (optionalSpellType.isPresent()) {
-            playerEntity.getSpellManager().learnSpell(optionalSpellType.get().value());
+            //TODO: Need to reconsider
+            //playerEntity.getSpellManager().learnSpell(optionalSpellType.get().value());
             itemStack.decrement(1);
             return TypedActionResult.consume(itemStack);
         }
@@ -50,16 +45,5 @@ public class SpellBookItem extends Item {
         ItemStack itemStack = new ItemStack(ZauberItems.SPELL_BOOK);
         itemStack.set(ZauberDataComponentTypes.STORED_SPELL_TYPE, new StoredSpellComponent(SpellType.REGISTRY.getEntry(spellType)));
         return itemStack;
-    }
-
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return itemStack.getItem();
-        return Items.BOOK;
-    }
-
-
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return itemStack;
-        return PolymerItemUtils.createItemStack(itemStack, lookup, player);
     }
 }

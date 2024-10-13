@@ -1,10 +1,7 @@
 package dev.louis.zauber.entity;
 
-import dev.louis.nebula.api.spell.Spell;
 import dev.louis.zauber.Zauber;
-import eu.pb4.polymer.core.api.entity.PolymerEntity;
-import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
-import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
@@ -18,26 +15,26 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class SpellArrowEntity extends PersistentProjectileEntity implements PolymerClientDecoded, PolymerKeepModel, PolymerEntity {
+public class SpellArrowEntity extends PersistentProjectileEntity {
     private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
     public static final EntityType<SpellArrowEntity> TYPE = EntityType.Builder.<SpellArrowEntity>create(SpellArrowEntity::new, SpawnGroup.MISC).dimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build("spell_arrow");
 
     @Nullable
-    private final Spell spell;
+    private final Entity caster;
 
     public SpellArrowEntity(EntityType<? extends SpellArrowEntity> entityType, World world) {
         super(entityType, world);
-        this.spell = null;
+        caster = null;
     }
 
-    public SpellArrowEntity(World world, LivingEntity owner, ItemStack stack, @NotNull Spell spell) {
+    public SpellArrowEntity(World world, LivingEntity owner, ItemStack stack, @NotNull Entity caster) {
         super(TYPE, owner, world, stack, null);
-        this.spell = spell;
+        this.caster = caster;
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (spell != null && spell.getCaster().equals(entityHitResult.getEntity())) return;
+        if (caster != null && caster.equals(entityHitResult.getEntity())) return;
         super.onEntityHit(entityHitResult);
     }
 

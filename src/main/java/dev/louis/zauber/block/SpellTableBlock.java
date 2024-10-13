@@ -3,9 +3,6 @@ package dev.louis.zauber.block;
 import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.screen.SpellTableScreenHandler;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
-import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -26,7 +23,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class SpellTableBlock extends Block implements PolymerBlock, PolymerClientDecoded, PolymerKeepModel {
+public class SpellTableBlock extends Block {
     private static final Text TITLE = Text.translatable("container.spell_crafting");
 
     protected static final VoxelShape SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 12.0, 16.0);
@@ -105,21 +102,6 @@ public class SpellTableBlock extends Block implements PolymerBlock, PolymerClien
     @Override
     protected MapCodec<? extends Block> getCodec() {
         return CODEC;
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state) {
-        return Blocks.ENCHANTING_TABLE.getDefaultState();
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state, ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return state;
-        return this.getPolymerBlockState(state);
-    }
-
-    public boolean handleMiningOnServer(ItemStack tool, BlockState state, BlockPos pos, ServerPlayerEntity player) {
-        return false;
     }
 }
 

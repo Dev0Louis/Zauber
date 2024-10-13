@@ -4,15 +4,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.louis.zauber.spell.type.SpellType;
 
-import dev.louis.zauber.component.type.StoredSpellComponent;
-import dev.louis.zauber.spell.type.SpellType;
+import dev.louis.zauber.component.item.type.StoredSpellComponent;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.criterion.AbstractCriterion;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
 import java.util.Optional;
 

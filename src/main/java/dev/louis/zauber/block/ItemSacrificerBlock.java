@@ -3,7 +3,6 @@ package dev.louis.zauber.block;
 import com.mojang.serialization.MapCodec;
 import dev.louis.zauber.block.entity.ItemSacrificerBlockEntity;
 import dev.louis.zauber.helper.ShutUpAboutBlockStateModels;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -22,7 +21,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 @ShutUpAboutBlockStateModels
-public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock {
+public class ItemSacrificerBlock extends BlockWithEntity {
     public static final MapCodec<ItemSacrificerBlock> CODEC = createCodec(ItemSacrificerBlock::new);
 
     public ItemSacrificerBlock(Settings settings) {
@@ -87,10 +86,5 @@ public class ItemSacrificerBlock extends BlockWithEntity implements PolymerBlock
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state) {
-        return Blocks.STONE_BRICK_WALL.getDefaultState();
     }
 }

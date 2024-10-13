@@ -1,12 +1,8 @@
 package dev.louis.zauber.spell.effect;
 
 import com.google.common.collect.ImmutableList;
-import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellEffect;
-import dev.louis.nebula.api.spell.SpellEffectType;
-import dev.louis.nebula.api.spell.SpellSource;
-import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.duck.ItemStackJuggernautModeDuck;
+import dev.louis.zauber.duck.ItemStackJuggernautModeExtension;
 import dev.louis.zauber.mixin.ServerWorldAccessor;
 import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
@@ -20,7 +16,6 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.collection.DefaultedList;
@@ -102,7 +97,7 @@ public class JuggernautSpellEffect extends SpellEffect {
         if (itemStack.isEnchantable()) {
             enchantMax(itemStack, registry);
         }
-        ItemStackJuggernautModeDuck.access(itemStack).zauber$setJuggernautModeTick(tickWorldtime);
+        ItemStackJuggernautModeExtension.access(itemStack).zauber$setJuggernautModeTick(tickWorldtime);
         return itemStack;
     }
 
@@ -129,7 +124,7 @@ public class JuggernautSpellEffect extends SpellEffect {
                     ItemStack itemStack = list.get(i);
 
                     if (itemStack.isEmpty()) continue;
-                    if (ItemStackJuggernautModeDuck.access(itemStack).zauber$getJuggernautTick() <= 0L) continue;
+                    if (ItemStackJuggernautModeExtension.access(itemStack).zauber$getJuggernautTick() <= 0L) continue;
                     list.set(i, ItemStack.EMPTY);
                 }
             }

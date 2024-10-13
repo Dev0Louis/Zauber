@@ -5,12 +5,16 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [],
   "client": [
+    "BlockRenderManagerMixin",
     "BlockStatesLoaderMixin",
+    "BuiltinModelItemRendererMixin",
     "ControlsListWidgetMixin",
     "InGameHudMixin",
+    "ItemRendererMixin",
     "ItemStackNameMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
+    "ModelLoaderMixin",
     "PlayerEntityMixin",
     "ProjectileEntityRendererMixin"
   ],

@@ -1,10 +1,6 @@
 package dev.louis.zauber.entity;
 
-import dev.louis.nebula.api.NebulaPlayer;
-import dev.louis.zauber.Zauber;
-import eu.pb4.polymer.core.api.entity.PolymerEntity;
-import eu.pb4.polymer.core.api.utils.PolymerClientDecoded;
-import eu.pb4.polymer.core.api.utils.PolymerKeepModel;
+import dev.louis.nebula.api.mana.pool.ManaPoolHolder;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -26,7 +22,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class ManaHorseEntity extends HorseEntity implements PolymerEntity, PolymerClientDecoded, PolymerKeepModel, Ownable {
+public class ManaHorseEntity extends HorseEntity implements Ownable {
     public static final EntityType<ManaHorseEntity> TYPE =
             EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).dimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
     private static final ParticleEffect PARTICLE_EFFECT = new DustParticleEffect(new Vector3f(0, 0, 0.8f), 1f);
@@ -117,7 +113,7 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
     public boolean willDisappearSoon() {
         //The Controller should always be equal to the caster.
         var controller = this.getControllingPassenger();
-        return !(controller instanceof NebulaPlayer nebulaPlayer) || !nebulaPlayer.getManaManager().hasEnoughMana(4);
+        return !(controller instanceof ManaPoolHolder manaPoolHolder) || (manaPoolHolder.getManaPool().getMana() < 4);
     }
 
     @Nullable
@@ -187,11 +183,5 @@ public class ManaHorseEntity extends HorseEntity implements PolymerEntity, Polym
         } else {
             this.jumpStrength = 0.4F + 0.4F * (float) strength / 90.0F;
         }
-    }
-
-    @Override
-    public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return TYPE;
-        return EntityType.HORSE;
     }
 }

@@ -1,28 +1,23 @@
 package dev.louis.zauber.entity;
 
-import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
 
-import java.util.List;
-
-public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
+public class HailStoneEntity extends ThrownItemEntity {
     public static final EntityType<HailStoneEntity> TYPE = FabricEntityTypeBuilder
             .create(SpawnGroup.MISC, HailStoneEntity::new)
             .build();
@@ -89,16 +84,5 @@ public class HailStoneEntity extends ThrownItemEntity implements PolymerEntity {
         }
 
         entity.damage(damageSource, damage);
-    }
-
-    @Override
-    public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
-        return EntityType.SNOWBALL;
-    }
-
-    @Override
-    public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
-        data.removeIf(serializedEntry -> serializedEntry.handler().equals(ITEM.dataType()));
-        data.add(new DataTracker.SerializedEntry<>(ITEM.id(), ITEM.dataType(), this.getDefaultItem().getDefaultStack()));
     }
 }

@@ -1,6 +1,6 @@
 package dev.louis.zauber.client.model;
 
-import dev.louis.zauber.component.ZauberDataComponentTypes;
+import dev.louis.zauber.component.item.ZauberDataComponentTypes;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.block.BlockState;

@@ -1,6 +1,5 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
 import dev.louis.nebula.api.spell.quick.SpellException;
 import dev.louis.zauber.entity.SpellArrowEntity;
@@ -34,7 +33,7 @@ public class ArrowSpell extends ZauberSpell<LivingEntity> {
                     try(var t1 = Transaction.openOuter()) {
                         float extracted = caster.getManaManager().extractMana(MANA_CONSUMPTION_PER_ARROW, t1);
                         if (extracted < MANA_CONSUMPTION_PER_ARROW) return;
-                        SpellArrowEntity arrow = new SpellArrowEntity(world, caster, new ItemStack(Items.ARROW), this);
+                        SpellArrowEntity arrow = new SpellArrowEntity(world, caster, new ItemStack(Items.ARROW), spellSource.getCaster());
 
                         Vec3d vec3d = caster.getOppositeRotationVector(1.0F);
                         Quaternionf quaternionf = (new Quaternionf()).setAngleAxis(0 * 0.017453292F, vec3d.x, vec3d.y, vec3d.z);

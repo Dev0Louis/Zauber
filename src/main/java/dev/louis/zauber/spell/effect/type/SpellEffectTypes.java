@@ -2,9 +2,7 @@ package dev.louis.zauber.spell.effect.type;
 
 import dev.louis.nebula.api.spell.SpellEffectType;
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.spell.effect.JuggernautSpellEffect;
-import dev.louis.zauber.spell.effect.RewindSpellEffect;
-import dev.louis.zauber.spell.effect.SproutSpellEffect;
+import dev.louis.zauber.spell.effect.*;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
@@ -23,6 +21,16 @@ public class SpellEffectTypes {
             SpellEffectType.REGISTRY,
             Identifier.of(Zauber.MOD_ID, "sprout"),
             new SpellEffectType<>(SproutSpellEffect::new)
+    );
+    public static final SpellEffectType<CloudJumpSpellEffect> CLOUD_JUMP = Registry.register(
+            SpellEffectType.REGISTRY,
+            Identifier.of(Zauber.MOD_ID, "cloud_jump"),
+            new SpellEffectType<>(CloudJumpSpellEffect::new)
+    );
+    public static final SpellEffectType<DashSpellEffect> DASH = Registry.register(
+            SpellEffectType.REGISTRY,
+            Identifier.of(Zauber.MOD_ID, "dash"),
+            new SpellEffectType<>(DashSpellEffect::new)
     );
 
     public static void init() {

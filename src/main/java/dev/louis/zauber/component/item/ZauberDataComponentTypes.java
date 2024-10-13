@@ -1,10 +1,9 @@
-package dev.louis.zauber.component;
+package dev.louis.zauber.component.item;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.component.type.JuggernautTickComponent;
-import dev.louis.zauber.component.type.LostBookIdComponent;
-import dev.louis.zauber.component.type.StoredSpellComponent;
-import eu.pb4.polymer.core.api.other.PolymerComponent;
+import dev.louis.zauber.component.item.type.JuggernautTickComponent;
+import dev.louis.zauber.component.item.type.LostBookIdComponent;
+import dev.louis.zauber.component.item.type.StoredSpellComponent;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;

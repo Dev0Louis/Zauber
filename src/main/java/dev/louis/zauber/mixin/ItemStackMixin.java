@@ -1,9 +1,9 @@
 package dev.louis.zauber.mixin;
 
-import dev.louis.zauber.component.ZauberDataComponentTypes;
-import dev.louis.zauber.component.type.JuggernautTickComponent;
+import dev.louis.zauber.component.item.ZauberDataComponentTypes;
+import dev.louis.zauber.component.item.type.JuggernautTickComponent;
 import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.duck.ItemStackJuggernautModeDuck;
+import dev.louis.zauber.duck.ItemStackJuggernautModeExtension;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentType;
 import net.minecraft.entity.Entity;
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemStack.class)
-public abstract class ItemStackMixin implements ItemStackJuggernautModeDuck, ComponentHolder {
+public abstract class ItemStackMixin implements ItemStackJuggernautModeExtension, ComponentHolder {
     @Shadow
     public abstract void setCount(int count);
 

@@ -2,10 +2,7 @@ package dev.louis.zauber.block.entity;
 
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.helper.SoundHelper;
-import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
-import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -24,45 +21,21 @@ import org.joml.Vector3f;
 
 public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
     public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = BlockEntityType.Builder.create(ItemSacrificerBlockEntity::new, ZauberBlocks.ITEM_SACRIFICER).build(null);
-    private ItemDisplayElement itemDisplayElement;
-    private BlockDisplayElement basePlate;
-    private BlockDisplayElement secondPlate;
     public boolean firstTick = true;
     private int ticksSinceItemsAdded;
-    private ElementHolder holder;
 
     public ItemSacrificerBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
     }
 
     private void init() {
-        this.holder = new ElementHolder();
-        ChunkAttachment.ofTicking(holder, (ServerWorld) world, pos.up());
 
-        basePlate = new BlockDisplayElement(Blocks.QUARTZ_SLAB.getDefaultState());
-        basePlate.setScale(new Vector3f(1, 0.2f, 1));
-        basePlate.setOffset(new Vec3d(-0.5, -1.5, -0.5));
-        holder.addElement(basePlate);
-
-        secondPlate = new BlockDisplayElement(Blocks.QUARTZ_SLAB.getDefaultState());
-        secondPlate.setScale(new Vector3f(0.5f, 0.2f, 0.5f));
-        holder.addElement(secondPlate);
-
-        itemDisplayElement = new ItemDisplayElement();
-        itemDisplayElement.setOffset(new Vec3d(0, -0.25, 0));
-        this.itemDisplayElement.setBillboardMode(DisplayEntity.BillboardMode.FIXED);
-        this.itemDisplayElement.setItem(this.getStoredStack());
-        holder.addElement(itemDisplayElement);
-        this.firstTick = false;
     }
 
     public static void tick(World world, BlockPos blockPos, BlockState state, ItemSacrificerBlockEntity itemSacrificer) {
         if (itemSacrificer.firstTick) {
             itemSacrificer.init();
         }
-        itemSacrificer.secondPlate.setScale(new Vector3f(0.75f, 0.2f, 0.75f));
-        itemSacrificer.secondPlate.setOffset(new Vec3d(-0.375, -1.4, -0.375));
-
 
         if (itemSacrificer.storedStack == ItemStack.EMPTY) return;
 
@@ -73,18 +46,15 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
 
 
         itemSacrificer.ticksSinceItemsAdded++;
-        itemSacrificer.itemDisplayElement
-                .setRightRotation(
+                /*.setRightRotation(
                         RotationAxis.POSITIVE_Y.rotationDegrees(world.getTime() * ((itemSacrificer.storedStack.getItem().hashCode() % 40) / 40f))
-                );
+                );*/
 
 
-        itemSacrificer.itemDisplayElement.setOffset(new Vec3d(0, getItemOffset(itemSacrificer), 0));
         float multiplier = Math.min(1, itemSacrificer.ticksSinceItemsAdded / 10f);
 
 
         float size = (float) ((float) (Math.sin(itemSacrificer.ticksSinceItemsAdded / 50f) / 30) + 0.4) * multiplier;
-        itemSacrificer.itemDisplayElement.setScale(new Vector3f(size, size, size));
     }
 
     public static double getItemOffset(ItemSacrificerBlockEntity itemSacrificer) {
@@ -92,7 +62,7 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
     }
 
     public ActionResult offerItemStack(PlayerEntity player, ItemStack offeredStack) {
-        itemDisplayElement.setScale(new Vector3f(0, 0, 0));
+        //itemDisplayElement.setScale(new Vector3f(0, 0, 0));
 
         var sound = SoundEvents.BLOCK_SNIFFER_EGG_PLOP;
         var volume = 2;
@@ -121,12 +91,11 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
     public void setStoredStack(ItemStack itemStack) {
         super.setStoredStack(itemStack);
         this.ticksSinceItemsAdded = 0;
-        if (this.itemDisplayElement != null) this.itemDisplayElement.setItem(this.storedStack);
+        //if (this.itemDisplayElement != null) this.itemDisplayElement.setItem(this.storedStack);
     }
 
     @Override
     public void markRemoved() {
-        if (holder != null) this.holder.destroy();
         super.markRemoved();
     }
 }

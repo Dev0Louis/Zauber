@@ -1,6 +1,5 @@
 package dev.louis.zauber.criterion;
 
-import eu.pb4.polymer.rsm.api.RegistrySyncUtils;
 import net.minecraft.advancement.criterion.Criterion;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -12,7 +11,6 @@ public class ZauberCriteria {
 
     public static <T extends Criterion<?>> T register(String id, T criterion) {
         T a = Registry.register(Registries.CRITERION, id, criterion);
-        RegistrySyncUtils.setServerEntry(Registries.CRITERION, a);
         return a;
     }
 

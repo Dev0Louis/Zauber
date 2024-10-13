@@ -1,15 +1,11 @@
 package dev.louis.zauber.mana.effect;
 
-import dev.louis.nebula.api.manager.mana.ManaManager;
-import dev.louis.zauber.Zauber;
-import eu.pb4.polymer.core.api.other.PolymerStatusEffect;
+import dev.louis.nebula.api.mana.pool.ManaPoolHolder;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 
-public class ManaRegenerationStatusEffect extends StatusEffect implements PolymerStatusEffect {
+public class ManaRegenerationStatusEffect extends StatusEffect {
     public ManaRegenerationStatusEffect() {
         super(StatusEffectCategory.BENEFICIAL,
                 0x7612ff);
@@ -26,16 +22,11 @@ public class ManaRegenerationStatusEffect extends StatusEffect implements Polyme
     // This method is called when it applies the status effect. We implement custom functionality here.
     @Override
     public boolean applyUpdateEffect(LivingEntity entity, int amplifier) {
-        if (!entity.getWorld().isClient() && entity instanceof PlayerEntity player) {
-            ManaManager playerManaManager = player.getManaManager();
-            playerManaManager.addMana(1 + amplifier);
+        if (!entity.getWorld().isClient() && entity instanceof ManaPoolHolder manaPoolHolder) {
+            var pool = manaPoolHolder.getManaPool();
+            pool.insertMana(1 + amplifier);
         }
         return true;
     }
 
-    @Override
-    public StatusEffect getPolymerReplacement(ServerPlayerEntity player) {
-        if (Zauber.isClientModded(player)) return this;
-        return null;
-    }
 }

@@ -1,7 +1,6 @@
 package dev.louis.zauber.recipe;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.screen.PolymerScreenHandlerType;
 import dev.louis.zauber.screen.SpellTableScreenHandler;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
@@ -29,6 +28,6 @@ public class ZauberRecipes {
     }
 
     private static <T extends ScreenHandler> ScreenHandlerType<T> registerPolymerScreenHandler(Identifier id, ScreenHandlerType.Factory<T> factory) {
-        return Registry.register(Registries.SCREEN_HANDLER, id, new PolymerScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES, ScreenHandlerType.STONECUTTER));
+        return Registry.register(Registries.SCREEN_HANDLER, id, new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES));
     }
 }

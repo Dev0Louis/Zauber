@@ -1,4 +1,4 @@
-package dev.louis.zauber.component.type;
+package dev.louis.zauber.component.item.type;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
