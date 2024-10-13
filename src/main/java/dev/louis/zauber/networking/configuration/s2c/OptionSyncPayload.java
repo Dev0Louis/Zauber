@@ -1,4 +1,4 @@
-package dev.louis.zauber.networking;
+package dev.louis.zauber.networking.configuration.s2c;
 
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.config.ConfigManager;

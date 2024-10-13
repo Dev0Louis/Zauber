@@ -1,19 +1,14 @@
-package dev.louis.zauber.networking;
+package dev.louis.zauber.networking.play.s2c;
 
 import dev.louis.zauber.Zauber;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.c2s.config.SelectKnownPacksC2SPacket;
-import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.OptionalInt;
 
 public record TelekinesisPayload(int playerId, OptionalInt telekinesedEntityId) implements CustomPayload {

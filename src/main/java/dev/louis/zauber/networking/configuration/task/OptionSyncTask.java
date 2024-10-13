@@ -1,6 +1,7 @@
-package dev.louis.zauber.networking;
+package dev.louis.zauber.networking.configuration.task;
 
 import dev.louis.zauber.config.ConfigManager;
+import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.ServerPlayerConfigurationTask;

@@ -2,7 +2,11 @@ package dev.louis.zauber;
 
 import com.mojang.logging.LogUtils;
 import dev.louis.nebula.api.event.SpellCastEvent;
-import dev.louis.zauber.networking.*;
+import dev.louis.zauber.networking.configuration.c2s.OptionSyncCompletePayload;
+import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
+import dev.louis.zauber.networking.configuration.task.OptionSyncTask;
+import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
+import dev.louis.zauber.networking.play.s2c.TelekinesisPayload;
 import dev.louis.zauber.spell.type.SpellType;
 
 import dev.louis.zauber.block.TrappingBedBlock;

@@ -6,7 +6,7 @@ import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.entity.BlockTelekinesisEntity;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.networking.TelekinesisPayload;
+import dev.louis.zauber.networking.play.s2c.TelekinesisPayload;
 import dev.louis.zauber.tag.ZauberItemTags;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.pattern.CachedBlockPosition;

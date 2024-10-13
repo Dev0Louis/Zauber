@@ -1,4 +1,4 @@
-package dev.louis.zauber.networking;
+package dev.louis.zauber.networking.configuration.c2s;
 
 import dev.louis.zauber.Zauber;
 import net.minecraft.network.PacketByteBuf;
