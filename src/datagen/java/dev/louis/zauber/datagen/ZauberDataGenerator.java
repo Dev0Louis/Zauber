@@ -74,7 +74,6 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
         ZauberDataGenerator.generator = generator;
         pack.addProvider(RecipeProvider::new);
         pack.addProvider(AdvancementsProvider::new);
-        pack.addProvider(FontProvider::new);
     }
 
     static class RecipeProvider extends FabricRecipeProvider {
@@ -357,127 +356,6 @@ public class ZauberDataGenerator implements DataGeneratorEntrypoint {
 
     }
 
-    static class FontProvider implements DataProvider {
-        private final Path output;
-
-        protected FontProvider(FabricDataOutput fabricDataOutput) {
-            super();
-            this.output = fabricDataOutput.getPath();
-        }
-
-        @Override
-        public CompletableFuture<?> run(DataWriter writer) {
-            return CompletableFuture.runAsync(() -> {
-                try {
-                    runInternal(writer);
-                } catch (IOException | ExecutionException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-
-        /**
-         * A few core things.
-         * We need to generate the font image, for that we stitch together multipile pngs into a pig one.
-         */
-        public void runInternal(DataWriter writer) throws IOException, ExecutionException, InterruptedException {
-
-            Path dir = Path.of("..").toAbsolutePath();
-
-            var rippedPages = RippedPages.rippedPages;
-            validateFilesPresent(dir.resolve("ripped_page"), rippedPages);
-            //From now on we can expect all files to be present.
-
-            var mergedImage = new BufferedImage(130 * rippedPages.size(), 165, BufferedImage.TYPE_INT_ARGB);
-            var graphics = mergedImage.getGraphics();
-            for (int i = 0; i < rippedPages.size(); i++) {
-                RippedPage rippedPage = rippedPages.get(i);
-                var id = rippedPage.id();
-                File file = dir.resolve("ripped_page").resolve(id.getNamespace()).resolve(id.getPath() + ".png").toFile();
-                var image = ImageIO.read(file);
-                //This is very prone to memory leaking, but it is fine as it is in Datagen /shrug
-                validateImageSize(id, image);
-
-                graphics.drawImage(
-                        image,
-                        130 * i,
-                        0,
-                        null
-                );
-                image.flush();
-            }
-            graphics.dispose();
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ImageIO.write(
-                    mergedImage,
-                    "png",
-                    outputStream
-            );
-            writeOutput(Path.of("assets/zauber/textures/font/ripped_page.png"), outputStream.toByteArray(), writer);
-            outputStream.close();
-
-            List<FontLoader> fontLoaders = new ArrayList<>();
-            fontLoaders.add(new ReferenceFont(Identifier.ofVanilla("include/space")));
-            fontLoaders.add(
-                    new SpaceFont.Loader(
-                            Map.of(
-                                    (int) '<', -150f,
-                                    (int) '>', 20f
-                            )
-                    )
-            );
-
-            int[][] codepointGrid = new int[1][rippedPages.size()];
-            for (int i = 0; i < rippedPages.size(); i++) {
-                RippedPage rippedPage = rippedPages.get(i);
-                codepointGrid[0][i] = rippedPage.character();
-            }
-            fontLoaders.add(
-                    new BitmapFont.Loader(
-                            Identifier.of(Zauber.MOD_ID, "font/ripped_page.png"),
-                            170,
-                            32,
-                            codepointGrid
-                    )
-            );
-
-            List<FontLoader.Provider> providerList = fontLoaders.stream().map(provider -> new FontLoader.Provider(provider, FontFilterType.FilterMap.NO_FILTER)).toList();
-            FontManager.Providers providers = new FontManager.Providers(providerList);
-            DataProvider.writeCodecToPath(
-                    writer,
-                    ZauberDataGenerator.generator.getRegistries().getNow(null),
-                    FontManager.Providers.CODEC,
-                    providers,
-                    output.resolve("assets/zauber/font/ripped_page.json")
-            ).get();
-        }
-
-        private void validateImageSize(Identifier id, BufferedImage image) {
-            if (image.getWidth() != 130 || image.getHeight() != 165)
-                throw new IllegalStateException("The image size, from " + id + " is not 130, 165.");
-        }
-
-        private void validateFilesPresent(Path path, List<RippedPage> rippedPages) throws FileNotFoundException {
-            for (RippedPage rippedPage : rippedPages) {
-                var id = rippedPage.id();
-                var pngPath = path.resolve(id.getNamespace()).resolve(id.getPath() + ".png");
-                var exists = Files.isRegularFile(pngPath);
-                if (!exists) throw new FileNotFoundException("Did not find " + id + " at " + pngPath);
-            }
-        }
-
-        public void writeOutput(Path path, byte[] bytes, DataWriter writer) throws IOException {
-            writer.write(output.resolve(path), bytes, HashCode.fromInt(Arrays.hashCode(bytes)));
-
-        }
-
-
-        @Override
-        public String getName() {
-            return "Font";
-        }
-    }
 
     @Override
     public @Nullable String getEffectiveModId() {

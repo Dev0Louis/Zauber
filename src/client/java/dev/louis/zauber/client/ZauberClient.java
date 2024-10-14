@@ -8,6 +8,7 @@ import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
 import dev.louis.zauber.client.render.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
+import dev.louis.zauber.client.screen.RippedPageScreen;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.StaffItem;
@@ -46,6 +47,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
@@ -96,6 +98,10 @@ public class ZauberClient implements ClientModInitializer {
                 } else {
                     playerInView = null;
                 }
+            }
+
+            if (player.isSneaking()) {
+                world.client.setScreen(new RippedPageScreen());
             }
         });
 

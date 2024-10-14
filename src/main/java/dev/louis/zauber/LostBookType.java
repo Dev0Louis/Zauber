@@ -78,13 +78,6 @@ public record LostBookType(Identifier id, List<Text> pages) implements NamedScre
             pages.add(Text.translatable("lost_book." + id.getNamespace() + "." + id.getPath() + "." + i));
         }
 
-        pages.set(
-                0,
-                Text.literal("<" + rippedPage.character() + ">").setStyle(LOST_BOOK_STYLE)
-                        .append(
-                                pages.get(0).copy().setStyle(Style.EMPTY.withColor(0).withFont(Style.DEFAULT_FONT_ID))
-                        )
-        );
 
         LOST_BOOKS.add(new LostBookType(id, pages));
     }
