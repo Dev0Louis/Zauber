@@ -2,18 +2,16 @@ package dev.louis.zauber.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.holder.SpellEffectHolder;
 import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
+import io.wispforest.accessories.api.AccessoriesCapability;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
@@ -66,20 +64,13 @@ public abstract class LivingEntityMixin extends Entity {
     public ItemStack modifyItemStack(ItemStack itemStack) {
         if (itemStack == null) {
             if (((Object) this) instanceof PlayerEntity player) {
-                var artifactTotemSlotType = TrinketsApi.getPlayerSlots(player).get("artifact").getSlots().get("totem");
-                var component = TrinketsApi.getTrinketComponent((LivingEntity) (Object) this);
-                if (component.isPresent()) {
+                var totem = AccessoriesCapability.get(player).getFirstEquipped(Items.TOTEM_OF_UNDYING);
 
-                    var b = component.get().getEquipped(Items.TOTEM_OF_UNDYING);
-                    for (Pair<SlotReference, ItemStack> slotReferenceItemStackPair : b) {
-
-                        if (slotReferenceItemStackPair.getLeft().inventory().getSlotType().equals(artifactTotemSlotType)) {
-                            ItemStack slotStack = slotReferenceItemStackPair.getRight();
-                            ItemStack stackCopy = slotStack.copy();
-                            slotStack.decrement(1);
-                            return stackCopy;
-                        }
-                    }
+                if (totem != null) {
+                    ItemStack slotStack = totem.stack();
+                    ItemStack stackCopy = slotStack.copy();
+                    slotStack.decrement(1);
+                    return stackCopy;
                 }
             }
         }

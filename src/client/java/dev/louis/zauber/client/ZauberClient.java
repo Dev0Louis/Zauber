@@ -2,9 +2,7 @@ package dev.louis.zauber.client;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.zauber.client.glisco.StencilFramebuffer;
 import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
 import dev.louis.zauber.client.render.StaffItemRenderer;
@@ -31,6 +29,7 @@ import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.configuration.c2s.OptionSyncCompletePayload;
 import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
 import dev.louis.zauber.recipe.ZauberRecipes;
+import io.wispforest.accessories.api.AccessoriesCapability;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -48,7 +47,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
@@ -100,14 +98,14 @@ public class ZauberClient implements ClientModInitializer {
                 }
             }
 
-            if (player.isSneaking()) {
+            if (player.isSneaking() && false) {
                 world.client.setScreen(new RippedPageScreen());
             }
         });
 
         HudRenderCallback.EVENT.register((context, tickCounter) -> {
             var client = MinecraftClient.getInstance();
-            TrinketsApi.getTrinketComponent(client.player).ifPresent(component -> {
+            AccessoriesCapability.getOptionally(client.player).ifPresent(capability -> {
                 List<Map.Entry<Item, PlayerTotemData>> sortedList = Zauber.ITEM_TO_TOTEM_DATA.entrySet().stream().collect(Collectors.toList());
                 //Collections.shuffle(sortedList);
                 sortedList.sort((totemData, totemData2) -> {
@@ -116,7 +114,7 @@ public class ZauberClient implements ClientModInitializer {
 
                     if (active) return -1;
                     if (!active2) return 1;
-                    return 1;
+                    return 1; //TODO: Check if null here works?
                 });
 
                 if (!sortedList.isEmpty()) {
@@ -127,7 +125,7 @@ public class ZauberClient implements ClientModInitializer {
                     List<Runnable> list = Lists.newArrayListWithExpectedSize(sortedList.size());
 
                     for (Map.Entry<Item, PlayerTotemData> entry : sortedList) {
-                        if (!component.isEquipped(entry.getKey())) continue;
+                        if (!capability.isEquipped(entry.getKey())) continue;
                         var playerTotemData = entry.getValue();
                         var texture = playerTotemData.texture();
                         int x = 0;

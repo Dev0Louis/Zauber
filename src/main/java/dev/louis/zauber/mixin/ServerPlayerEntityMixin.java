@@ -3,7 +3,6 @@ package dev.louis.zauber.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
-import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.criterion.ZauberCriteria;
 import dev.louis.zauber.extension.EntityWithFollowingEntities;
@@ -40,9 +39,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements En
     private boolean wasLastWakeUpCanceled = false;
 
     @Shadow
-    public abstract ServerWorld getServerWorld();
-
-    @Shadow
     public abstract Either<SleepFailureReason, Unit> trySleep(BlockPos pos);
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
@@ -60,7 +56,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements En
     )
     public void checkIfTotemOfDarknessIsEquippedAndIfNeededSpawnCompanionEntity(CallbackInfo ci) {
         //var isDarkTotemPresent = TrinketsApi.getTrinketComponent(this).map(trinketComponent -> trinketComponent.isEquipped(ZauberItems.TOTEM_OF_DARKNESS)).orElse(false);
-        TrinketsApi.getTrinketComponent(this).ifPresent(component -> {
+        /*TrinketsApi.getTrinketComponent(this).ifPresent(component -> {
             ITEM_TO_TOTEM_DATA.forEach((item, playerTotemData) -> {
                 var entityType = playerTotemData.entityType();
                 var checker = playerTotemData.activityChecker();
@@ -100,7 +96,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements En
                 }
             });
         });
-
+*/
     }
 
     @Override

@@ -36,7 +36,6 @@
     "fabricloader": ">=0.14.9",
     "fabric-api": "*",
     "minecraft": ">=1.21",
-    "nebula": ">=7.0.0-",
-    "trinkets": ">=3.10.0"
+    "nebula": ">=7.0.0-"
   }
 }
