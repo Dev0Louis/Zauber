@@ -1,7 +1,6 @@
 package dev.louis.zauber.spell.effect;
 
 import dev.louis.nebula.api.spell.SpellEffect;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleTypes;
@@ -23,7 +22,7 @@ public class DashSpellEffect extends SpellEffect {
         target.setInvisible(true);
         target.setInvulnerable(true);
         target.setNoDrag(true);
-        var dashVelocityMultiplier = ConfigManager.getServerConfig().dashVelocityMultiplier();
+        var dashVelocityMultiplier = 1/*ConfigManager.getServerConfig().dashVelocityMultiplier()*/;
         dashVelocity = target.getRotationVector().multiply(dashVelocityMultiplier, 0.2, dashVelocityMultiplier);
         target.playSound(
                 SoundEvents.BLOCK_DEEPSLATE_TILES_HIT,
@@ -80,6 +79,6 @@ public class DashSpellEffect extends SpellEffect {
 
     @Override
     public boolean shouldContinue() {
-        return age < ConfigManager.getServerConfig().dashSpellDuration() && !aborted;
+        return age < 1/*ConfigManager.getServerConfig().dashSpellDuration()*/ && !aborted;
     }
 }

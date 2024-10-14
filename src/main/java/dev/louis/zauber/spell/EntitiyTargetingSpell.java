@@ -1,8 +1,6 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -22,7 +20,7 @@ public abstract class EntitiyTargetingSpell extends ZauberSpell<LivingEntity> {
 
     public Optional<Entity> getTargetedEntity(SpellSource<LivingEntity> source) {
         if (source.getCaster() instanceof LivingEntity entity) {
-            int maxDistance = ConfigManager.getServerConfig().entityTargetingDistance();
+            int maxDistance =  1/*ConfigManager.getServerConfig().entityTargetingDistance()*/;
             Vec3d startPos = entity.getEyePos();
             Vec3d rotation = entity.getRotationVec(1.0F).multiply(maxDistance);
             Vec3d endPos = startPos.add(rotation);

@@ -2,7 +2,6 @@ package dev.louis.zauber.mixin;
 
 import dev.louis.zauber.component.item.ZauberDataComponentTypes;
 import dev.louis.zauber.component.item.type.JuggernautTickComponent;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.extension.ItemStackJuggernautModeExtension;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentType;
@@ -60,7 +59,7 @@ public abstract class ItemStackMixin implements ItemStackJuggernautModeExtension
     public boolean zauber$isValid(ServerWorld world) {
         long juggernautTicks = zauber$getJuggernautTick();
         if (juggernautTicks == 0L) return false;
-        return (((ServerWorldAccessor) world).getWorldProperties().getTime() - zauber$getJuggernautTick()) < ConfigManager.getServerConfig().juggernautSpellDuration();
+        return (((ServerWorldAccessor) world).getWorldProperties().getTime() - zauber$getJuggernautTick()) < /*ConfigManager.getServerConfig().juggernautSpellDuration();*/ 1;
     }
 
 

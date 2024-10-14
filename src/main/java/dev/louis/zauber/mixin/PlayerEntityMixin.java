@@ -10,10 +10,7 @@ import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.tag.ZauberItemTags;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.pattern.CachedBlockPosition;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MovementType;
+import net.minecraft.entity.*;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -52,7 +49,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
 
 
     @Nullable
-    private LivingEntity staffTargetedEntity;
+    private Entity staffTargetedEntity;
     @Nullable
     private BlockPos staffTargetedBlock;
 
@@ -117,10 +114,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         }
 
         if (this.getStackInHand(this.getActiveHand()).isOf(ZauberItems.STAFF)) {
-            getTargetedEntity(TARGETING_DISTANCE)
-                    .filter(LivingEntity.class::isInstance)
-                    .map(LivingEntity.class::cast)
-                    .ifPresent(entity -> staffTargetedEntity = entity);
+            getTargetedEntity(TARGETING_DISTANCE).ifPresent(entity -> staffTargetedEntity = entity);
 
             var rayCast = this.raycast(TARGETING_DISTANCE, 0, false);
             if (rayCast.getType() == HitResult.Type.BLOCK) {
@@ -154,7 +148,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         Vec3d start = eyePos.add(rotation);
         Box box = this.getBoundingBox().stretch(rotation).expand(1.0);
         int maxDistanceSquared = maxDistance * maxDistance;
-        Predicate<Entity> predicate = entityx -> !entityx.isSpectator() && entityx.canHit() && entityx.getVehicle() == null;
+        Predicate<Entity> predicate = entityx -> !entityx.isSpectator() &&  entityx.getVehicle() == null && ((entityx.canHit() && entityx instanceof LivingEntity) || entityx instanceof BlockTelekinesisEntity || entityx instanceof FallingBlockEntity);
         EntityHitResult entityHitResult = ProjectileUtil.raycast(this, eyePos, start, box, predicate, maxDistanceSquared);
         if (entityHitResult == null) {
             return Optional.empty();
@@ -182,7 +176,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     }
 
     @Override
-    public Optional<LivingEntity> getStaffTargetedEntity() {
+    public Optional<Entity> getStaffTargetedEntity() {
         return Optional.ofNullable(staffTargetedEntity);
     }
 

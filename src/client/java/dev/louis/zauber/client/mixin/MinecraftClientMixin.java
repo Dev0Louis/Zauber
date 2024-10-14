@@ -6,7 +6,6 @@ import dev.louis.nebula.api.spell.SpellSource;
 import dev.louis.zauber.client.ZauberClient;
 import dev.louis.zauber.client.glisco.StencilFramebuffer;
 import dev.louis.zauber.client.screen.RippedPageScreen;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
 import dev.louis.zauber.spell.type.PlayerSpellFactory;
@@ -65,7 +64,7 @@ public abstract class MinecraftClientMixin {
     }
 
     public void resetSpellCooldown() {
-        spellCooldown = ConfigManager.getServerConfig().spellCooldown();
+        spellCooldown = /*ConfigManager.getServerConfig().spellCooldown()*/ 1;
     }
 
     @WrapWithCondition(

@@ -1,17 +1,12 @@
 package dev.louis.zauber.spell.effect;
 
 import dev.louis.nebula.api.spell.SpellEffect;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.WorldEvents;
 
 public class SproutSpellEffect extends SpellEffect {
@@ -65,6 +60,6 @@ public class SproutSpellEffect extends SpellEffect {
 
     @Override
     public boolean shouldContinue() {
-        return age < ConfigManager.getServerConfig().sproutSpellDuration();
+        return age < 1/*ConfigManager.getServerConfig().sproutSpellDuration()*/;
     }
 }

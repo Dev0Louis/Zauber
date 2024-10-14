@@ -1,19 +1,34 @@
 package dev.louis.zauber.config;
 
+import com.bawnorton.configurable.Configurable;
+
 public class ServerConfig {
-    private int entityTargetingDistance = 24;
-    private int blockTargetingDistance = 64;
-    private int spellCooldown = 10;
-    private float supernovaExplosionPower = 16.0F;
-    private float dashVelocityMultiplier = 1.3F;
-    private int dashSpellDuration = 5;
-    private int sproutSpellDuration = 20 * 10;
-    private int fireSpellDuration = 20;
-    private int iceSpellDuration = 20;
-    private int juggernautSpellDuration = 120 * 20;
-    private int rewindSpellDuration = 6 * 20;
-    private double windExpelSpellAcceleration = 0.1;
-    private int windExpelSpellDuration = 20;
+    @Configurable
+    private static int entityTargetingDistance = 24;
+    @Configurable
+    private static int blockTargetingDistance = 64;
+    @Configurable
+    private static int spellCooldown = 10;
+    @Configurable
+    private static float supernovaExplosionPower = 16.0F;
+    @Configurable
+    private static float dashVelocityMultiplier = 1.3F;
+    @Configurable
+    private static int dashSpellDuration = 5;
+    @Configurable
+    private static int sproutSpellDuration = 20 * 10;
+    @Configurable
+    private static int fireSpellDuration = 20;
+    @Configurable
+    private static int iceSpellDuration = 20;
+    @Configurable
+    private static int juggernautSpellDuration = 120 * 20;
+    @Configurable
+    private static int rewindSpellDuration = 6 * 20;
+    @Configurable
+    private static double windExpelSpellAcceleration = 0.1;
+    @Configurable
+    private static int windExpelSpellDuration = 20;
 
     protected ServerConfig() {
 

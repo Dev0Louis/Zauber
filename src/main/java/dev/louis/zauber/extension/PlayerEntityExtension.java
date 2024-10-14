@@ -12,7 +12,7 @@ public interface PlayerEntityExtension {
     void zauber$stopTelekinesis();
     void zauber$startTelekinesisOn(@Nullable Entity telekinesisEntity);
     Optional<Entity> zauber$getTelekinesisAffected();
-    Optional<LivingEntity> getStaffTargetedEntity();
+    Optional<Entity> getStaffTargetedEntity();
     Optional<BlockPos> getStaffTargetedBlock();
 
     void zauber$throwTelekinesis();

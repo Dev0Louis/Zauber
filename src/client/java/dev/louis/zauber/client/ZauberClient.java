@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.Spell;
-import dev.louis.zauber.client.glisco.StencilFramebuffer;
 import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
 import dev.louis.zauber.client.render.StaffItemRenderer;
@@ -26,10 +25,7 @@ import dev.louis.zauber.client.model.SpellUnbakedModel;
 import dev.louis.zauber.client.render.entity.BlueArrowEntityRenderer;
 import dev.louis.zauber.client.render.entity.ManaHorseEntityRenderer;
 import dev.louis.zauber.client.screen.SpellTableScreen;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.networking.configuration.c2s.OptionSyncCompletePayload;
-import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
 import dev.louis.zauber.recipe.ZauberRecipes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -48,7 +44,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
@@ -75,16 +70,8 @@ public class ZauberClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ConfigManager.loadClientConfig();
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-            ConfigManager.clearOverrideConfig();
-        });
         EntityModelLayerRegistry.registerModelLayer(STAFF_MODEL_LAYER, StaffItemModel::getTexturedModelData);
 
-        ClientConfigurationNetworking.registerGlobalReceiver(OptionSyncPayload.ID, (packet, context) -> {
-            ConfigManager.setOverrideConfig(packet.overrideConfig());
-            context.responseSender().sendPacket(new OptionSyncCompletePayload());
-        });
         StaffItemRenderer staffItemRenderer = new StaffItemRenderer(STAFF_MODEL_LAYER);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(staffItemRenderer);
         BuiltinItemRendererRegistry.INSTANCE.register(ZauberItems.STAFF, staffItemRenderer);
@@ -284,13 +271,14 @@ public class ZauberClient implements ClientModInitializer {
 
                 if (!user.isSneaking()) {
                     AtomicBoolean shouldReturn = new AtomicBoolean();
-                    ext.getStaffTargetedEntity().ifPresent(entity -> {
+                    ext.getStaffTargetedEntity().ifPresentOrElse(entity -> {
                         ClientPlayNetworking.send(new StartTelekinesisPayload(entity));
                         shouldReturn.set(true);
-                    });
-                    ext.getStaffTargetedBlock().ifPresent(pos -> {
-                        ClientPlayNetworking.send(new StartTelekinesisPayload(pos));
-                        shouldReturn.set(true);
+                    }, () -> {
+                        ext.getStaffTargetedBlock().ifPresent(pos -> {
+                            ClientPlayNetworking.send(new StartTelekinesisPayload(pos));
+                            shouldReturn.set(true);
+                        });
                     });
                     if (shouldReturn.get()) {
                         return TypedActionResult.success(stack);

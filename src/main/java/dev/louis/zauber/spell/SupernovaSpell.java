@@ -1,8 +1,6 @@
 package dev.louis.zauber.spell;
 
-import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleTypes;
@@ -41,7 +39,7 @@ public class SupernovaSpell extends ZauberSpell<LivingEntity> {
                 source.getPos().getX(),
                 source.getCaster().getEyeY(),
                 source.getPos().getZ(),
-                ConfigManager.getServerConfig().supernovaExplosionPower(),
+                1/*ConfigManager.getServerConfig().supernovaExplosionPower()*/,
                 true,
                 World.ExplosionSourceType.MOB
         );

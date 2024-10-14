@@ -1,7 +1,6 @@
 package dev.louis.zauber.client;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.mana.ManaDirection;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
@@ -16,7 +15,7 @@ public class ManaDrawer {
     }
 
     private static void render(Identifier texture, DrawContext context, int x, int y) {
-        boolean invert = ConfigManager.getClientConfig().manaDirection() == ManaDirection.LEFT;
+        boolean invert = false /*ConfigManager.getClientConfig().manaDirection() == ManaDirection.LEFT*/;
 
         context.drawTexture(texture, x, y, 0, 9, 9, 9, invert ? -9 : 9, 9);
     }

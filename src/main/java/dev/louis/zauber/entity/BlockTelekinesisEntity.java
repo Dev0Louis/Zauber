@@ -136,7 +136,9 @@ public class BlockTelekinesisEntity extends TelekinesisEntity implements Ownable
                 this.blockState
         );
         fallingBlockEntity.setFallingBlockPos(this.getBlockPos());
-        fallingBlockEntity.setVelocity(fallingBlockEntity.getPos().subtract(owner.getPos()).multiply(0.2));
+        if (owner != null) {
+            fallingBlockEntity.setVelocity(fallingBlockEntity.getPos().subtract(owner.getPos()).multiply(0.2));
+        }
         this.getWorld().spawnEntity(fallingBlockEntity);
         this.discard();
     }

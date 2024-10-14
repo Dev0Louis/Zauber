@@ -3,9 +3,6 @@ package dev.louis.zauber;
 import com.mojang.logging.LogUtils;
 import dev.louis.nebula.api.event.SpellCastEvent;
 import dev.louis.zauber.networking.ZauberPlayNetworkHandler;
-import dev.louis.zauber.networking.configuration.c2s.OptionSyncCompletePayload;
-import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
-import dev.louis.zauber.networking.configuration.task.OptionSyncTask;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
@@ -16,7 +13,6 @@ import dev.louis.zauber.block.TrappingBedBlock;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.component.item.ZauberDataComponentTypes;
 import dev.louis.zauber.component.item.type.LostBookIdComponent;
-import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.criterion.ZauberCriteria;
 import dev.louis.zauber.extension.EntityWithFollowingEntities;
 import dev.louis.zauber.entity.*;
@@ -132,8 +128,6 @@ public class Zauber implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ConfigManager.loadServerConfig();
-
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
             //TODO:REMOVE
             /*ServerTickEvents.START_SERVER_TICK.register(server -> {
@@ -156,17 +150,6 @@ public class Zauber implements ModInitializer {
         ZauberCriteria.init();
         ZauberPotionTags.init();
 
-        ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
-            if (ServerConfigurationNetworking.canSend(handler, OptionSyncPayload.ID)) {
-                handler.addTask(new OptionSyncTask());
-            }
-        });
-
-        PayloadTypeRegistry.configurationC2S().register(OptionSyncCompletePayload.ID, OptionSyncCompletePayload.CODEC);
-        PayloadTypeRegistry.configurationS2C().register(OptionSyncPayload.ID, OptionSyncPayload.CODEC);
-        ServerConfigurationNetworking.registerGlobalReceiver(OptionSyncCompletePayload.ID, (packet, context) -> {
-            context.networkHandler().completeTask(OptionSyncTask.KEY);
-        });
 
         PayloadTypeRegistry.playC2S().register(ThrowBlockPayload.ID, ThrowBlockPayload.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(ThrowBlockPayload.ID, ZauberPlayNetworkHandler::onThrowBlock);

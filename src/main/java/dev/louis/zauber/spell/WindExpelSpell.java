@@ -6,15 +6,8 @@ import dev.louis.nebula.api.spell.quick.SpellException;
 import dev.louis.zauber.spell.effect.CloudJumpSpellEffect;
 import dev.louis.zauber.spell.type.SpellType;
 
-import dev.louis.zauber.config.ConfigManager;
-import dev.louis.zauber.helper.SoundHelper;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
 
 public class WindExpelSpell extends ZauberSpell<LivingEntity> {
     public WindExpelSpell() {
