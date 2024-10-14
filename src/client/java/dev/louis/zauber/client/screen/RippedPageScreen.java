@@ -46,13 +46,7 @@ public class RippedPageScreen extends Screen {
     private Text content;
     private List<OrderedText> cachedContent;
 
-    public static StencilFramebuffer stencilFrameBuffer;
-
-    {
-        if (stencilFrameBuffer == null) {
-            stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
-        }
-    }
+    public StencilFramebuffer stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());;
 
     public RippedPageScreen(Text text) {
         this(text, true);
@@ -78,6 +72,7 @@ public class RippedPageScreen extends Screen {
         this.addCloseButton();
     }
 
+
     protected void addCloseButton() {
         this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
             this.close();
@@ -87,6 +82,7 @@ public class RippedPageScreen extends Screen {
 
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
+
         int i = (this.width - 192) / 2;
         if (cachedContent == null) {
             this.cachedContent = this.textRenderer.wrapLines(this.content, MAX_TEXT_WIDTH);
@@ -94,10 +90,11 @@ public class RippedPageScreen extends Screen {
 
         int linesToDraw = Math.min(MAX_TEXT_HEIGHT / 9, this.cachedContent.size());
 
-        stencilFrameBuffer.beginWrite(true);
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
 
         RenderSystem.clearStencil(0);
+        stencilFrameBuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+        stencilFrameBuffer.beginWrite(true);
+        GL11.glEnable(GL11.GL_STENCIL_TEST);
         RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
         RenderSystem.stencilFunc(GL_ALWAYS, 1, 0xFF);
         RenderSystem.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -111,11 +108,13 @@ public class RippedPageScreen extends Screen {
         }
 
         stencilFrameBuffer.endWrite();
+
         RenderSystem.enableBlend();
         MinecraftClient.getInstance().getFramebuffer().beginWrite(false);
         stencilFrameBuffer.draw(stencilFrameBuffer.textureWidth, stencilFrameBuffer.textureHeight, false);
         GL11.glDisable(GL11.GL_STENCIL_TEST);
         RenderSystem.defaultBlendFunc();
+        stencilFrameBuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
 
         Style style = this.getTextStyleAt(mouseX, mouseY);
         if (style != null) {

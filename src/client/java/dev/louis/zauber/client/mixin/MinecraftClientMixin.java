@@ -4,6 +4,8 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
 import dev.louis.zauber.client.ZauberClient;
+import dev.louis.zauber.client.glisco.StencilFramebuffer;
+import dev.louis.zauber.client.screen.RippedPageScreen;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
@@ -11,8 +13,10 @@ import dev.louis.zauber.spell.type.PlayerSpellFactory;
 import dev.louis.zauber.spell.type.SpellType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.util.Window;
 import net.minecraft.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -30,6 +34,10 @@ public abstract class MinecraftClientMixin {
     public ClientPlayerEntity player;
 
     @Shadow @Final public GameOptions options;
+    @Shadow @Final private Window window;
+    @Shadow @Nullable public Screen currentScreen;
+    @Shadow private static MinecraftClient instance;
+    @Shadow @Final public static boolean IS_SYSTEM_MAC;
     @Unique
     int spellCooldown = 0;
 
@@ -74,5 +82,17 @@ public abstract class MinecraftClientMixin {
             }
         }
         return true;
+    }
+
+    @Inject(
+            method = "onResolutionChanged",
+            at = @At("TAIL")
+    )
+    public void resizeStencilBuffer(CallbackInfo ci) {
+        if (this.currentScreen instanceof RippedPageScreen rippedPageScreen) {
+            //TODO: Why does this make the screen go black?
+            rippedPageScreen.stencilFrameBuffer.resize(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight(), IS_SYSTEM_MAC);
+
+        }
     }
 }
