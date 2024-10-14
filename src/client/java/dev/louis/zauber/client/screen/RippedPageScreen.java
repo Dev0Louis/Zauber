@@ -46,7 +46,7 @@ public class RippedPageScreen extends Screen {
     private Text content;
     private List<OrderedText> cachedContent;
 
-    public StencilFramebuffer stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());;
+    public static StencilFramebuffer stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());;
 
     public RippedPageScreen(Text text) {
         this(text, true);

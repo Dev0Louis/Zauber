@@ -89,10 +89,6 @@ public abstract class MinecraftClientMixin {
             at = @At("TAIL")
     )
     public void resizeStencilBuffer(CallbackInfo ci) {
-        if (this.currentScreen instanceof RippedPageScreen rippedPageScreen) {
-            //TODO: Why does this make the screen go black?
-            rippedPageScreen.stencilFrameBuffer.resize(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight(), IS_SYSTEM_MAC);
-
-        }
+            RippedPageScreen.stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
     }
 }
