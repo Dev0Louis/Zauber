@@ -7,8 +7,13 @@ package dev.louis.zauber.client.screen;
 
 import java.util.List;
 import java.util.Objects;
+
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import dev.louis.zauber.client.glisco.StencilFramebuffer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -16,30 +21,38 @@ import net.minecraft.client.util.NarratorManager;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.ClickEvent.Action;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
+
+import static com.mojang.blaze3d.platform.GlConst.GL_ALWAYS;
+import static org.lwjgl.opengl.GL11C.*;
 
 @Environment(EnvType.CLIENT)
 public class RippedPageScreen extends Screen {
     public static final int field_32328 = 16;
     public static final int field_32329 = 36;
     public static final int field_32330 = 30;
-    public static final Text EMPTY_PROVIDER = Text.of("HEY LISTEN!");
-    public static final Identifier BOOK_TEXTURE = Identifier.of("zauber", "textures/gui/ripped_page.png");
+    public static final Text EMPTY_PROVIDER = Text.of("HEY LISTEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    public static final Identifier RIPPED_PAGE_TEXTURE = Identifier.of("zauber", "textures/gui/ripped_page.png");
     protected static final int MAX_TEXT_WIDTH = 114;
     protected static final int MAX_TEXT_HEIGHT = 128;
     protected static final int WIDTH = 192;
     protected static final int HEIGHT = 192;
     private Text content;
     private List<OrderedText> cachedContent;
-    Text pageIndexText = Text.of("TEST?");
 
+    public static StencilFramebuffer stencilFrameBuffer;
 
+    {
+        if (stencilFrameBuffer == null) {
+            stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
+        }
+    }
 
     public RippedPageScreen(Text text) {
         this(text, true);
@@ -52,7 +65,6 @@ public class RippedPageScreen extends Screen {
     private RippedPageScreen(Text content, boolean playPageTurnSound) {
         super(NarratorManager.EMPTY);
         this.cachedContent = null;
-        this.pageIndexText = ScreenTexts.EMPTY;
         this.content = content;
     }
 
@@ -80,14 +92,30 @@ public class RippedPageScreen extends Screen {
             this.cachedContent = this.textRenderer.wrapLines(this.content, MAX_TEXT_WIDTH);
         }
 
-        int k = this.textRenderer.getWidth(this.pageIndexText);
-        context.drawText(this.textRenderer, this.pageIndexText, i - k + 192 - 44, 18, 0, false);
         int linesToDraw = Math.min(MAX_TEXT_HEIGHT / 9, this.cachedContent.size());
 
+        stencilFrameBuffer.beginWrite(true);
+        GL11.glEnable(GL11.GL_STENCIL_TEST);
+
+        RenderSystem.clearStencil(0);
+        RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
+        RenderSystem.stencilFunc(GL_ALWAYS, 1, 0xFF);
+        RenderSystem.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        context.drawTexture(RIPPED_PAGE_TEXTURE, (this.width - 192) / 2, 2, 0, 0, 192, 192);
+
+        RenderSystem.stencilFunc(GL_EQUAL, 1, 0xFF);
+        RenderSystem.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         for(int line = 0; line < linesToDraw; ++line) {
             OrderedText orderedText = this.cachedContent.get(line);
             context.drawText(this.textRenderer, orderedText, i + 36, 32 + line * 9, 0, false);
         }
+
+        stencilFrameBuffer.endWrite();
+        RenderSystem.enableBlend();
+        MinecraftClient.getInstance().getFramebuffer().beginWrite(false);
+        stencilFrameBuffer.draw(stencilFrameBuffer.textureWidth, stencilFrameBuffer.textureHeight, false);
+        GL11.glDisable(GL11.GL_STENCIL_TEST);
+        RenderSystem.defaultBlendFunc();
 
         Style style = this.getTextStyleAt(mouseX, mouseY);
         if (style != null) {
@@ -98,7 +126,7 @@ public class RippedPageScreen extends Screen {
 
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderInGameBackground(context);
-        context.drawTexture(BOOK_TEXTURE, (this.width - 192) / 2, 2, 0, 0, 1192, 1192);
+
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {

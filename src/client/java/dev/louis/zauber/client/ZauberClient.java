@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.trinkets.api.TrinketsApi;
 import dev.louis.nebula.api.spell.Spell;
+import dev.louis.zauber.client.glisco.StencilFramebuffer;
 import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
 import dev.louis.zauber.client.render.StaffItemRenderer;
@@ -71,7 +72,6 @@ public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
     public static PlayerEntity playerInView;
     public static EntityModelLayer STAFF_MODEL_LAYER = new EntityModelLayer(Identifier.of(Zauber.MOD_ID, "staff"), "staff");
-
 
     @Override
     public void onInitializeClient() {

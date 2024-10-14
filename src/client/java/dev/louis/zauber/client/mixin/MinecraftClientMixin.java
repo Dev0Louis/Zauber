@@ -29,8 +29,6 @@ public abstract class MinecraftClientMixin {
     @Nullable
     public ClientPlayerEntity player;
 
-    @Shadow public abstract void close();
-
     @Shadow @Final public GameOptions options;
     @Unique
     int spellCooldown = 0;
