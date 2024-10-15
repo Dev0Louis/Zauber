@@ -77,28 +77,28 @@ public class SphereRenderer {
         var color = 0xFFFFFFFF;
         vertices.vertex(entry, p1);
         vertices.texture(0, 0);
-        vertices.color(color);
-        vertices.light(light);
+        //vertices.color(color);
+        //vertices.light(light);
         //vertices.normal(entry, 0, 1, 0);
 
         vertices.vertex(entry, p2);
         vertices.texture(0, 1);
-        vertices.color(color);
-        vertices.light(light);
+        //vertices.color(color);
+        //vertices.light(light);
         //vertices.normal(entry, 0, 1, 0);
         //vertices.texture(0, 1);
 
         vertices.vertex(entry, p3);
         vertices.texture(1, 1);
-        vertices.color(color);
-        vertices.light(light);
+        //vertices.color(color);
+        //vertices.light(light);
         //vertices.normal(entry, 0, 1, 0);
         //vertices.texture(1, 0);
 
         vertices.vertex(entry, p4);
         vertices.texture(0, 0);
-        vertices.color(color);
-        vertices.light(light);
+        //vertices.color(color);
+        //vertices.light(light);
         //vertices.normal(entry, 0, 1, 0);
         //vertices.texture(1, 1);
     }

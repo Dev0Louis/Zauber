@@ -15,7 +15,7 @@ import static net.minecraft.client.render.RenderPhase.*;
 public class ZauberRenderLayers {
     private static final RenderLayer.MultiPhase DEBUG_QUADS = RenderLayer.of(
             "debug_quads",
-            VertexFormats.POSITION_COLOR_TEXTURE_LIGHT,
+            VertexFormats.POSITION_TEXTURE,
             VertexFormat.DrawMode.QUADS,
             786432,
             false,
