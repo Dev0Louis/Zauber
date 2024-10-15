@@ -1,9 +1,8 @@
 package dev.louis.zauber.client.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import dev.louis.zauber.client.render.StaffItemRenderer;
-import dev.louis.zauber.client.render.UnsafeItemRendererContext;
+import dev.louis.zauber.client.render.item.StaffItemRenderer;
+import dev.louis.zauber.client.render.item.UnsafeItemRendererContext;
 import dev.louis.zauber.item.ZauberItems;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemModels;

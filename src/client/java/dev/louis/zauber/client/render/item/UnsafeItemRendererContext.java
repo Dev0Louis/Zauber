@@ -1,4 +1,4 @@
-package dev.louis.zauber.client.render;
+package dev.louis.zauber.client.render.item;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Unit;

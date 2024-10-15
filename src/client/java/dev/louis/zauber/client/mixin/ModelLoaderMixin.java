@@ -1,6 +1,6 @@
 package dev.louis.zauber.client.mixin;
 
-import dev.louis.zauber.client.render.StaffItemRenderer;
+import dev.louis.zauber.client.render.item.StaffItemRenderer;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.util.ModelIdentifier;

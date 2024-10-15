@@ -5,8 +5,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
-import dev.louis.zauber.client.render.StaffItemRenderer;
+import dev.louis.zauber.client.render.item.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
+import dev.louis.zauber.client.render.misc.SphereRenderer;
+import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.client.screen.RippedPageScreen;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.extension.PlayerEntityExtension;
@@ -38,16 +40,14 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -58,6 +58,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -73,6 +74,19 @@ public class ZauberClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+            var matrices = context.matrixStack();
+            matrices.push();
+            var camera = context.camera();
+            Vec3d transformedPosition = new Vec3d(0, -50, 0).subtract(camera.getPos());
+
+            matrices.translate(transformedPosition.x, transformedPosition.y, transformedPosition.z);
+            //RenderSystem.setShaderTexture(0, StaffItemRenderer.ENTITY_HOLDING_TEXTURE);
+            SphereRenderer.renderSphere(context.matrixStack().peek(), 10, context.consumers().getBuffer(ZauberRenderLayers.getBrrrrrrrr()));
+            matrices.pop();
+        });
+
         ConfigManager.loadClientConfig();
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ConfigManager.clearOverrideConfig();
