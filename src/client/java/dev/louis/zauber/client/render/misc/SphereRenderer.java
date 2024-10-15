@@ -54,14 +54,7 @@ public class SphereRenderer {
         Vector3f p3 = calculateSpherePoint(phi2, theta2, mul);
         Vector3f p4 = calculateSpherePoint(phi2, theta1, mul);
 
-        final boolean irisWorkAround = false;
-        // Render the quad
-        if(irisWorkAround) {
-            //NOT IMPLEMENTED YET!
-            return;
-        } else {
-            renderQuad(entry, vertexConsumer, light, p1, p2, p3, p4);
-        }
+        renderQuad(entry, vertexConsumer, light, p1, p2, p3, p4);
     }
 
     private static Vector3f calculateSpherePoint(float phi, float theta, float mul) {
