@@ -9,6 +9,7 @@
     "BlockStatesLoaderMixin",
     "BuiltinModelItemRendererMixin",
     "ControlsListWidgetMixin",
+    "EntityRenderDispatcherMixin",
     "InGameHudMixin",
     "ItemRendererMixin",
     "ItemStackNameMixin",

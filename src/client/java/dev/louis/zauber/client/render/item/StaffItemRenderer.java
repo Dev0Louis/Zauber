@@ -30,6 +30,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+import net.minecraft.util.math.RotationAxis;
+import org.joml.Quaternionf;
 
 public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer, SimpleSynchronousResourceReloadListener {
 
@@ -73,11 +75,17 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
                     extension.zauber$getTelekinesisAffected().ifPresent(entity -> {
                         UnsafeItemRendererContext.IN_STAFF_RENDERING.set(Unit.INSTANCE);
                         renderEntity(matrices, vertexConsumers, light, entity);
-                        matrices.push();
-                        matrices.translate(0, .4, 0);
-                        //RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-                        //SphereRenderer.renderSphere(matrices.peek(), light, vertexConsumers.getBuffer(ZauberRenderLayers.getBrrrrrrrr()));
-                        matrices.pop();
+
+                        /*matrices.push();
+                        matrices.translate(0, .15, 0);
+                        var scale = 0.25f;
+                        matrices.translate(0, scale, 0);
+                        matrices.scale(scale, scale, scale);
+                        matrices.multiply(RotationAxis.NEGATIVE_Z.rotation((float) Math.sin(player.age / 200f * Math.PI)));
+                        matrices.multiply(RotationAxis.POSITIVE_X.rotation((float) Math.sin(player.age / 100f * Math.PI)));
+                        matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) Math.sin(player.age / 600f * Math.PI)));
+                        SphereRenderer.renderSphere(matrices.peek(), vertexConsumers.getBuffer(ZauberRenderLayers.getBrrrrrrrr()));
+                        matrices.pop();*/
                         //RenderSystem.setShaderColor(1, 0, 0, 1);
                         UnsafeItemRendererContext.IN_STAFF_RENDERING.remove();
                         //RenderSystem.setShaderColor(1, 1, 1, 1);

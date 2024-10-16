@@ -9,52 +9,26 @@ public class SphereRenderer {
     private static final int SPHERE_SEGMENTS = 16;
     private static final int SPHERE_RINGS = 8;
 
-    public static void renderSphere(MatrixStack.Entry entry, int light, VertexConsumer vertexConsumer) {
-        float phiStep = (float) (Math.PI / SPHERE_RINGS);
-        float thetaStep = (float) (2.0 * Math.PI / SPHERE_SEGMENTS);
+    public static void renderSphere(MatrixStack.Entry entry, VertexConsumer vertexConsumer) {
+        Mesh mesh = IcoSphereCreator.create(2, true);
 
-        /*for (int i = 0; i < SPHERE_RINGS; i++) {
-            float phi1 = i * phiStep;
-            float phi2 = (i + 1) * phiStep;
+        for (Face face : mesh.faces) {
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[2]));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[1]));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[0]));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).y);
+        }
 
-            for (int j = 0; j < SPHERE_SEGMENTS; j++) {
-                float theta1 = j * thetaStep;
-                float theta2 = (j + 1) * thetaStep;
-
-                float mul = 2.435f;
-                // Calculate the vertices for the current quad
-                Vector3f p1 = calculateSpherePoint(phi1, theta1, mul);
-                Vector3f p2 = calculateSpherePoint(phi1, theta2, mul);
-                Vector3f p3 = calculateSpherePoint(phi2, theta2, mul);
-                Vector3f p4 = calculateSpherePoint(phi2, theta1, mul);
-
-                final boolean irisWorkAround = false;
-                // Render the quad
-                if(irisWorkAround) {
-                    //NOT IMPLEMENTED YET!
-                    return;
-                } else {
-                    renderQuad(entry, vertexConsumer, light, p1, p2, p3, p4);
-                }
-            }
-        }*/
-        int i = 4;
-        float phi1 = i * phiStep;
-        float phi2 = (i + 1) * phiStep;
-
-        int j = 4;
-        float theta1 = j * thetaStep;
-        float theta2 = (j + 1) * thetaStep;
-
-
-        float mul = 2.435f;
-        // Calculate the vertices for the current quad
-        Vector3f p1 = calculateSpherePoint(phi1, theta1, mul);
-        Vector3f p2 = calculateSpherePoint(phi1, theta2, mul);
-        Vector3f p3 = calculateSpherePoint(phi2, theta2, mul);
-        Vector3f p4 = calculateSpherePoint(phi2, theta1, mul);
-
-        renderQuad(entry, vertexConsumer, light, p1, p2, p3, p4);
+        for (Face face : mesh.faces) {
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[0]));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[1]));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[2]));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).y);
+        }
     }
 
     private static Vector3f calculateSpherePoint(float phi, float theta, float mul) {
@@ -76,20 +50,20 @@ public class SphereRenderer {
 
         var color = 0xFFFFFFFF;
         vertices.vertex(entry, p1);
-        vertices.texture(0, 0);
+        vertices.texture(0, 1);
         //vertices.color(color);
         //vertices.light(light);
         //vertices.normal(entry, 0, 1, 0);
 
         vertices.vertex(entry, p2);
-        vertices.texture(0, 1);
+        vertices.texture(1, 1);
         //vertices.color(color);
         //vertices.light(light);
         //vertices.normal(entry, 0, 1, 0);
         //vertices.texture(0, 1);
 
         vertices.vertex(entry, p3);
-        vertices.texture(1, 1);
+        vertices.texture(1, 0);
         //vertices.color(color);
         //vertices.light(light);
         //vertices.normal(entry, 0, 1, 0);

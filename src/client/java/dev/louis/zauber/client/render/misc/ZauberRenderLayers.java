@@ -2,21 +2,16 @@ package dev.louis.zauber.client.render.misc;
 
 import dev.louis.zauber.client.render.item.StaffItemRenderer;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-
-import java.util.function.BiFunction;
 
 import static net.minecraft.client.render.RenderPhase.*;
 
 public class ZauberRenderLayers {
-    private static final RenderLayer.MultiPhase DEBUG_QUADS = RenderLayer.of(
-            "debug_quads",
+    private static final RenderLayer.MultiPhase DEBUG_TRIANGLES = RenderLayer.of(
+            "debug_triangles",
             VertexFormats.POSITION_TEXTURE,
-            VertexFormat.DrawMode.QUADS,
+            VertexFormat.DrawMode.TRIANGLES,
             786432,
             false,
             true,
@@ -24,6 +19,6 @@ public class ZauberRenderLayers {
     );
 
     public static RenderLayer getBrrrrrrrr() {
-        return DEBUG_QUADS;
+        return DEBUG_TRIANGLES;
     }
 }

@@ -76,15 +76,25 @@ public class ZauberClient implements ClientModInitializer {
     public void onInitializeClient() {
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            var matrices = context.matrixStack();
-            matrices.push();
-            var camera = context.camera();
-            Vec3d transformedPosition = new Vec3d(0, -50, 0).subtract(camera.getPos());
+            if (true) return;
+            /*
+            for (var player : context.world().getPlayers()) {
+                var matrices = context.matrixStack();
+                matrices.push();
+                var camera = context.camera();
 
-            matrices.translate(transformedPosition.x, transformedPosition.y, transformedPosition.z);
-            //RenderSystem.setShaderTexture(0, StaffItemRenderer.ENTITY_HOLDING_TEXTURE);
-            SphereRenderer.renderSphere(context.matrixStack().peek(), 10, context.consumers().getBuffer(ZauberRenderLayers.getBrrrrrrrr()));
-            matrices.pop();
+                Vec3d vec3d = context.world().client.getEntityRenderDispatcher().getRenderer(player).getPositionOffset(player, context.tickCounter().getTickDelta(false));
+                Vec3d transformedPosition = player.getPos().add(vec3d).subtract(camera.getPos());
+
+                matrices.translate(transformedPosition.x, transformedPosition.y, transformedPosition.z);
+                var size = 1.2f;
+                matrices.translate(0, size, 0);
+                matrices.scale(size, size, size);
+                //RenderSystem.setShaderTexture(0, StaffItemRenderer.ENTITY_HOLDING_TEXTURE);
+                SphereRenderer.renderSphere(context.matrixStack().peek(), 10, context.consumers().getBuffer(ZauberRenderLayers.getBrrrrrrrr()));
+                matrices.pop();
+            }
+            */
         });
 
         ConfigManager.loadClientConfig();
