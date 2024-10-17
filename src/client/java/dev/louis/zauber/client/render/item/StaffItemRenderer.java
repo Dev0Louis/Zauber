@@ -1,11 +1,8 @@
 package dev.louis.zauber.client.render.item;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.client.extension.BlockRenderManagerExtension;
 import dev.louis.zauber.client.model.StaffItemModel;
-import dev.louis.zauber.client.render.misc.SphereRenderer;
-import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -13,14 +10,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -29,9 +24,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
-import net.minecraft.util.math.RotationAxis;
-import org.joml.Quaternionf;
 
 public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer, SimpleSynchronousResourceReloadListener {
 
@@ -39,6 +31,7 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
     public static final ModelIdentifier STAFF_IN_HAND = ModelIdentifier.ofInventoryVariant(Identifier.of(Zauber.MOD_ID, "staff_in_hand"));
     public static final ModelIdentifier STAFF = ModelIdentifier.ofInventoryVariant(Identifier.of(Zauber.MOD_ID, "staff"));
     public static final Identifier ENTITY_HOLDING_TEXTURE = Identifier.of(Zauber.MOD_ID, "textures/test.png");
+    private static final Integer MAX_RENDER_DEPTH = 2;
     private final EntityModelLayer staffModelLayer;
     private ItemRenderer itemRenderer;
     private StaffItemModel modelStaff;
@@ -67,28 +60,15 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
 
             this.modelStaff.render(matrices, vertexConsumer, light, overlay);
             matrices.pop();
-
-            if (UnsafeItemRendererContext.IN_STAFF_RENDERING.get() == null) {
+            var depth = UnsafeItemRendererContext.STAFF_RENDERING_DEPTH.get();
+            if (depth < MAX_RENDER_DEPTH) {
                 var unsafeEntity = UnsafeItemRendererContext.RENDERER_ENTITY.get();
                 if (unsafeEntity instanceof PlayerEntity player) {
                     var extension = (PlayerEntityExtension) player;
                     extension.zauber$getTelekinesisAffected().ifPresent(entity -> {
-                        UnsafeItemRendererContext.IN_STAFF_RENDERING.set(Unit.INSTANCE);
+                        UnsafeItemRendererContext.STAFF_RENDERING_DEPTH.set(depth + 1);
                         renderEntity(matrices, vertexConsumers, light, entity);
-
-                        /*matrices.push();
-                        matrices.translate(0, .15, 0);
-                        var scale = 0.25f;
-                        matrices.translate(0, scale, 0);
-                        matrices.scale(scale, scale, scale);
-                        matrices.multiply(RotationAxis.NEGATIVE_Z.rotation((float) Math.sin(player.age / 200f * Math.PI)));
-                        matrices.multiply(RotationAxis.POSITIVE_X.rotation((float) Math.sin(player.age / 100f * Math.PI)));
-                        matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) Math.sin(player.age / 600f * Math.PI)));
-                        SphereRenderer.renderSphere(matrices.peek(), vertexConsumers.getBuffer(ZauberRenderLayers.getBrrrrrrrr()));
-                        matrices.pop();*/
-                        //RenderSystem.setShaderColor(1, 0, 0, 1);
-                        UnsafeItemRendererContext.IN_STAFF_RENDERING.remove();
-                        //RenderSystem.setShaderColor(1, 1, 1, 1);
+                        UnsafeItemRendererContext.STAFF_RENDERING_DEPTH.remove();
                     });
                 }
             }
