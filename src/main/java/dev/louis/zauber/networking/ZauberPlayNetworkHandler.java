@@ -19,7 +19,7 @@ public class ZauberPlayNetworkHandler {
         var stack = player.getStackInHand(player.getActiveHand());
         var hasStaff = stack.isOf(ZauberItems.STAFF);
         if (hasStaff) {
-            ((StaffItem) stack.getItem()).throwBlock(player.getWorld(), player, stack);
+            ((PlayerEntityExtension) player).zauber$throwTelekinesis();
         }
     }
 
@@ -46,6 +46,11 @@ public class ZauberPlayNetworkHandler {
     }
 
     public static void onStopTelekinesis(StopTelekinesisPayload payload, ServerPlayNetworking.Context context) {
-
+        var player = context.player();
+        var stack = player.getStackInHand(player.getActiveHand());
+        var hasStaff = stack.isOf(ZauberItems.STAFF);
+        if (hasStaff) {
+            ((PlayerEntityExtension) player).zauber$stopTelekinesis();
+        }
     }
 }

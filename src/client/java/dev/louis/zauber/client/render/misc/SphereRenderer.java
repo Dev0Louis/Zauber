@@ -12,22 +12,22 @@ public class SphereRenderer {
     public static void renderSphere(MatrixStack.Entry entry, VertexConsumer vertexConsumer) {
         Mesh mesh = IcoSphereCreator.create(2, true);
 
-        for (Face face : mesh.faces) {
-            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[2]));
-            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).y);
-            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[1]));
-            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).y);
-            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[0]));
-            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).y);
-        }
 
         for (Face face : mesh.faces) {
-            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[0]));
-            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[0]).y);
-            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[1]));
-            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[1]).y);
-            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexIndices[2]));
-            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).x, mesh.textureCoordinates.get(face.textureCoordinateIndices[2]).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexZ));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateZ).x, mesh.textureCoordinates.get(face.textureCoordinateZ).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexY));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateY).x, mesh.textureCoordinates.get(face.textureCoordinateY).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexX));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateX).x, mesh.textureCoordinates.get(face.textureCoordinateX).y);
+        }
+        for (Face face : mesh.faces) {
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexX));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateX).x, mesh.textureCoordinates.get(face.textureCoordinateX).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexY));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateY).x, mesh.textureCoordinates.get(face.textureCoordinateY).y);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexZ));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateZ).x, mesh.textureCoordinates.get(face.textureCoordinateZ).y);
         }
     }
 

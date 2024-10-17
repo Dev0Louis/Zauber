@@ -27,11 +27,6 @@ public class StaffItem extends Item {
         return TypedActionResult.success(user.getStackInHand(hand));
     }
 
-    //called on server only
-    public void throwBlock(World world, PlayerEntity player, ItemStack stack) {
-        ((PlayerEntityExtension) player).zauber$throwTelekinesis();
-    }
-
     public interface ClientAction {
         TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand);
     }

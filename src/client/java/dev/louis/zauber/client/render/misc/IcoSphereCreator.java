@@ -181,13 +181,13 @@ public class IcoSphereCreator
             for (Face tri : faces)
             {
                 // replace triangle by 4 triangles
-                int a = getMiddlePoint(tri.vertexIndices[0], tri.vertexIndices[1]);
-                int b = getMiddlePoint(tri.vertexIndices[1], tri.vertexIndices[2]);
-                int c = getMiddlePoint(tri.vertexIndices[2], tri.vertexIndices[0]);
+                int a = getMiddlePoint(tri.vertexX, tri.vertexY);
+                int b = getMiddlePoint(tri.vertexY, tri.vertexZ);
+                int c = getMiddlePoint(tri.vertexZ, tri.vertexX);
 
-                faces2.add(new Face(tri.vertexIndices[0], a, c));
-                faces2.add(new Face(tri.vertexIndices[1], b, a));
-                faces2.add(new Face(tri.vertexIndices[2], c, b));
+                faces2.add(new Face(tri.vertexX, a, c));
+                faces2.add(new Face(tri.vertexY, b, a));
+                faces2.add(new Face(tri.vertexZ, c, b));
                 faces2.add(new Face(a, b, c));
             }
             faces = faces2;
@@ -208,9 +208,9 @@ public class IcoSphereCreator
 
         for (Face face : this.geometry.getFaces())
         {
-            Vector3f v1 = geometry.getVertices().get(face.vertexIndices[0]);
-            Vector3f v2 = geometry.getVertices().get(face.vertexIndices[1]);
-            Vector3f v3 = geometry.getVertices().get(face.vertexIndices[2]);
+            Vector3f v1 = geometry.getVertices().get(face.vertexX);
+            Vector3f v2 = geometry.getVertices().get(face.vertexY);
+            Vector3f v3 = geometry.getVertices().get(face.vertexZ);
 
             //Generate normals
             //Special thanks to this site https://www.opengl.org/wiki/Calculating_a_Surface_Normal
@@ -221,13 +221,13 @@ public class IcoSphereCreator
             float z = (u.x() * v.y()) - (u.y() * v.x());
             geometry.normals.add(new Vector3f(x, y, z).normalize());
 
-            face.normalIndices[0] = geometry.normals.size() - 1;
-            face.normalIndices[1] = geometry.normals.size() - 1;
-            face.normalIndices[2] = geometry.normals.size() - 1;
+            face.normalX = geometry.normals.size() - 1;
+            face.normalY = geometry.normals.size() - 1;
+            face.normalZ = geometry.normals.size() - 1;
 
-            face.textureCoordinateIndices[0] = 0;
-            face.textureCoordinateIndices[1] = 1;
-            face.textureCoordinateIndices[2] = 2;
+            face.textureCoordinateX = 0;
+            face.textureCoordinateY = 1;
+            face.textureCoordinateZ = 2;
         }
 
         return this.geometry;

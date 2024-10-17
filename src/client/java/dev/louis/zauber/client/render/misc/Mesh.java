@@ -11,10 +11,10 @@ import java.util.List;
  */
 public class Mesh implements Cloneable
 {
-    public final List<Vector3f> vertices = new ArrayList();
-    public final List<Vector2f> textureCoordinates = new ArrayList();
-    public final List<Vector3f> normals = new ArrayList();
-    public final List<Face> faces = new ArrayList();
+    public final List<Vector3f> vertices = new ArrayList<>();
+    public final List<Vector2f> textureCoordinates = new ArrayList<>();
+    public final List<Vector3f> normals = new ArrayList<>();
+    public final List<Face> faces = new ArrayList<>();
 
     public void addVert(Vector3f pos)
     {
@@ -30,8 +30,7 @@ public class Mesh implements Cloneable
     }
 
     @Override
-    public Mesh clone()
-    {
+    public Mesh clone() {
         Mesh mesh = new Mesh();
         mesh.vertices.addAll(vertices);
         mesh.textureCoordinates.addAll(textureCoordinates);

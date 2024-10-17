@@ -89,6 +89,6 @@ public abstract class MinecraftClientMixin {
             at = @At("TAIL")
     )
     public void resizeStencilBuffer(CallbackInfo ci) {
-            RippedPageScreen.stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
+            StencilFramebuffer.stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
     }
 }

@@ -1,6 +1,7 @@
 package dev.louis.zauber.client;
 
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.zauber.client.model.StaffItemModel;
@@ -11,9 +12,11 @@ import dev.louis.zauber.client.render.misc.SphereRenderer;
 import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.client.screen.RippedPageScreen;
 import dev.louis.zauber.entity.*;
+import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.StaffItem;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
+import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
 import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.spell.type.SpellType;
 
@@ -47,9 +50,13 @@ import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -58,14 +65,20 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
+import static com.mojang.blaze3d.platform.GlConst.GL_ALWAYS;
+import static dev.louis.zauber.client.glisco.StencilFramebuffer.stencilFrameBuffer;
+import static org.lwjgl.opengl.GL11C.*;
 
 public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
@@ -306,20 +319,21 @@ public class ZauberClient implements ClientModInitializer {
 
                 if (!user.isSneaking()) {
                     AtomicBoolean shouldReturn = new AtomicBoolean();
-                    ext.getStaffTargetedEntity().ifPresent(entity -> {
+                    ext.getStaffTargetedEntity().ifPresentOrElse(entity -> {
                         ClientPlayNetworking.send(new StartTelekinesisPayload(entity));
                         shouldReturn.set(true);
-                    });
-                    ext.getStaffTargetedBlock().ifPresent(pos -> {
-                        ClientPlayNetworking.send(new StartTelekinesisPayload(pos));
-                        shouldReturn.set(true);
+                    }, () -> {
+                        ext.getStaffTargetedBlock().ifPresent(pos -> {
+                            ClientPlayNetworking.send(new StartTelekinesisPayload(pos));
+                            shouldReturn.set(true);
+                        });
                     });
                     if (shouldReturn.get()) {
                         return TypedActionResult.success(stack);
                     }
                 }
 
-                ext.zauber$stopTelekinesis();
+                ClientPlayNetworking.send(new StopTelekinesisPayload());
             }
             return TypedActionResult.pass(stack);
         });

@@ -10,6 +10,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
 public class StencilFramebuffer extends SimpleFramebuffer {
+    public static StencilFramebuffer stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
+
+
     public StencilFramebuffer(int width, int height) {
         super(width, height, true, MinecraftClient.IS_SYSTEM_MAC);
     }

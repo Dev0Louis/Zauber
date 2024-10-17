@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import static com.mojang.blaze3d.platform.GlConst.GL_ALWAYS;
+import static dev.louis.zauber.client.glisco.StencilFramebuffer.stencilFrameBuffer;
 import static org.lwjgl.opengl.GL11C.*;
 
 @Environment(EnvType.CLIENT)
@@ -46,7 +47,6 @@ public class RippedPageScreen extends Screen {
     private Text content;
     private List<OrderedText> cachedContent;
 
-    public static StencilFramebuffer stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());;
 
     public RippedPageScreen(Text text) {
         this(text, true);

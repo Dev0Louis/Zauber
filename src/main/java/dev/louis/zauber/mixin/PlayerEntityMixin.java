@@ -200,6 +200,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
                 telekinesisEntity.setVelocity(telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
             }
 
+            telekinesisEntity.addVelocity(this.getVelocity());
             ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
             telekinesisEntity = null;
         }
