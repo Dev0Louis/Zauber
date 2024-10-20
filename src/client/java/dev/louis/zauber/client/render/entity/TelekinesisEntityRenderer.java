@@ -1,6 +1,6 @@
 package dev.louis.zauber.client.render.entity;
 
-import dev.louis.zauber.entity.BlockTelekinesisEntity;
+import dev.louis.zauber.entity.TelekinesisEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -11,7 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 
-public class TelekinesisEntityRenderer extends EntityRenderer<BlockTelekinesisEntity> {
+public class TelekinesisEntityRenderer extends EntityRenderer<TelekinesisEntity> {
     private final BlockRenderManager blockRenderManager;
 
     public TelekinesisEntityRenderer(EntityRendererFactory.Context ctx) {
@@ -20,7 +20,7 @@ public class TelekinesisEntityRenderer extends EntityRenderer<BlockTelekinesisEn
     }
 
     @Override
-    public void render(BlockTelekinesisEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(TelekinesisEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         var blockState = entity.getBlockState();
         if (blockState != null) {
             matrices.push();
@@ -44,7 +44,7 @@ public class TelekinesisEntityRenderer extends EntityRenderer<BlockTelekinesisEn
     }
 
     @Override
-    public Identifier getTexture(BlockTelekinesisEntity entity) {
+    public Identifier getTexture(TelekinesisEntity entity) {
         return null;
     }
 }

@@ -1,8 +1,7 @@
 package dev.louis.zauber.networking;
 
-import dev.louis.zauber.entity.BlockTelekinesisEntity;
+import dev.louis.zauber.entity.TelekinesisEntity;
 import dev.louis.zauber.extension.PlayerEntityExtension;
-import dev.louis.zauber.item.StaffItem;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
@@ -10,7 +9,6 @@ import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 
 public class ZauberPlayNetworkHandler {
@@ -29,13 +27,14 @@ public class ZauberPlayNetworkHandler {
                 case StartTelekinesisPayload.TelekinesisTarget.BlockTarget(BlockPos pos) -> {
                     var world = context.player().getWorld();
                     var realState = world.getBlockState(pos);
+                    if (realState.contains(Properties.DOUBLE_BLOCK_HALF)) return;
                     var state = realState.contains(Properties.WATERLOGGED) ? realState.with(Properties.WATERLOGGED, Boolean.FALSE) : realState;
 
                     world.setBlockState(pos, realState.getFluidState().getBlockState(), Block.NOTIFY_ALL);
 
-                    BlockTelekinesisEntity blockTelekinesisEntity = new BlockTelekinesisEntity(world, pos.toCenterPos(), state, world.getBlockEntity(pos), context.player());
-                    world.spawnEntity(blockTelekinesisEntity);
-                    ((PlayerEntityExtension) context.player()).zauber$startTelekinesisOn(blockTelekinesisEntity);
+                    TelekinesisEntity telekinesisEntity = new TelekinesisEntity(world, pos.toCenterPos(), state, world.getBlockEntity(pos), context.player());
+                    world.spawnEntity(telekinesisEntity);
+                    ((PlayerEntityExtension) context.player()).zauber$startTelekinesisOn(telekinesisEntity);
                 }
                 case StartTelekinesisPayload.TelekinesisTarget.EntityTarget(int telekinedEntityId) -> {
                     var entity = context.player().getWorld().getEntityById(telekinedEntityId);

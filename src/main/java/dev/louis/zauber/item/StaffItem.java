@@ -1,12 +1,8 @@
 package dev.louis.zauber.item;
 
-import dev.louis.zauber.extension.PlayerEntityExtension;
-import dev.louis.zauber.entity.BlockTelekinesisEntity;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;

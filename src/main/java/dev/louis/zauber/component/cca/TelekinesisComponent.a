@@ -1,6 +1,6 @@
 package dev.louis.zauber.component.cca;
 
-import dev.louis.zauber.entity.BlockTelekinesisEntity;
+import dev.louis.zauber.entity.TelekinesisEntity;
 import dev.louis.zauber.item.ZauberItems;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
@@ -64,8 +64,8 @@ public class TelekinesisComponent implements AutoSyncedComponent, ServerTickingC
     @Override
     public void zauber$throwTelekinesis() {
         if(telekinesisEntity != null) {
-            if (telekinesisEntity instanceof BlockTelekinesisEntity blockTelekinesisEntity) {
-                blockTelekinesisEntity.throwBlock();
+            if (telekinesisEntity instanceof BlockTelekinesisEntity telekinesisEntity) {
+                telekinesisEntity.throwBlock();
             } else {
                 telekinesisEntity.setVelocity(telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
             }

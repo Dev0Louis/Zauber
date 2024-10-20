@@ -1,18 +1,15 @@
 package dev.louis.zauber.client;
 
 import com.google.common.collect.Lists;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
 import dev.louis.zauber.client.render.item.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
-import dev.louis.zauber.client.render.misc.SphereRenderer;
 import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.client.screen.RippedPageScreen;
 import dev.louis.zauber.entity.*;
-import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.StaffItem;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
@@ -50,13 +47,10 @@ import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -65,20 +59,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
-import static com.mojang.blaze3d.platform.GlConst.GL_ALWAYS;
-import static dev.louis.zauber.client.glisco.StencilFramebuffer.stencilFrameBuffer;
-import static org.lwjgl.opengl.GL11C.*;
 
 public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
@@ -87,27 +75,36 @@ public class ZauberClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            if (true) return;
-            /*
-            for (var player : context.world().getPlayers()) {
-                var matrices = context.matrixStack();
-                matrices.push();
-                var camera = context.camera();
+            var player = context.world().client.player;
+            if (player.isSneaking()) {
+                ((PlayerEntityExtension) player).zauber$getTelekinesisAffected().ifPresent(telekinesed -> {
+                    if (telekinesed instanceof TelekinesisEntity telekinedEntity) {
+                        var camera = context.camera();
+                        var matrices = context.matrixStack();
 
-                Vec3d vec3d = context.world().client.getEntityRenderDispatcher().getRenderer(player).getPositionOffset(player, context.tickCounter().getTickDelta(false));
-                Vec3d transformedPosition = player.getPos().add(vec3d).subtract(camera.getPos());
+                        matrices.push();
 
-                matrices.translate(transformedPosition.x, transformedPosition.y, transformedPosition.z);
-                var size = 1.2f;
-                matrices.translate(0, size, 0);
-                matrices.scale(size, size, size);
-                //RenderSystem.setShaderTexture(0, StaffItemRenderer.ENTITY_HOLDING_TEXTURE);
-                SphereRenderer.renderSphere(context.matrixStack().peek(), 10, context.consumers().getBuffer(ZauberRenderLayers.getBrrrrrrrr()));
-                matrices.pop();
+                        Vec3d dest = Vec3d.of(telekinesed.getBlockPos());
+                        Vec3d transformedPosition = dest.subtract(camera.getPos());
+
+                        matrices.translate(transformedPosition.x, transformedPosition.y, transformedPosition.z);
+
+                        var buffer = context.consumers().getBuffer(ZauberRenderLayers.LINES);
+
+                        renderVerticalVertex(buffer, matrices, 0, 0);
+                        renderVerticalVertex(buffer, matrices, 0, 1);
+                        renderVerticalVertex(buffer, matrices, 1, 0);
+                        renderVerticalVertex(buffer, matrices, 1, 1);
+                        renderUpHorizontalVertexes(buffer, matrices, true, 0, 0);
+                        renderUpHorizontalVertexes(buffer, matrices, true, 1, 1);
+                        renderUpHorizontalVertexes(buffer, matrices, false, 0, 0);
+                        renderUpHorizontalVertexes(buffer, matrices, false, 1, 1);
+                        matrices.pop();
+                    }
+                });
             }
-            */
+
         });
 
         ConfigManager.loadClientConfig();
@@ -144,7 +141,6 @@ public class ZauberClient implements ClientModInitializer {
             var client = MinecraftClient.getInstance();
             AccessoriesCapability.getOptionally(client.player).ifPresent(capability -> {
                 List<Map.Entry<Item, PlayerTotemData>> sortedList = Zauber.ITEM_TO_TOTEM_DATA.entrySet().stream().collect(Collectors.toList());
-                //Collections.shuffle(sortedList);
                 sortedList.sort((totemData, totemData2) -> {
                     var active = totemData.getValue().activityChecker().isActive(client.player);
                     var active2 = totemData2.getValue().activityChecker().isActive(client.player);
@@ -258,7 +254,7 @@ public class ZauberClient implements ClientModInitializer {
         EntityRendererRegistry.register(SpellArrowEntity.TYPE, BlueArrowEntityRenderer::new);
         EntityRendererRegistry.register(ManaArrowEntity.TYPE, BlueArrowEntityRenderer::new);
         EntityRendererRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntityRenderer::new);
-        EntityRendererRegistry.register(BlockTelekinesisEntity.TYPE, TelekinesisEntityRenderer::new);
+        EntityRendererRegistry.register(TelekinesisEntity.TYPE, TelekinesisEntityRenderer::new);
         //ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION, ExplosionLargeParticle.Factory::new);
         //ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION_EMITTER, ExplosionLargeParticle.Factory::new);
         //ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_RUNE, DragonBreathParticle.Factory::new);
@@ -337,6 +333,56 @@ public class ZauberClient implements ClientModInitializer {
             }
             return TypedActionResult.pass(stack);
         });
+
+    }
+
+    static final int lineAlpha = 100;
+
+    private static void renderUpHorizontalVertexes(VertexConsumer buffer, MatrixStack matrices, boolean up, int x, int z) {
+        var y = up ? 1 : 0;
+        buffer.vertex(matrices.peek(),
+                        x,
+                        y,
+                        z
+                )
+                .color(255, 255, 255, lineAlpha)
+                .overlay(0)
+                .normal(0, 1, 0);
+        buffer.vertex(matrices.peek(),
+                        (x + 1) % 2,
+                        y,
+                        z
+                )
+                .color(255, 255, 255, lineAlpha)
+                .overlay(0)
+                .normal(0, 1, 0);
+        buffer.vertex(matrices.peek(),
+                        x,
+                        y,
+                        z
+                )
+                .color(255, 255, 255, lineAlpha)
+                .overlay(0)
+                .normal(0, 1, 0);
+        buffer.vertex(matrices.peek(),
+                        x,
+                        y,
+                        (z + 1) % 2
+                )
+                .color(255, 255, 255, lineAlpha)
+                .overlay(0)
+                .normal(0, 1, 0);
+    }
+
+    private static void renderVerticalVertex(VertexConsumer buffer, MatrixStack matrices, int x, int z) {
+        buffer.vertex(matrices.peek(), x, 0, z)
+                .color(255, 255, 255, lineAlpha)
+                .overlay(0)
+                .normal(0, 1, 0);
+        buffer.vertex(matrices.peek(), x, 1, z)
+                .color(255, 255, 255, lineAlpha)
+                .overlay(0)
+                .normal(0, 1, 0);
     }
 
     public static void createSpellKeyBind(SpellType<?> spellType, boolean hides) {

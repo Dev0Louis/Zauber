@@ -1,15 +1,14 @@
 package dev.louis.zauber.mixin;
 
 import dev.louis.zauber.Zauber;
+import dev.louis.zauber.entity.TelekinesisEntity;
 import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.extension.PlayerEntityExtension;
-import dev.louis.zauber.entity.BlockTelekinesisEntity;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.tag.ZauberItemTags;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -21,6 +20,7 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -84,10 +84,10 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     @Override
     public void zauber$startTelekinesisOn(@Nullable Entity newTelekinesisEntity) {
         if (this.telekinesisEntity != null && !this.getWorld().isClient()) {
-            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
+            ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
             //TODO: Remove special caseing
-            if (this.telekinesisEntity instanceof BlockTelekinesisEntity blockTelekinesisEntity) {
-                blockTelekinesisEntity.loseOwner();
+            if (this.telekinesisEntity instanceof TelekinesisEntity telekinesisEntity) {
+                telekinesisEntity.loseOwner();
             }
         }
 
@@ -123,7 +123,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
                     .ifPresent(entity -> staffTargetedEntity = entity);
 
             var rayCast = this.raycast(TARGETING_DISTANCE, 0, false);
-            if (rayCast.getType() == HitResult.Type.BLOCK) {
+            if (
+                    rayCast.getType() == HitResult.Type.BLOCK &&
+                    !this.getWorld().getBlockState(((BlockHitResult) rayCast).getBlockPos())
+                            .contains(Properties.DOUBLE_BLOCK_HALF)
+            ) {
                 staffTargetedBlock = ((BlockHitResult) rayCast).getBlockPos();
             }
 
@@ -194,15 +198,15 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     @Override
     public void zauber$throwTelekinesis() {
         if(telekinesisEntity != null) {
-            if (telekinesisEntity instanceof BlockTelekinesisEntity blockTelekinesisEntity) {
-                blockTelekinesisEntity.throwBlock();
+            if (this.telekinesisEntity instanceof TelekinesisEntity telekinesisEntity) {
+                telekinesisEntity.throwBlock();
             } else {
-                telekinesisEntity.setVelocity(telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
+                this.telekinesisEntity.setVelocity(this.telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
             }
 
-            telekinesisEntity.addVelocity(this.getVelocity());
-            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
-            telekinesisEntity = null;
+            this.telekinesisEntity.addVelocity(this.getVelocity());
+            ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
+            this.telekinesisEntity = null;
         }
 
         if (!this.getWorld().isClient()) {
@@ -213,12 +217,12 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     @Override
     public void zauber$stopTelekinesis() {
         if(telekinesisEntity != null) {
-            if (telekinesisEntity instanceof BlockTelekinesisEntity blockTelekinesisEntity) {
-                blockTelekinesisEntity.loseOwner();
+            if (this.telekinesisEntity instanceof TelekinesisEntity telekinesisEntity) {
+                telekinesisEntity.loseOwner();
             }
 
-            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
-            telekinesisEntity = null;
+            ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
+            this.telekinesisEntity = null;
         }
 
         if (!this.getWorld().isClient()) {
