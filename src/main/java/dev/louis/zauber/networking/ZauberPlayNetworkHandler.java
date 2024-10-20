@@ -1,6 +1,6 @@
 package dev.louis.zauber.networking;
 
-import dev.louis.zauber.entity.TelekinesisEntity;
+import dev.louis.zauber.entity.TelekinedBlockEntity;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
@@ -32,9 +32,9 @@ public class ZauberPlayNetworkHandler {
 
                     world.setBlockState(pos, realState.getFluidState().getBlockState(), Block.NOTIFY_ALL);
 
-                    TelekinesisEntity telekinesisEntity = new TelekinesisEntity(world, pos.toCenterPos(), state, world.getBlockEntity(pos), context.player());
-                    world.spawnEntity(telekinesisEntity);
-                    ((PlayerEntityExtension) context.player()).zauber$startTelekinesisOn(telekinesisEntity);
+                    TelekinedBlockEntity telekinedBlockEntity = new TelekinedBlockEntity(world, pos.toCenterPos(), state, world.getBlockEntity(pos), context.player());
+                    world.spawnEntity(telekinedBlockEntity);
+                    ((PlayerEntityExtension) context.player()).zauber$startTelekinesisOn(telekinedBlockEntity);
                 }
                 case StartTelekinesisPayload.TelekinesisTarget.EntityTarget(int telekinedEntityId) -> {
                     var entity = context.player().getWorld().getEntityById(telekinedEntityId);

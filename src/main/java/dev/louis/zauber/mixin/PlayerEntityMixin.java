@@ -1,7 +1,7 @@
 package dev.louis.zauber.mixin;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.entity.TelekinesisEntity;
+import dev.louis.zauber.entity.TelekinedBlockEntity;
 import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.HeartOfTheDarknessItem;
@@ -86,8 +86,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         if (this.telekinesisEntity != null && !this.getWorld().isClient()) {
             ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
             //TODO: Remove special caseing
-            if (this.telekinesisEntity instanceof TelekinesisEntity telekinesisEntity) {
-                telekinesisEntity.loseOwner();
+            if (this.telekinesisEntity instanceof TelekinedBlockEntity telekinedBlockEntity) {
+                telekinedBlockEntity.loseOwner();
             }
         }
 
@@ -198,8 +198,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     @Override
     public void zauber$throwTelekinesis() {
         if(telekinesisEntity != null) {
-            if (this.telekinesisEntity instanceof TelekinesisEntity telekinesisEntity) {
-                telekinesisEntity.throwBlock();
+            if (this.telekinesisEntity instanceof TelekinedBlockEntity telekinedBlockEntity) {
+                telekinedBlockEntity.throwBlock();
             } else {
                 this.telekinesisEntity.setVelocity(this.telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
             }
@@ -217,8 +217,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     @Override
     public void zauber$stopTelekinesis() {
         if(telekinesisEntity != null) {
-            if (this.telekinesisEntity instanceof TelekinesisEntity telekinesisEntity) {
-                telekinesisEntity.loseOwner();
+            if (this.telekinesisEntity instanceof TelekinedBlockEntity telekinedBlockEntity) {
+                telekinedBlockEntity.loseOwner();
             }
 
             ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);

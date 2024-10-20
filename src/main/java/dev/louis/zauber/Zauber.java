@@ -228,7 +228,7 @@ public class Zauber implements ModInitializer {
         });
 
         registerEntity("spell_arrow", SpellArrowEntity.TYPE);
-        registerEntity("block_telekinesis", TelekinesisEntity.TYPE);
+        registerEntity("block_telekinesis", TelekinedBlockEntity.TYPE);
         registerEntity("haunting_damage", HauntingDamageEntity.TYPE);
         registerEntity("ice_peak", IcePeakEntity.TYPE);
         registerEntity("hail_stone", HailStoneEntity.TYPE);

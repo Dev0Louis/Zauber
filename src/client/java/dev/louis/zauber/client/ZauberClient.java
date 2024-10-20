@@ -79,7 +79,7 @@ public class ZauberClient implements ClientModInitializer {
             var player = context.world().client.player;
             if (player.isSneaking()) {
                 ((PlayerEntityExtension) player).zauber$getTelekinesisAffected().ifPresent(telekinesed -> {
-                    if (telekinesed instanceof TelekinesisEntity telekinedEntity) {
+                    if (telekinesed instanceof TelekinedBlockEntity) {
                         var camera = context.camera();
                         var matrices = context.matrixStack();
 
@@ -254,7 +254,7 @@ public class ZauberClient implements ClientModInitializer {
         EntityRendererRegistry.register(SpellArrowEntity.TYPE, BlueArrowEntityRenderer::new);
         EntityRendererRegistry.register(ManaArrowEntity.TYPE, BlueArrowEntityRenderer::new);
         EntityRendererRegistry.register(ManaHorseEntity.TYPE, ManaHorseEntityRenderer::new);
-        EntityRendererRegistry.register(TelekinesisEntity.TYPE, TelekinesisEntityRenderer::new);
+        EntityRendererRegistry.register(TelekinedBlockEntity.TYPE, TelekinesisEntityRenderer::new);
         //ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION, ExplosionLargeParticle.Factory::new);
         //ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_EXPLOSION_EMITTER, ExplosionLargeParticle.Factory::new);
         //ParticleFactoryRegistry.getInstance().register(ZauberParticleTypes.MANA_RUNE, DragonBreathParticle.Factory::new);

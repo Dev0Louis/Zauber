@@ -1,6 +1,6 @@
 package dev.louis.zauber.component.cca;
 
-import dev.louis.zauber.entity.TelekinesisEntity;
+import dev.louis.zauber.entity.TelekinedBlockEntity;
 import dev.louis.zauber.item.ZauberItems;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
@@ -63,20 +63,20 @@ public class TelekinesisComponent implements AutoSyncedComponent, ServerTickingC
 
     @Override
     public void zauber$throwTelekinesis() {
-        if(telekinesisEntity != null) {
-            if (telekinesisEntity instanceof BlockTelekinesisEntity telekinesisEntity) {
-                telekinesisEntity.throwBlock();
+        if(telekinedBlockEntity != null) {
+            if (telekinedBlockEntity instanceof BlockTelekinesisEntity telekinedBlockEntity) {
+                telekinedBlockEntity.throwBlock();
             } else {
-                telekinesisEntity.setVelocity(telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
+                telekinedBlockEntity.setVelocity(telekinedBlockEntity.getPos().subtract(this.getPos()).multiply(0.2));
             }
 
-            telekinesisEntity = null;
+            telekinedBlockEntity = null;
         }
     }
 
     @Override
     public Optional<Entity> zauber$getTelekinesisAffected() {
-        return Optional.ofNullable(telekinesisEntity);
+        return Optional.ofNullable(telekinedBlockEntity);
     }
     @Override
     public void readFromNbt(NbtCompound nbtCompound, RegistryWrapper.WrapperLookup wrapperLookup) {

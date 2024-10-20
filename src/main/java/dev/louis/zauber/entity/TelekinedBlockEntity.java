@@ -28,22 +28,22 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 //Entity to reference Telekinesis
-public class TelekinesisEntity extends Entity implements Ownable {
+public class TelekinedBlockEntity extends Entity implements Ownable {
     PlayerEntity owner;
-    public static final EntityType<TelekinesisEntity> TYPE = EntityType.Builder
-            .<TelekinesisEntity>create(TelekinesisEntity::new, SpawnGroup.MISC)
+    public static final EntityType<TelekinedBlockEntity> TYPE = EntityType.Builder
+            .<TelekinedBlockEntity>create(TelekinedBlockEntity::new, SpawnGroup.MISC)
             .dimensions(1, 1)
             .build();
     BlockState blockState;
-    protected static final TrackedData<BlockPos> BLOCK_POS = DataTracker.registerData(TelekinesisEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
+    protected static final TrackedData<BlockPos> BLOCK_POS = DataTracker.registerData(TelekinedBlockEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     @Nullable
     NbtCompound blockEntityData;
 
-    public TelekinesisEntity(EntityType<?> type, World world) {
+    public TelekinedBlockEntity(EntityType<?> type, World world) {
         super(type, world);
     }
 
-    public TelekinesisEntity(World world, Vec3d pos, BlockState state, @Nullable BlockEntity blockEntity, PlayerEntity owner) {
+    public TelekinedBlockEntity(World world, Vec3d pos, BlockState state, @Nullable BlockEntity blockEntity, PlayerEntity owner) {
         super(TYPE, world);
         this.setPosition(pos);
         this.blockState = state;
@@ -64,7 +64,7 @@ public class TelekinesisEntity extends Entity implements Ownable {
         if (this.getWorld().isClient()) return;
 
         //System.out.println(state);
-        if (owner == null || ((PlayerEntityExtension) owner).zauber$getTelekinesisAffected().map(entity -> entity != TelekinesisEntity.this).orElse(true)) {
+        if (owner == null || ((PlayerEntityExtension) owner).zauber$getTelekinesisAffected().map(entity -> entity != TelekinedBlockEntity.this).orElse(true)) {
 
             if (tryPlace()) return;
             FallingBlockEntity fallingBlockEntity = new FallingBlockEntity(
