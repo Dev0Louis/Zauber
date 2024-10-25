@@ -63,6 +63,8 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
     public void tick() {
         super.tick();
 
+
+
         if (this.getWorld().isClient()) return;
 
         if (owner == null || owner.zauber$getTelekinesisAffected().map(entity -> entity != TelekinedBlockEntity.this).orElse(true)) {
@@ -79,6 +81,7 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
             this.getWorld().spawnEntity(fallingBlockEntity);
             this.discard();
         }
+
 
         /*var target = this.owner.getEyePos().add(this.owner.getRotationVector().normalize().multiply(6).add(0, -.5, 0));
         this.setVelocity(this.getVelocity().multiply(0.75));

@@ -326,6 +326,7 @@ public class ZauberClient implements ClientModInitializer {
                         });
                     });
                     if (shouldReturn.get()) {
+                        user.swingHand(hand);
                         return TypedActionResult.success(stack);
                     }
                 }

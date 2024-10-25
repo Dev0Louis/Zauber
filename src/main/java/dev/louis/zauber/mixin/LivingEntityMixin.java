@@ -34,7 +34,7 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyReturnValue(
             method = "isPushable", at = @At("RETURN"))
     public boolean dashingPlayersAreNotPushable(boolean original) {
-        //TODO: Add Nebula way to check for Type
+        //TODO: Add Nebula way to check for SpellType being active
         return original && !((Object) this instanceof SpellEffectHolder spellEffectHolder && spellEffectHolder.getSpellEffects().stream().anyMatch(spellEffect -> spellEffect.getType().equals(SpellEffectTypes.DASH)));
     }
 

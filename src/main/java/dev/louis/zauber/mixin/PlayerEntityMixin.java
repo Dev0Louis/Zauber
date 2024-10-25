@@ -171,7 +171,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         for (int j = 0; j < serverWorld.getPlayers().size(); j++) {
             ServerPlayerEntity player = serverWorld.getPlayers().get(j);
             serverWorld.sendToPlayerIfNearby(player, false, this.getX(), this.getY(), this.getZ(), ServerPlayNetworking.createS2CPacket(payload));
-                System.out.println("Send: " + payload);
+            System.out.println("Send: " + payload);
         }
     }
 
