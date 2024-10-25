@@ -1,7 +1,6 @@
 package dev.louis.zauber.client.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.extension.EntityExtension;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -23,8 +22,13 @@ public class EntityRenderDispatcherMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V")
     )
     public void renderTelekinesisAroundTelekinesed(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int light, CallbackInfo ci, @Local EntityRenderer<Entity> entityRenderer) {
-        if (((EntityExtension) entity).isTelekinesed()) {
-            VertexConsumerProvider fakeVertexConsumerProvider = (layer) -> vertexConsumerProvider.getBuffer(ZauberRenderLayers.getBrrrrrrrr(entity, tickDelta));
+        if (((EntityExtension) entity).zauber$isTelekinesed()) {
+            VertexConsumerProvider fakeVertexConsumerProvider = (layer) -> {
+                if (!layer.name.equals("leash")) {
+                    return vertexConsumerProvider.getBuffer(ZauberRenderLayers.getBrrrrrrrr(entity, tickDelta));
+                }
+                return vertexConsumerProvider.getBuffer(layer);
+            };
 
             entityRenderer.render(
                     entity,

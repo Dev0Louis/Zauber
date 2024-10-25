@@ -7,6 +7,7 @@
     "BowItemMixin",
     "CauldronBehaviorMixin",
     "EntityMixin",
+    "HorseEntityMixin",
     "ItemEntityMixin",
     "ItemStackComponentizationFixMixin",
     "ItemStackMixin",

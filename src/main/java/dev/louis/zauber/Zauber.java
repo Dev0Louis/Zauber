@@ -8,7 +8,7 @@ import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
 import dev.louis.zauber.networking.configuration.task.OptionSyncTask;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
-import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
+import dev.louis.zauber.networking.play.c2s.ThrowTelekinedPayload;
 import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.spell.type.SpellType;
 
@@ -168,8 +168,8 @@ public class Zauber implements ModInitializer {
             context.networkHandler().completeTask(OptionSyncTask.KEY);
         });
 
-        PayloadTypeRegistry.playC2S().register(ThrowBlockPayload.ID, ThrowBlockPayload.CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(ThrowBlockPayload.ID, ZauberPlayNetworkHandler::onThrowBlock);
+        PayloadTypeRegistry.playC2S().register(ThrowTelekinedPayload.ID, ThrowTelekinedPayload.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(ThrowTelekinedPayload.ID, ZauberPlayNetworkHandler::onThrowTelekined);
 
         PayloadTypeRegistry.playC2S().register(StartTelekinesisPayload.ID, StartTelekinesisPayload.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(StartTelekinesisPayload.ID, ZauberPlayNetworkHandler::onStartTelekinesis);

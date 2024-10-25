@@ -1,14 +1,17 @@
 package dev.louis.zauber.client.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import dev.louis.nebula.api.spell.Spell;
 import dev.louis.nebula.api.spell.SpellSource;
 import dev.louis.zauber.client.ZauberClient;
 import dev.louis.zauber.client.glisco.StencilFramebuffer;
-import dev.louis.zauber.client.screen.RippedPageScreen;
 import dev.louis.zauber.config.ConfigManager;
 import dev.louis.zauber.item.ZauberItems;
-import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
+import dev.louis.zauber.networking.play.c2s.ThrowTelekinedPayload;
 import dev.louis.zauber.spell.type.PlayerSpellFactory;
 import dev.louis.zauber.spell.type.SpellType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -18,11 +21,9 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.Hand;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,10 +35,6 @@ public abstract class MinecraftClientMixin {
     public ClientPlayerEntity player;
 
     @Shadow @Final public GameOptions options;
-    @Shadow @Final private Window window;
-    @Shadow @Nullable public Screen currentScreen;
-    @Shadow private static MinecraftClient instance;
-    @Shadow @Final public static boolean IS_SYSTEM_MAC;
     @Unique
     int spellCooldown = 0;
 
@@ -68,20 +65,21 @@ public abstract class MinecraftClientMixin {
         spellCooldown = ConfigManager.getServerConfig().spellCooldown();
     }
 
-    @WrapWithCondition(
+    @WrapOperation(
             method = "handleInputEvents",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;handleBlockBreaking(Z)V")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;doAttack()Z")
     )
-    public boolean a(MinecraftClient client, boolean breaking) {
+    public boolean a(MinecraftClient client, Operation<Boolean> original, @Local(ordinal = 0, index = 1) LocalBooleanRef booleanRef   /*bl3*/) {
         if (client.player != null) {
             var stack = client.player.getStackInHand(client.player.getActiveHand());
             var hasStaff = stack.isOf(ZauberItems.STAFF);
             if (hasStaff && this.options.attackKey.isPressed()) {
-                ClientPlayNetworking.send(ThrowBlockPayload.INSTANCE);
-                return false;
+                ClientPlayNetworking.send(ThrowTelekinedPayload.INSTANCE);
+                client.player.swingHand(Hand.MAIN_HAND);
+                return true;
             }
         }
-        return true;
+        return original.call(client);
     }
 
     @Inject(

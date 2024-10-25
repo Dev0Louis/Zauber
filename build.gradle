@@ -1,7 +1,7 @@
 import net.fabricmc.loom.util.gradle.SourceSetHelper
 
 plugins {
-    id 'fabric-loom' version '1.7-SNAPSHOT'
+    id 'fabric-loom' version '1.8-SNAPSHOT'
     id 'maven-publish'
 }
 

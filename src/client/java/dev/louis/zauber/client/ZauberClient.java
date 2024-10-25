@@ -9,6 +9,7 @@ import dev.louis.zauber.client.render.item.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
 import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.client.screen.RippedPageScreen;
+import dev.louis.zauber.client.telekinesis.ClientTargetingHelper;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.StaffItem;
@@ -48,6 +49,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -84,8 +86,9 @@ public class ZauberClient implements ClientModInitializer {
                         var matrices = context.matrixStack();
 
                         matrices.push();
-
-                        Vec3d dest = Vec3d.of(telekinesed.getBlockPos());
+                        Vec3d dest = new Vec3d(Math.round(telekinesed.getX() -.5), Math.round(telekinesed.getY()), Math.round(telekinesed.getZ() -.5));
+                        DebugRenderer.drawString(matrices, context.consumers(), telekinesed.getPos().toString(), telekinesed.getX(), telekinesed.getY() + 2, telekinesed.getZ(), 0xFF0FFF0F);
+                        DebugRenderer.drawString(matrices, context.consumers(), dest.toString(), telekinesed.getX(), telekinesed.getY() + 2.4, telekinesed.getZ(), 0xFF0F0FFF);
                         Vec3d transformedPosition = dest.subtract(camera.getPos());
 
                         matrices.translate(transformedPosition.x, transformedPosition.y, transformedPosition.z);
@@ -311,15 +314,13 @@ public class ZauberClient implements ClientModInitializer {
         StaffItem.CLIENT_ACTION = ((world, user, hand) -> {
             var stack = user.getStackInHand(hand);
             if (stack.isOf(ZauberItems.STAFF)) {
-                var ext = (PlayerEntityExtension) user;
-
                 if (!user.isSneaking()) {
                     AtomicBoolean shouldReturn = new AtomicBoolean();
-                    ext.getStaffTargetedEntity().ifPresentOrElse(entity -> {
+                    ClientTargetingHelper.getTargetedEntity().ifPresentOrElse(entity -> {
                         ClientPlayNetworking.send(new StartTelekinesisPayload(entity));
                         shouldReturn.set(true);
                     }, () -> {
-                        ext.getStaffTargetedBlock().ifPresent(pos -> {
+                        ClientTargetingHelper.getTargetBlock().ifPresent(pos -> {
                             ClientPlayNetworking.send(new StartTelekinesisPayload(pos));
                             shouldReturn.set(true);
                         });

@@ -1,19 +1,21 @@
 package dev.louis.zauber.extension;
 
-import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public interface PlayerEntityExtension {
-    void zauber$stopTelekinesis();
-    void zauber$startTelekinesisOn(@Nullable Entity telekinesisEntity);
-    Optional<Entity> zauber$getTelekinesisAffected();
-    Optional<LivingEntity> getStaffTargetedEntity();
-    Optional<BlockPos> getStaffTargetedBlock();
-
-    void zauber$throwTelekinesis();
+    default void zauber$stopTelekinesis() {
+     throw new UnsupportedOperationException("BLOOP BLOOP. I am a Mixin method don't call me >:C");
+    }
+    default void zauber$startTelekinesisOn(@Nullable Entity telekinesisEntity) {
+     throw new UnsupportedOperationException("BLOOP BLOOP. I am a Mixin method don't call me >:C");
+    }
+    default Optional<Entity> zauber$getTelekinesisAffected() {
+     throw new UnsupportedOperationException("BLOOP BLOOP. I am a Mixin method don't call me >:C");
+    }
+    default void zauber$throwTelekined() {
+     throw new UnsupportedOperationException("BLOOP BLOOP. I am a Mixin method don't call me >:C");
+    }
 }

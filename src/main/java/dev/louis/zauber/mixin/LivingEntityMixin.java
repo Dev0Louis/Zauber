@@ -4,11 +4,13 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.louis.nebula.api.spell.holder.SpellEffectHolder;
 import dev.louis.zauber.extension.EntityExtension;
+import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.spell.effect.type.SpellEffectTypes;
 import io.wispforest.accessories.api.AccessoriesCapability;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -16,8 +18,10 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Debug(export = true)
 @Mixin(value = LivingEntity.class, priority = 1001)
@@ -32,6 +36,16 @@ public abstract class LivingEntityMixin extends Entity {
     public boolean dashingPlayersAreNotPushable(boolean original) {
         //TODO: Add Nebula way to check for Type
         return original && !((Object) this instanceof SpellEffectHolder spellEffectHolder && spellEffectHolder.getSpellEffects().stream().anyMatch(spellEffect -> spellEffect.getType().equals(SpellEffectTypes.DASH)));
+    }
+
+    @Inject(
+            method = "applyDamage",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setHealth(F)V")
+    )
+    public void stopTelekinesisOnDamage(DamageSource source, float amount, CallbackInfo ci) {
+        ((EntityExtension) this).zauber$getTelekineser().ifPresent(telekineser -> {
+            ((PlayerEntityExtension) telekineser).zauber$stopTelekinesis();
+        });
     }
 
     /*@Inject(
@@ -50,7 +64,7 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }*/
 
-    @SuppressWarnings({"InvalidInjectorMethodSignature", "UnreachableCode"})
+    @SuppressWarnings({"InvalidInjectorMethodSignature", "UnreachableCode", "MixinAnnotationTarget"})
     @ModifyVariable(
             method = "tryUseTotem",
             at = @At(value = "LOAD", opcode = 0),
@@ -82,6 +96,6 @@ public abstract class LivingEntityMixin extends Entity {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;isIn(Lnet/minecraft/registry/tag/TagKey;)Z")
     )
     public boolean a(boolean isImmune) {
-        return isImmune || ((EntityExtension) this).isTelekinesed();
+        return isImmune || ((EntityExtension) this).zauber$isTelekinesed();
     }
 }

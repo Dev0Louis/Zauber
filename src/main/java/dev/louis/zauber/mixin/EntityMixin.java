@@ -1,34 +1,32 @@
 package dev.louis.zauber.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.extension.PlayerEntityExtension;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Optional;
 
-@Debug(export = true)
 @Mixin(Entity.class)
 public class EntityMixin implements EntityExtension {
+    @Unique
     @Nullable
     private PlayerEntity telekineser;
 
     @Override
-    public Optional<PlayerEntity> getTelekineser() {
+    public Optional<PlayerEntity> zauber$getTelekineser() {
         this.checkTelekinesis();
         return Optional.ofNullable(telekineser);
     }
 
     @Override
-    public void setTelekineser(PlayerEntity newTelekineser) {
+    public void zauber$setTelekineser(@NotNull PlayerEntity newTelekineser) {
         if (telekineser != null && telekineser != newTelekineser) {
             ((PlayerEntityExtension) telekineser).zauber$stopTelekinesis();
         }
@@ -37,12 +35,15 @@ public class EntityMixin implements EntityExtension {
     }
 
     @Override
-    public void removeTelinesisFrom(PlayerEntity player) {
-        if (player == telekineser) telekineser = null;
+    public void zauber$removeTelekinesisFrom(PlayerEntity player) {
+        if (player == telekineser) {
+            telekineser = null;
+        }
     }
 
+
     @Override
-    public boolean isTelekinesed() {
+    public boolean zauber$isTelekinesed() {
         this.checkTelekinesis();
         return telekineser != null;
     }
@@ -58,6 +59,6 @@ public class EntityMixin implements EntityExtension {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;isIn(Lnet/minecraft/registry/tag/TagKey;)Z")
     )
     public boolean a(boolean isImmune) {
-        return isImmune || this.isTelekinesed();
+        return isImmune || this.zauber$isTelekinesed();
     }
 }

@@ -1,6 +1,7 @@
 package dev.louis.zauber.entity;
 
 import dev.louis.zauber.Zauber;
+import dev.louis.zauber.extension.EntityExtension;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -38,6 +39,7 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
     protected static final TrackedData<BlockPos> BLOCK_POS = DataTracker.registerData(TelekinedBlockEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     @Nullable
     NbtCompound blockEntityData;
+    private boolean tryPlaceDirect;
 
     public TelekinedBlockEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -63,10 +65,9 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
 
         if (this.getWorld().isClient()) return;
 
-        //System.out.println(state);
-        if (owner == null || ((PlayerEntityExtension) owner).zauber$getTelekinesisAffected().map(entity -> entity != TelekinedBlockEntity.this).orElse(true)) {
+        if (owner == null || owner.zauber$getTelekinesisAffected().map(entity -> entity != TelekinedBlockEntity.this).orElse(true)) {
 
-            if (tryPlace()) return;
+            if (tryPlaceDirect && tryPlace()) return;
             FallingBlockEntity fallingBlockEntity = new FallingBlockEntity(
                     this.getWorld(),
                     this.getX(),
@@ -79,7 +80,6 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
             this.discard();
         }
 
-
         /*var target = this.owner.getEyePos().add(this.owner.getRotationVector().normalize().multiply(6).add(0, -.5, 0));
         this.setVelocity(this.getVelocity().multiply(0.75));
         var vel = target.subtract(this.getPos()).multiply(0.1);
@@ -87,9 +87,14 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
         this.move(MovementType.SELF, this.getVelocity());*/
     }
 
+    @Override
+    public boolean isFireImmune() {
+        return true;
+    }
+
     private boolean tryPlace() {
-        var block = blockState.getBlock();
-        var blockPos = this.getBlockPos();
+        // Not floored, but rounded
+        var blockPos = new BlockPos((int) Math.round(this.getX() -.5), (int) Math.round(this.getY()), (int) Math.round(this.getZ() -.5));
         BlockState blockState = this.getWorld().getBlockState(blockPos);
         if (!blockState.isOf(Blocks.MOVING_PISTON)) {
             boolean canReplace = blockState.canReplace(new AutomaticItemPlacementContext(this.getWorld(), blockPos, Direction.DOWN, ItemStack.EMPTY, Direction.UP));
@@ -118,7 +123,7 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
                             try {
                                 blockEntity.read(nbtCompound, this.getWorld().getRegistryManager());
                             } catch (Exception var15) {
-                                Zauber.LOGGER.error("Failed to load block entity from falling block", (Throwable)var15);
+                                Zauber.LOGGER.error("Failed to load block entity from falling block", var15);
                             }
 
                             blockEntity.markDirty();
@@ -190,8 +195,13 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
                 this.blockState
         );
         fallingBlockEntity.setFallingBlockPos(this.getBlockPos());
-        fallingBlockEntity.setVelocity(fallingBlockEntity.getPos().subtract(owner.getPos()).multiply(0.2));
+        fallingBlockEntity.setVelocity(this.getVelocity());
+        fallingBlockEntity.addVelocity(fallingBlockEntity.getPos().subtract(owner.getPos()).multiply(0.2));
         this.getWorld().spawnEntity(fallingBlockEntity);
         this.discard();
+    }
+
+    public void placeDirect() {
+        this.tryPlaceDirect = true;
     }
 }

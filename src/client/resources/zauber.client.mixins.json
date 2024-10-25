@@ -7,6 +7,7 @@
   "client": [
     "BlockRenderManagerMixin",
     "BlockStatesLoaderMixin",
+    "ClientPlayerMixin",
     "ControlsListWidgetMixin",
     "EntityRenderDispatcherMixin",
     "InGameHudMixin",

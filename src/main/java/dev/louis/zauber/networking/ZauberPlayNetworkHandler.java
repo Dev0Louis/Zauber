@@ -1,23 +1,25 @@
 package dev.louis.zauber.networking;
 
 import dev.louis.zauber.entity.TelekinedBlockEntity;
-import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
-import dev.louis.zauber.networking.play.c2s.ThrowBlockPayload;
+import dev.louis.zauber.networking.play.c2s.ThrowTelekinedPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 public class ZauberPlayNetworkHandler {
-    public static void onThrowBlock(ThrowBlockPayload ignored, ServerPlayNetworking.Context context) {
+    public static void onThrowTelekined(ThrowTelekinedPayload ignored, ServerPlayNetworking.Context context) {
         var player = context.player();
         var stack = player.getStackInHand(player.getActiveHand());
         var hasStaff = stack.isOf(ZauberItems.STAFF);
         if (hasStaff) {
-            ((PlayerEntityExtension) player).zauber$throwTelekinesis();
+            player.zauber$throwTelekined();
         }
     }
 
@@ -34,11 +36,11 @@ public class ZauberPlayNetworkHandler {
 
                     TelekinedBlockEntity telekinedBlockEntity = new TelekinedBlockEntity(world, pos.toCenterPos(), state, world.getBlockEntity(pos), context.player());
                     world.spawnEntity(telekinedBlockEntity);
-                    ((PlayerEntityExtension) context.player()).zauber$startTelekinesisOn(telekinedBlockEntity);
+                    context.player().zauber$startTelekinesisOn(telekinedBlockEntity);
                 }
                 case StartTelekinesisPayload.TelekinesisTarget.EntityTarget(int telekinedEntityId) -> {
                     var entity = context.player().getWorld().getEntityById(telekinedEntityId);
-                    ((PlayerEntityExtension) context.player()).zauber$startTelekinesisOn(entity);
+                    context.player().zauber$startTelekinesisOn(entity);
                 }
             }
         });
@@ -49,7 +51,21 @@ public class ZauberPlayNetworkHandler {
         var stack = player.getStackInHand(player.getActiveHand());
         var hasStaff = stack.isOf(ZauberItems.STAFF);
         if (hasStaff) {
-            ((PlayerEntityExtension) player).zauber$stopTelekinesis();
+            if (player.isSneaking()) {
+                player.zauber$getTelekinesisAffected()
+                        .flatMap(cast(TelekinedBlockEntity.class))
+                        .ifPresent(TelekinedBlockEntity::placeDirect);
+            }
+            player.zauber$stopTelekinesis();
         }
+    }
+
+    public static <X, T> Function<X, Optional<T>> cast(Class<? extends T> clazz) {
+        return x -> {
+            if (clazz.isInstance(x)) {
+                return Optional.of(clazz.cast(x));
+            }
+            return Optional.empty();
+        };
     }
 }

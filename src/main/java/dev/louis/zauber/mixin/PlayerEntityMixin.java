@@ -1,5 +1,6 @@
 package dev.louis.zauber.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.entity.TelekinedBlockEntity;
 import dev.louis.zauber.extension.EntityExtension;
@@ -13,8 +14,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -36,6 +39,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -46,18 +50,20 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
 
     @Shadow public abstract void playSound(SoundEvent sound, float volume, float pitch);
 
-    private static final int TARGETING_DISTANCE = 20;
+    @Unique
     @Nullable
-    private Entity telekinesisEntity;
-
-
-    @Nullable
-    private LivingEntity staffTargetedEntity;
-    @Nullable
-    private BlockPos staffTargetedBlock;
+    private Entity telekined;
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
+    }
+
+    @Inject(
+            method = "applyDamage",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setHealth(F)V")
+    )
+    public void stopTelekinesisOnDamage(DamageSource source, float amount, CallbackInfo ci) {
+        this.zauber$getTelekineser().ifPresent(PlayerEntityExtension::zauber$stopTelekinesis);
     }
 
     @Inject(
@@ -83,17 +89,17 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
 
     @Override
     public void zauber$startTelekinesisOn(@Nullable Entity newTelekinesisEntity) {
-        if (this.telekinesisEntity != null && !this.getWorld().isClient()) {
-            ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
+        if (this.telekined != null && !this.getWorld().isClient()) {
+            this.telekined.zauber$removeTelekinesisFrom((PlayerEntity) (Object) this);
             //TODO: Remove special caseing
-            if (this.telekinesisEntity instanceof TelekinedBlockEntity telekinedBlockEntity) {
+            if (this.telekined instanceof TelekinedBlockEntity telekinedBlockEntity) {
                 telekinedBlockEntity.loseOwner();
             }
         }
 
-        this.telekinesisEntity = newTelekinesisEntity;
+        this.telekined = newTelekinesisEntity;
         if (newTelekinesisEntity != null) {
-            ((EntityExtension) newTelekinesisEntity).setTelekineser((PlayerEntity) (Object) this);
+            newTelekinesisEntity.zauber$setTelekineser((PlayerEntity) (Object) this);
         }
 
         if (!this.getWorld().isClient()) {
@@ -106,78 +112,62 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;tick()V")
     )
     public void staffStuff(CallbackInfo ci) {
-        staffTargetedEntity = null;
-        staffTargetedBlock = null;
-        if (telekinesisEntity != null && (!telekinesisEntity.isAlive())) {
-            ((EntityExtension) telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
-            telekinesisEntity = null;
-            if (!this.getWorld().isClient()) {
-                this.syncTelekinesisState();
+        if (!(this.getStackInHand(this.getActiveHand()).isOf(ZauberItems.STAFF))) {
+            var oldTelekined = telekined;
+            telekined = null;
+            if (oldTelekined != null && (!oldTelekined.isAlive())) {
+                oldTelekined.zauber$removeTelekinesisFrom((PlayerEntity) (Object) this);
+                if (!this.getWorld().isClient()) {
+                    this.syncTelekinesisState();
+                }
             }
         }
-
-        if (this.getStackInHand(this.getActiveHand()).isOf(ZauberItems.STAFF)) {
-            getTargetedEntity(TARGETING_DISTANCE)
-                    .filter(LivingEntity.class::isInstance)
-                    .map(LivingEntity.class::cast)
-                    .ifPresent(entity -> staffTargetedEntity = entity);
-
-            var rayCast = this.raycast(TARGETING_DISTANCE, 0, false);
-            if (
-                    rayCast.getType() == HitResult.Type.BLOCK &&
-                    !this.getWorld().getBlockState(((BlockHitResult) rayCast).getBlockPos())
-                            .contains(Properties.DOUBLE_BLOCK_HALF)
-            ) {
-                staffTargetedBlock = ((BlockHitResult) rayCast).getBlockPos();
-            }
-
-            //System.out.println(this.getWorld().isClient() + " " + newTelekinesisEntity);
-
-            if (telekinesisEntity != null) {
-                if (!this.getWorld().isClient()) {
-                    var target = this.getEyePos().add(this.getRotationVector().normalize().multiply(6).add(0, -.5, 0));
-                    telekinesisEntity.setVelocity(telekinesisEntity.getVelocity().multiply(0.75));
-                    var vel = target.subtract(telekinesisEntity.getPos()).multiply(0.1);
-                    telekinesisEntity.velocityModified = true;
-                    telekinesisEntity.addVelocity(vel);
-                    telekinesisEntity.move(MovementType.SELF, telekinesisEntity.getVelocity());
+        var telekined = this.telekined;
+        if (telekined != null) {
+            if (!this.getWorld().isClient()) {
+                Vec3d target = switch (telekined) {
+                    case TelekinedBlockEntity ignored -> this.getCameraPosVec(0).add(this.getRotationVector().multiply(5)).add(0, -0.5, 0);
+                    default ->                           this.getCameraPosVec(0).add(this.getRotationVector().multiply(5));
+                };
+                telekined.setVelocity(telekined.getVelocity().multiply(0.75));
+                var vel = target.subtract(telekined.getPos()).multiply(0.1);
+                telekined.velocityModified = true;
+                if (telekined instanceof PlayerEntity) {
+                    telekined.setVelocity(vel);
                 } else {
-                    Vec3d vec3d = telekinesisEntity.getVelocity();
-                    double dX = telekinesisEntity.getX() + vec3d.x;
-                    double dY = telekinesisEntity.getY() + vec3d.y;
-                    double dZ = telekinesisEntity.getZ() + vec3d.z;
-                    telekinesisEntity.setPosition(dX, dY, dZ);
+                    telekined.addVelocity(vel);
                 }
+                telekined.move(MovementType.SELF, telekined.getVelocity());
+            } else {
+                Vec3d vec3d = telekined.getVelocity();
+                double dX = telekined.getX() + vec3d.x;
+                double dY = telekined.getY() + vec3d.y;
+                double dZ = telekined.getZ() + vec3d.z;
+                telekined.setPosition(dX, dY, dZ);
             }
         }
     }
 
-    private Optional<Entity> getTargetedEntity(int maxDistance) {
-        Vec3d eyePos = this.getEyePos();
-        Vec3d rotation = this.getRotationVec(1.0F).multiply(maxDistance);
-        Vec3d start = eyePos.add(rotation);
-        Box box = this.getBoundingBox().stretch(rotation).expand(1.0);
-        int maxDistanceSquared = maxDistance * maxDistance;
-        Predicate<Entity> predicate = entityx -> !entityx.isSpectator() && entityx.canHit() && entityx.getVehicle() == null;
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(this, eyePos, start, box, predicate, maxDistanceSquared);
-        if (entityHitResult == null) {
-            return Optional.empty();
-        } else {
-            return eyePos.squaredDistanceTo(entityHitResult.getPos()) > (double) maxDistanceSquared ? Optional.empty() : Optional.of(entityHitResult.getEntity());
-        }
+    @ModifyReturnValue(
+            method = "shouldCancelInteraction",
+            at = @At("RETURN")
+    )
+    public boolean cancelInteractionWithStaff(boolean original) {
+        //TODO: Figure out why this isn't fixing the horse interactions?
+        return original || this.getMainHandStack().isOf(ZauberItems.STAFF);
     }
 
     @Override
     public void onStartedTrackingBy(ServerPlayerEntity player) {
         super.onStartedTrackingBy(player);
-        TelekinesisStatePayload payload = new TelekinesisStatePayload((PlayerEntity) (Object) this, telekinesisEntity);
+        TelekinesisStatePayload payload = new TelekinesisStatePayload((PlayerEntity) (Object) this, telekined);
         ServerPlayNetworking.send(player, payload);
     }
 
     @Unique
     private void syncTelekinesisState() {
         var serverWorld = (ServerWorld) this.getWorld();
-        TelekinesisStatePayload payload = new TelekinesisStatePayload((PlayerEntity) (Object) this, telekinesisEntity);
+        TelekinesisStatePayload payload = new TelekinesisStatePayload((PlayerEntity) (Object) this, telekined);
         for (int j = 0; j < serverWorld.getPlayers().size(); j++) {
             ServerPlayerEntity player = serverWorld.getPlayers().get(j);
             serverWorld.sendToPlayerIfNearby(player, false, this.getX(), this.getY(), this.getZ(), ServerPlayNetworking.createS2CPacket(payload));
@@ -186,27 +176,17 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     }
 
     @Override
-    public Optional<LivingEntity> getStaffTargetedEntity() {
-        return Optional.ofNullable(staffTargetedEntity);
-    }
-
-    @Override
-    public Optional<BlockPos> getStaffTargetedBlock() {
-        return Optional.ofNullable(staffTargetedBlock);
-    }
-
-    @Override
-    public void zauber$throwTelekinesis() {
-        if(telekinesisEntity != null) {
-            if (this.telekinesisEntity instanceof TelekinedBlockEntity telekinedBlockEntity) {
+    public void zauber$throwTelekined() {
+        if(telekined != null) {
+            if (this.telekined instanceof TelekinedBlockEntity telekinedBlockEntity) {
                 telekinedBlockEntity.throwBlock();
             } else {
-                this.telekinesisEntity.setVelocity(this.telekinesisEntity.getPos().subtract(this.getPos()).multiply(0.2));
+                this.telekined.addVelocity(this.telekined.getPos().subtract(this.getPos()).multiply(0.2));
             }
 
-            this.telekinesisEntity.addVelocity(this.getVelocity());
-            ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
-            this.telekinesisEntity = null;
+            this.telekined.addVelocity(this.getVelocity());
+            this.telekined.zauber$removeTelekinesisFrom((PlayerEntity) (Object) this);
+            this.telekined = null;
         }
 
         if (!this.getWorld().isClient()) {
@@ -216,13 +196,13 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
 
     @Override
     public void zauber$stopTelekinesis() {
-        if(telekinesisEntity != null) {
-            if (this.telekinesisEntity instanceof TelekinedBlockEntity telekinedBlockEntity) {
+        if(telekined != null) {
+            if (this.telekined instanceof TelekinedBlockEntity telekinedBlockEntity) {
                 telekinedBlockEntity.loseOwner();
             }
 
-            ((EntityExtension) this.telekinesisEntity).removeTelinesisFrom((PlayerEntity) (Object) this);
-            this.telekinesisEntity = null;
+            this.telekined.zauber$removeTelekinesisFrom((PlayerEntity) (Object) this);
+            this.telekined = null;
         }
 
         if (!this.getWorld().isClient()) {
@@ -232,6 +212,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
 
     @Override
     public Optional<Entity> zauber$getTelekinesisAffected() {
-        return Optional.ofNullable(telekinesisEntity);
+        return Optional.ofNullable(telekined);
     }
 }
