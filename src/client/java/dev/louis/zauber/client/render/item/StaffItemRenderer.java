@@ -24,6 +24,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 
 public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer, SimpleSynchronousResourceReloadListener {
 
@@ -53,6 +54,7 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
         } else {
             matrices.push();
             matrices.scale(1.0F, -1.0F, -1.0F);
+            matrices.scale(.5f, .5F, .5F);
             VertexConsumer vertexConsumer = ItemRenderer.getDirectItemGlintConsumer(
                     vertexConsumers, this.modelStaff.getLayer(StaffItemModel.TEXTURE), false, stack.hasGlint()
             );
@@ -110,7 +112,7 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
         matrices.push();
         var scale = (1 / entity.getHeight()) / 4;
         matrices.scale(scale, scale, scale);
-        matrices.translate(0, entity.getHeight(), 0);
+        matrices.translate(0, .625f, 0);
         float prevBodyYaw = 0;
         float prevPrevBodyYaw = 0;
         float prevPrevHeadYaw = 0;
@@ -123,12 +125,16 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
             prevPrevHeadYaw = livingEntity.prevHeadYaw;
             prevHeadYaw = livingEntity.headYaw;
 
-            livingEntity.bodyYaw = (float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
-            livingEntity.prevBodyYaw = (float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
-            livingEntity.prevHeadYaw = (float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
-            livingEntity.headYaw = (float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
-
+            livingEntity.bodyYaw = 0; //(float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
+            livingEntity.prevBodyYaw = 0; //(float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
+            livingEntity.prevHeadYaw = 0; //(float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
+            livingEntity.headYaw = 0; //(float) (Math.sin(MinecraftClient.getInstance().world.getTime() / 15f) * 10f) + -20;
         }
+        var a = MinecraftClient.getInstance().world.getTime() / 20f;
+        var b = MinecraftClient.getInstance().world.getTime() / 10f;
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) (Math.sin(b) * 0.25 + a)));
+        //matrices.multiply(RotationAxis.POSITIVE_Z.rotation((float) Math.sin(a * 5) * 0.1f));
+        //matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) Math.sin(a * 7) * 0.1f));
         MinecraftClient.getInstance().getEntityRenderDispatcher().render(
                 entity,
                 0,
