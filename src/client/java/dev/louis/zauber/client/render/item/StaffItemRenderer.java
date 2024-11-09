@@ -3,7 +3,8 @@ package dev.louis.zauber.client.render.item;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.client.extension.BlockRenderManagerExtension;
 import dev.louis.zauber.client.model.StaffItemModel;
-import dev.louis.zauber.extension.PlayerEntityExtension;
+import dev.louis.zauber.client.render.misc.SphereRenderer;
+import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.BlockState;
@@ -20,7 +21,6 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -32,6 +32,7 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
     public static final ModelIdentifier STAFF_IN_HAND = ModelIdentifier.ofInventoryVariant(Identifier.of(Zauber.MOD_ID, "staff_in_hand"));
     public static final ModelIdentifier STAFF = ModelIdentifier.ofInventoryVariant(Identifier.of(Zauber.MOD_ID, "staff"));
     public static final Identifier ENTITY_HOLDING_TEXTURE = Identifier.of(Zauber.MOD_ID, "textures/test.png");
+    public static final Identifier STAFF_SPHERE = Identifier.of(Zauber.MOD_ID, "textures/staff_sphere.png");
     private static final Integer MAX_RENDER_DEPTH = 2;
     private final EntityModelLayer staffModelLayer;
     private ItemRenderer itemRenderer;
@@ -54,15 +55,27 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
         } else {
             matrices.push();
             matrices.scale(1.0F, -1.0F, -1.0F);
-            matrices.scale(.5f, .5F, .5F);
+            //matrices.scale(.5f, .5F, .5F);
             VertexConsumer vertexConsumer = ItemRenderer.getDirectItemGlintConsumer(
                     vertexConsumers, this.modelStaff.getLayer(StaffItemModel.TEXTURE), false, stack.hasGlint()
             );
 
 
             this.modelStaff.render(matrices, vertexConsumer, light, overlay);
+            float a = Math.abs((float) Math.sin(System.currentTimeMillis() / 1000d) * 0.1f);
+            matrices.scale(a, a, a);
+            SphereRenderer.renderColoredSphere(
+                    matrices.peek(),
+                    vertexConsumers.getBuffer(ZauberRenderLayers.getStaffSphere()),
+                    0,
+                    0,
+                    (float) (.8f + (Math.sin(System.currentTimeMillis() / 400D) * 0.2f))
+            );
+
             matrices.pop();
-            var depth = UnsafeItemRendererContext.STAFF_RENDERING_DEPTH.get();
+
+
+            /*var depth = UnsafeItemRendererContext.STAFF_RENDERING_DEPTH.get();
             if (depth < MAX_RENDER_DEPTH) {
                 var unsafeEntity = UnsafeItemRendererContext.RENDERER_ENTITY.get();
                 if (unsafeEntity instanceof PlayerEntity player) {
@@ -73,7 +86,7 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
                         UnsafeItemRendererContext.STAFF_RENDERING_DEPTH.remove();
                     });
                 }
-            }
+            }*/
 
             /*extension.getStaffTargetedEntity().ifPresentOrElse(
                     entity  -> renderEntity(matrices, vertexConsumers, light, entity),
@@ -133,8 +146,6 @@ public class StaffItemRenderer implements BuiltinItemRendererRegistry.DynamicIte
         var a = MinecraftClient.getInstance().world.getTime() / 20f;
         var b = MinecraftClient.getInstance().world.getTime() / 10f;
         matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) (Math.sin(b) * 0.25 + a)));
-        //matrices.multiply(RotationAxis.POSITIVE_Z.rotation((float) Math.sin(a * 5) * 0.1f));
-        //matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) Math.sin(a * 7) * 0.1f));
         MinecraftClient.getInstance().getEntityRenderDispatcher().render(
                 entity,
                 0,

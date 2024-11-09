@@ -1,6 +1,7 @@
 package dev.louis.zauber.client.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -21,15 +22,19 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
+
+
     @Shadow
     @Nullable
     public ClientPlayerEntity player;
@@ -65,22 +70,6 @@ public abstract class MinecraftClientMixin {
         spellCooldown = ConfigManager.getServerConfig().spellCooldown();
     }
 
-    @WrapOperation(
-            method = "handleInputEvents",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;doAttack()Z")
-    )
-    public boolean a(MinecraftClient client, Operation<Boolean> original, @Local(ordinal = 0, index = 1) LocalBooleanRef booleanRef   /*bl3*/) {
-        if (client.player != null) {
-            var stack = client.player.getStackInHand(client.player.getActiveHand());
-            var hasStaff = stack.isOf(ZauberItems.STAFF);
-            if (hasStaff && this.options.attackKey.isPressed()) {
-                ClientPlayNetworking.send(ThrowTelekinedPayload.INSTANCE);
-                client.player.swingHand(Hand.MAIN_HAND);
-                return true;
-            }
-        }
-        return original.call(client);
-    }
 
     @Inject(
             method = "onResolutionChanged",
@@ -88,5 +77,28 @@ public abstract class MinecraftClientMixin {
     )
     public void resizeStencilBuffer(CallbackInfo ci) {
             StencilFramebuffer.stencilFrameBuffer = new StencilFramebuffer(MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
+    }
+
+    @Debug(export = true)
+    @Inject(
+            method = "doItemUse",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/item/ItemStack;getCount()I"
+            ),
+            allow = 1,
+            require = 1,
+            slice = @Slice(
+                    to = @At(
+                            value = "INVOKE",
+                            target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;interactBlock(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;"
+                    )
+            )
+    )
+    public void tryStartSpellSelection(CallbackInfo ci, @Local ItemStack stack) {
+        //noinspection DataFlowIssue
+        if (this.player.isSneaking() && stack.isEmpty()) {
+
+        }
     }
 }

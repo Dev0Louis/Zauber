@@ -10,6 +10,7 @@ import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
 import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.client.screen.RippedPageScreen;
 import dev.louis.zauber.client.telekinesis.ClientTargetingHelper;
+import dev.louis.zauber.client.telekinesis.TelekinesisPad;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.extension.PlayerEntityExtension;
 import dev.louis.zauber.item.StaffItem;
@@ -42,6 +43,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworkin
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
@@ -74,10 +76,16 @@ public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
     public static PlayerEntity playerInView;
     public static EntityModelLayer STAFF_MODEL_LAYER = new EntityModelLayer(Identifier.of(Zauber.MOD_ID, "staff"), "staff");
+    public static TelekinesisPad telekinesisPad = new TelekinesisPad(new Vec3d(0, 0, 0));
 
     @Override
     public void onInitializeClient() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            telekinesisPad.tick(client);
+        });
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+            telekinesisPad.render(context.world(), context.camera(), context.matrixStack(), context.consumers());
+
             var player = context.world().client.player;
             if (player.isSneaking()) {
                 ((PlayerEntityExtension) player).zauber$getTelekinesisAffected().ifPresent(telekinesed -> {
@@ -122,7 +130,7 @@ public class ZauberClient implements ClientModInitializer {
         });
         StaffItemRenderer staffItemRenderer = new StaffItemRenderer(STAFF_MODEL_LAYER);
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(staffItemRenderer);
-        BuiltinItemRendererRegistry.INSTANCE.register(ZauberItems.STAFF, staffItemRenderer);
+        //BuiltinItemRendererRegistry.INSTANCE.register(ZauberItems.STAFF, staffItemRenderer);
 
         ClientTickEvents.END_WORLD_TICK.register(world -> {
             var player = world.client.player;
@@ -311,31 +319,6 @@ public class ZauberClient implements ClientModInitializer {
         });
 
         ClientPlayNetworking.registerGlobalReceiver(TelekinesisStatePayload.ID, ZauberClientPlayNetworkHandler::onTelekinesisState);
-        StaffItem.CLIENT_ACTION = ((world, user, hand) -> {
-            var stack = user.getStackInHand(hand);
-            if (stack.isOf(ZauberItems.STAFF)) {
-                if (!user.isSneaking()) {
-                    AtomicBoolean shouldReturn = new AtomicBoolean();
-                    ClientTargetingHelper.getTargetedEntity().ifPresentOrElse(entity -> {
-                        ClientPlayNetworking.send(new StartTelekinesisPayload(entity));
-                        shouldReturn.set(true);
-                    }, () -> {
-                        ClientTargetingHelper.getTargetBlock().ifPresent(pos -> {
-                            ClientPlayNetworking.send(new StartTelekinesisPayload(pos));
-                            shouldReturn.set(true);
-                        });
-                    });
-                    if (shouldReturn.get()) {
-                        user.swingHand(hand);
-                        return TypedActionResult.success(stack);
-                    }
-                }
-
-                ClientPlayNetworking.send(new StopTelekinesisPayload());
-            }
-            return TypedActionResult.pass(stack);
-        });
-
     }
 
     static final int lineAlpha = 100;

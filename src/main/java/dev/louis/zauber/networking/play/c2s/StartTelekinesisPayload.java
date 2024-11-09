@@ -1,6 +1,7 @@
 package dev.louis.zauber.networking.play.c2s;
 
 import dev.louis.zauber.Zauber;
+import dev.louis.zauber.telekinesis.TelekinesisTarget;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -48,15 +49,7 @@ public record StartTelekinesisPayload(TelekinesisTarget target) implements Custo
         return ID;
     }
 
-    public sealed interface TelekinesisTarget {
-        record BlockTarget(BlockPos pos) implements TelekinesisTarget {
 
-        }
-
-        record EntityTarget(int telekinedEntityId) implements TelekinesisTarget {
-
-        }
-    }
 
 
 }

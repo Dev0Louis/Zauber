@@ -97,14 +97,14 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
 
     private boolean tryPlace() {
         // Not floored, but rounded
-        var blockPos = new BlockPos((int) Math.round(this.getX() -.5), (int) Math.round(this.getY()), (int) Math.round(this.getZ() -.5));
+        var blockPos = new BlockPos((int) Math.floor(this.getX()), (int) Math.round(this.getY()), (int) Math.floor(this.getZ()));
         BlockState blockState = this.getWorld().getBlockState(blockPos);
         if (!blockState.isOf(Blocks.MOVING_PISTON)) {
             boolean canReplace = blockState.canReplace(new AutomaticItemPlacementContext(this.getWorld(), blockPos, Direction.DOWN, ItemStack.EMPTY, Direction.UP));
             boolean canPlaceAt = this.blockState.canPlaceAt(this.getWorld(), blockPos);
             if (canReplace && canPlaceAt) {
                 if (this.blockState.contains(Properties.WATERLOGGED) && this.getWorld().getFluidState(blockPos).getFluid() == Fluids.WATER) {
-                    this.blockState = this.blockState.with(Properties.WATERLOGGED, Boolean.valueOf(true));
+                    this.blockState = this.blockState.with(Properties.WATERLOGGED, Boolean.TRUE);
                 }
 
                 if (this.getWorld().setBlockState(blockPos, this.blockState, Block.NOTIFY_ALL)) {

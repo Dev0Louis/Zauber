@@ -3,11 +3,8 @@ package dev.louis.zauber.client.render.misc;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.louis.zauber.client.render.item.StaffItemRenderer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.item.ItemRenderer;
+import dev.louis.zauber.client.telekinesis.TelekinesisPad;
+import net.minecraft.client.render.*;
 import net.minecraft.entity.Entity;
 
 import java.util.OptionalDouble;
@@ -27,6 +24,36 @@ public class ZauberRenderLayers {
         RenderSystem.logicOp(GlStateManager.LogicOp.NOOP);
         //RenderSystem.logicOp(GlStateManager.LogicOp.A/);
     }, RenderSystem::disableColorLogicOp);
+
+    private static final RenderLayer TELEKINESIS_PAD = RenderLayer.of(
+            "telekinesis_pad",
+            VertexFormats.POSITION_TEXTURE,
+            VertexFormat.DrawMode.QUADS,
+            786432,
+            RenderLayer.MultiPhaseParameters.builder().program(POSITION_TEXTURE_PROGRAM).texture(new Texture(TelekinesisPad.TEXTURE, false, false)).cull(DISABLE_CULLING).lightmap(ENABLE_LIGHTMAP).build(false)
+    );
+
+    private static final RenderLayer.MultiPhase DEBUG_TRIANGLES = RenderLayer.of(
+            "debug_triangles",
+            VertexFormats.POSITION_TEXTURE,
+            VertexFormat.DrawMode.TRIANGLES,
+            786432,
+            false,
+            true,
+            RenderLayer.MultiPhaseParameters.builder().program(POSITION_TEXTURE_PROGRAM).texture(new Texture(StaffItemRenderer.ENTITY_HOLDING_TEXTURE, false, false)).transparency(TRANSLUCENT_TRANSPARENCY).build(false)
+    );
+
+    private static final RenderPhase.ShaderProgram POS_TEX_COLOR_SHADER_PROGRAM = new RenderPhase.ShaderProgram(GameRenderer::getPositionTexColorProgram);
+
+    private static final RenderLayer.MultiPhase STAFF_SPHERE = RenderLayer.of(
+            "spell_sphere",
+            VertexFormats.POSITION_TEXTURE_COLOR,
+            VertexFormat.DrawMode.TRIANGLES,
+            786432,
+            false,
+            true,
+            RenderLayer.MultiPhaseParameters.builder().program(POS_TEX_COLOR_SHADER_PROGRAM).texture(new Texture(StaffItemRenderer.STAFF_SPHERE, false, false)).transparency(TRANSLUCENT_TRANSPARENCY).build(false)
+    );
 
     public static final RenderLayer.MultiPhase LINES = RenderLayer.of(
             "lines",
@@ -63,5 +90,13 @@ public class ZauberRenderLayers {
                         .target(ITEM_ENTITY_TARGET)
                         .build(false)
         );
+    }
+
+    public static RenderLayer getTelekinesisPad() {
+        return TELEKINESIS_PAD;
+    }
+
+    public static RenderLayer.MultiPhase getStaffSphere() {
+        return STAFF_SPHERE;
     }
 }

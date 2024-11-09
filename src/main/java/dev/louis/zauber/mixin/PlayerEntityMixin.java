@@ -112,7 +112,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;tick()V")
     )
     public void staffStuff(CallbackInfo ci) {
-        if (!(this.getStackInHand(this.getActiveHand()).isOf(ZauberItems.STAFF))) {
+        /*if (!(this.getStackInHand(this.getActiveHand()).isOf(ZauberItems.STAFF))) {
             var oldTelekined = telekined;
             telekined = null;
             if (oldTelekined != null && (!oldTelekined.isAlive())) {
@@ -121,7 +121,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
                     this.syncTelekinesisState();
                 }
             }
-        }
+        }*/
         var telekined = this.telekined;
         if (telekined != null) {
             if (!this.getWorld().isClient()) {
@@ -148,14 +148,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         }
     }
 
-    @ModifyReturnValue(
+    /*@ModifyReturnValue(
             method = "shouldCancelInteraction",
             at = @At("RETURN")
     )
     public boolean cancelInteractionWithStaff(boolean original) {
         //TODO: Figure out why this isn't fixing the horse interactions?
         return original || this.getMainHandStack().isOf(ZauberItems.STAFF);
-    }
+    }*/
 
     @Override
     public void onStartedTrackingBy(ServerPlayerEntity player) {

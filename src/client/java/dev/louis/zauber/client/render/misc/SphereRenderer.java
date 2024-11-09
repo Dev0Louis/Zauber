@@ -9,6 +9,34 @@ public class SphereRenderer {
     private static final int SPHERE_SEGMENTS = 16;
     private static final int SPHERE_RINGS = 8;
 
+    public static void renderColoredSphere(MatrixStack.Entry entry, VertexConsumer vertexConsumer, float r, float g, float b) {
+        Mesh mesh = IcoSphereCreator.create(2, true);
+
+
+        for (Face face : mesh.faces) {
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexZ));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateZ).x, mesh.textureCoordinates.get(face.textureCoordinateZ).y);
+            vertexConsumer.color(r, g, b, 1);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexY));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateY).x, mesh.textureCoordinates.get(face.textureCoordinateY).y);
+            vertexConsumer.color(r, g, b, 1);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexX));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateX).x, mesh.textureCoordinates.get(face.textureCoordinateX).y);
+            vertexConsumer.color(r, g, b, 1);
+        }
+        for (Face face : mesh.faces) {
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexX));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateX).x, mesh.textureCoordinates.get(face.textureCoordinateX).y);
+            vertexConsumer.color(r, g, b, 1);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexY));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateY).x, mesh.textureCoordinates.get(face.textureCoordinateY).y);
+            vertexConsumer.color(r, g, b, 1);
+            vertexConsumer.vertex(entry, mesh.vertices.get(face.vertexZ));
+            vertexConsumer.texture(mesh.textureCoordinates.get(face.textureCoordinateZ).x, mesh.textureCoordinates.get(face.textureCoordinateZ).y);
+            vertexConsumer.color(r, g, b, 1);
+        }
+    }
+
     public static void renderSphere(MatrixStack.Entry entry, VertexConsumer vertexConsumer) {
         Mesh mesh = IcoSphereCreator.create(2, true);
 
