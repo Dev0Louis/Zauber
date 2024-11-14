@@ -5,13 +5,14 @@ import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import dev.louis.zauber.helper.EffectHelper;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -24,6 +25,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class SmeltingRitual extends Ritual {
+
+    private final ServerRecipeManager.MatchGetter<SingleStackRecipeInput, ? extends AbstractCookingRecipe> matchGetter;
+
     @Nullable
     private BlockPos itemSacrificerPos;
     private int fuelTicks;
@@ -36,32 +40,37 @@ public class SmeltingRitual extends Ritual {
     public SmeltingRitual(World world, RitualStoneBlockEntity ritualStoneBlockEntity, int fuelTicks) {
         super(world, ritualStoneBlockEntity);
         this.fuelTicks = fuelTicks;
+        this.matchGetter = ServerRecipeManager.createCachedMatchGetter(RecipeType.SMELTING);
+
     }
 
-    private static Optional<Integer> getCookTime(World world, ItemStack itemStack) {
-        return world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, new SingleStackRecipeInput(itemStack), world).map(recipe -> recipe.value().getCookingTime());
+    private Optional<Integer> getCookTime(ServerWorld world, ItemStack itemStack) {
+        return matchGetter.getFirstMatch(new SingleStackRecipeInput(itemStack), world).map(recipe -> recipe.value().getCookingTime());
     }
 
-    public static Optional<Integer> getFuelTime(ItemConvertible item) {
-        Integer integer = FuelRegistry.INSTANCE.get(item);
-        if (integer == null) return Optional.empty();
-        return Optional.of(integer);
+    public static Optional<Integer> getFuelTime(
+            ItemStack item,
+            FuelRegistry fuelRegistry
+    ) {
+        int fuelTicks = fuelRegistry.getFuelTicks(item);
+        if (fuelTicks == 0) return Optional.empty();
+        return Optional.of(fuelTicks);
     }
 
-    public static Optional<ItemStack> cook(World world, ItemStack itemStack) {
-        return world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, new SingleStackRecipeInput(itemStack), world).map(recipe -> recipe.value().getResult(world.getRegistryManager()));
+    public Optional<ItemStack> cook(World world, ItemStack itemStack) {
+        return matchGetter.getFirstMatch(new SingleStackRecipeInput(itemStack), (ServerWorld) world).map(recipe -> recipe.value().craft(null, world.getRegistryManager()));
     }
 
     @Override
     public void tick() {
         this.tryBurnEntities();
         if (itemSacrificerPos == null) {
-            ritualStoneBlockEntity.getNonEmptyItemSacrificers().filter(itemSacrificer -> getCookTime(this.world, itemSacrificer.getStoredStack()).map(integer -> fuelTicks - integer > 0).orElse(false)).findAny().ifPresent(itemSacrificer -> {
+            ritualStoneBlockEntity.getNonEmptyItemSacrificers().filter(itemSacrificer -> getCookTime((ServerWorld) this.world, itemSacrificer.getStoredStack()).map(integer -> fuelTicks - integer > 0).orElse(false)).findAny().ifPresent(itemSacrificer -> {
 
                 itemSacrificerPos = itemSacrificer.getPos();
                 //this is safe as we checḱ that as a requirement for an itemSacrificer to be selected
                 //noinspection OptionalGetWithoutIsPresent
-                cookTime = getCookTime(world, itemSacrificer.getStoredStack()).get();
+                cookTime = getCookTime((ServerWorld) world, itemSacrificer.getStoredStack()).get();
             });
         }
 
@@ -112,7 +121,7 @@ public class SmeltingRitual extends Ritual {
             entity.setOnFireFor(15);
             entity.setFireTicks(entity.getFireTicks() + 1);
 
-            entity.damage(world.getDamageSources().inFire(), 1);
+            entity.damage((ServerWorld) world, world.getDamageSources().inFire(), 1);
 
         });
     }
@@ -132,14 +141,14 @@ public class SmeltingRitual extends Ritual {
         return fuelTicks <= 0 || inactivityTicks > 20 * 5;
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         ItemStack ritualItemStack = ritualStoneBlockEntity.getStoredStack();
-        var fuelTime = getFuelTime(ritualItemStack.getItem());
+        var fuelTime = getFuelTime(ritualItemStack, world.getFuelRegistry());
 
         if (fuelTime.isEmpty()) return null;
 
         ritualStoneBlockEntity.setStoredStack(ItemStack.EMPTY);
-        EffectHelper.playBreakItemEffect((ServerWorld) world, ritualStoneBlockEntity.getPos(), ritualItemStack);
+        EffectHelper.playBreakItemEffect(world, ritualStoneBlockEntity.getPos(), ritualItemStack);
         return new SmeltingRitual(world, ritualStoneBlockEntity, fuelTime.get());
     }
 }

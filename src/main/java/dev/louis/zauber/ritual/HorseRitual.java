@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -79,7 +80,7 @@ public class HorseRitual extends Ritual implements ManaPullingRitual {
         );
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualStonePos = ritualStoneBlockEntity.getPos();
         var box = Box.of(ritualStonePos.toCenterPos(), 32, 20, 32);
 

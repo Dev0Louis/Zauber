@@ -34,8 +34,6 @@ public abstract class LivingEntityRendererMixin {
 
     @Shadow protected EntityModel<?> model;
 
-    @Shadow protected abstract float getAnimationCounter(LivingEntity entity, float tickDelta);
-
     @ModifyArg(
             method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V"),

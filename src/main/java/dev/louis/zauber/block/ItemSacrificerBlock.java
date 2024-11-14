@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -39,17 +38,17 @@ public class ItemSacrificerBlock extends BlockWithEntity {
     }
 
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.OFF_HAND || world.isClient()) return ItemActionResult.FAIL;
+    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (hand == Hand.OFF_HAND || world.isClient()) return ActionResult.FAIL;
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof ItemSacrificerBlockEntity itemSacrificerBlockEntity) {
             if (!itemSacrificerBlockEntity.offerItemStack(player, stack).isAccepted()) {
-                return ItemActionResult.FAIL;
+                return ActionResult.FAIL;
             }
         }
 
-        return ItemActionResult.SUCCESS;
+        return ActionResult.SUCCESS;
     }
 
     @Override

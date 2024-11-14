@@ -7,8 +7,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.util.Optional;
@@ -20,19 +20,19 @@ public class SpellBookItem extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
+    public ActionResult use(World world, PlayerEntity playerEntity, Hand hand) {
         ItemStack itemStack = playerEntity.getStackInHand(hand);
-        if (world.isClient()) return TypedActionResult.pass(itemStack);
-        if (hand != Hand.MAIN_HAND) return TypedActionResult.pass(itemStack);
+        if (world.isClient()) return ActionResult.PASS;
+        if (hand != Hand.MAIN_HAND) return ActionResult.PASS;
 
         Optional<RegistryEntry<SpellType<?>>> optionalSpellType = getSpellType(itemStack);
         if (optionalSpellType.isPresent()) {
             //TODO: Need to reconsider
             //playerEntity.getSpellManager().learnSpell(optionalSpellType.get().value());
             itemStack.decrement(1);
-            return TypedActionResult.consume(itemStack);
+            return ActionResult.CONSUME;
         }
-        return TypedActionResult.fail(itemStack);
+        return ActionResult.FAIL;
     }
 
     public static Optional<RegistryEntry<SpellType<?>>> getSpellType(ItemStack itemStack) {

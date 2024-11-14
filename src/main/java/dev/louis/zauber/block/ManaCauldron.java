@@ -17,7 +17,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ItemActionResult;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -41,7 +41,7 @@ public class ManaCauldron extends AbstractCauldronBlock {
                 world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 world.emitGameEvent(null, GameEvent.FLUID_PLACE, pos);
             }
-            return ItemActionResult.success(world.isClient);
+            return ActionResult.SUCCESS;
         }));
 
         MANA_CAULDRON_BEHAVIOR.map().put(ZauberItems.TOTEM_OF_MANA, ((state, world, pos, player, hand, stack) -> {
@@ -54,9 +54,9 @@ public class ManaCauldron extends AbstractCauldronBlock {
                     world.setBlockState(pos, state.with(MANA_LEVEL, manaLevel));
                 }
                 world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
-                return ItemActionResult.CONSUME;
+                return ActionResult.CONSUME;
             }
-            return ItemActionResult.CONSUME;
+            return ActionResult.CONSUME;
         }));
     }
 

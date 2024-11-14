@@ -21,7 +21,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class TotemOfIceRitual extends Ritual {
-    private final Vector3f BLUE_COLOR = new Vector3f(0, 0.2f, 0.5f);
+    private final int BLUE_COLOR = 0x008099;
     @Nullable
     private BlockPos nextItemSacrificerPos;
     private int connectionTime;
@@ -123,7 +123,7 @@ public class TotemOfIceRitual extends Ritual {
         return this.ice >= 4 || this.age > 800;
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         List<ItemStack> ice = ritualStoneBlockEntity.getAvailableItemStacks().filter(itemStack -> itemStack.isOf(Items.ICE)).toList();

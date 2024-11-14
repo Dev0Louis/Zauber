@@ -1,8 +1,6 @@
 package dev.louis.zauber.entity;
 
 import dev.louis.zauber.Zauber;
-import dev.louis.zauber.extension.EntityExtension;
-import dev.louis.zauber.extension.PlayerEntityExtension;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.*;
@@ -67,7 +65,7 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
 
         if (this.getWorld().isClient()) return;
 
-        if (owner == null || owner.zauber$getTelekinesisAffected().map(entity -> entity != TelekinedBlockEntity.this).orElse(true)) {
+        if (owner == null || owner.zauber$getTelekined().map(entity -> entity != TelekinedBlockEntity.this).orElse(true)) {
 
             if (tryPlaceDirect && tryPlace()) return;
             FallingBlockEntity fallingBlockEntity = new FallingBlockEntity(

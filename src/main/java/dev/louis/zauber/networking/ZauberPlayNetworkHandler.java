@@ -1,7 +1,6 @@
 package dev.louis.zauber.networking;
 
 import dev.louis.zauber.entity.TelekinedBlockEntity;
-import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
 import dev.louis.zauber.networking.play.c2s.ThrowTelekinedPayload;
@@ -46,8 +45,8 @@ public class ZauberPlayNetworkHandler {
 
     public static void onStopTelekinesis(StopTelekinesisPayload payload, ServerPlayNetworking.Context context) {
         var player = context.player();
-        if (player.isSneaking()) {
-            player.zauber$getTelekinesisAffected()
+        if (payload.place()) {
+            player.zauber$getTelekined()
                     .flatMap(cast(TelekinedBlockEntity.class))
                     .ifPresent(TelekinedBlockEntity::placeDirect);
         }

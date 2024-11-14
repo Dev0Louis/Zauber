@@ -21,7 +21,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class HeartOfTheSeaRitual extends Ritual {
-    private final Vector3f BLUE_COLOR = new Vector3f(0, 0, 0.5f);
+    private final int BLUE_COLOR = 0x000099;
     @Nullable
     private BlockPos nextItemSacrificerPos;
     private int connectionTime;
@@ -123,7 +123,7 @@ public class HeartOfTheSeaRitual extends Ritual {
         return this.crystalsCollected >= 4 || this.age > 800;
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         List<ItemStack> prismarineCrystals = ritualStoneBlockEntity.getAvailableItemStacks().filter(itemStack -> itemStack.isOf(Items.PRISMARINE_CRYSTALS)).toList();

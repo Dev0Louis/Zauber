@@ -11,6 +11,7 @@ import dev.louis.zauber.ritual.ManaPullingRitual;
 import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.ritual.mana.ManaPool;
 import dev.louis.zauber.ritual.mana.ManaReference;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -46,8 +47,8 @@ import java.util.stream.Stream;
 public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
     private static final String[] RAI_NAMES = {"rai", "enjarai", "silliestpersonalive"};
 
-    public static final BlockEntityType<RitualStoneBlockEntity> TYPE = BlockEntityType.Builder.create(RitualStoneBlockEntity::new, ZauberBlocks.RITUAL_STONE).build(null);
-    private static final Vector3f PARTICLE_COLOR = new Vector3f(0, 0, 1);
+    public static final BlockEntityType<RitualStoneBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(RitualStoneBlockEntity::new, ZauberBlocks.RITUAL_STONE).build(null);
+    private static final int PARTICLE_COLOR = 0x0000FF;
     private static final boolean EXPLOSION_CHAINS = true;
     private static final BlockState INACTIVE_STATE = Blocks.OBSIDIAN.getDefaultState();
     private static final BlockState ACTIVE_STATE = Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
@@ -129,7 +130,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
         this.setStoredStack(ItemStack.EMPTY);
     }
 
-    public void onInteracted(PlayerEntity player, ItemStack stack, World world, BlockPos pos) {
+    public void onInteracted(PlayerEntity player, ItemStack stack, ServerWorld world, BlockPos pos) {
         switch (this.state) {
             case INACTIVE -> {
                 if (!stack.isEmpty()) {
@@ -157,12 +158,12 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
                 interactionTimes++;
                 if (interactionTimes > 10) {
                     this.getRandomNonEmptyItemSacrificer().ifPresentOrElse(itemSacrificerBlockEntity -> {
-                        EffectHelper.playBreakItemEffect((ServerWorld) world, itemSacrificerBlockEntity.getPos().toCenterPos().add(0, 1, 0), itemSacrificerBlockEntity.getStoredStack());
+                        EffectHelper.playBreakItemEffect(world, itemSacrificerBlockEntity.getPos().toCenterPos().add(0, 1, 0), itemSacrificerBlockEntity.getStoredStack());
                         itemSacrificerBlockEntity.setStoredStack(ItemStack.EMPTY);
                     }, () -> {
                         //if not present
                         if (!this.storedStack.isEmpty()) {
-                            EffectHelper.playBreakItemEffect((ServerWorld) world, this.getPos().toCenterPos().add(0, 1, 0), this.getStoredStack());
+                            EffectHelper.playBreakItemEffect(world, this.getPos().toCenterPos().add(0, 1, 0), this.getStoredStack());
                             this.setStoredStack(ItemStack.EMPTY);
                         }
                     });
@@ -201,7 +202,7 @@ public class RitualStoneBlockEntity extends BlockEntityWithItemStack {
         })).findAny();
     }
 
-    private Pair<@Nullable Identifier, @Nullable Ritual> createRitual(World world, BlockPos pos) {
+    private Pair<@Nullable Identifier, @Nullable Ritual> createRitual(ServerWorld world, BlockPos pos) {
         for (Map.Entry<Identifier, Ritual.Starter> entry : Ritual.RITUAL_STARTERS.entrySet()) {
             var ritual = entry.getValue().tryStart(world, this);
             if (ritual != null) return new Pair<>(entry.getKey(), ritual);

@@ -10,9 +10,9 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -33,16 +33,16 @@ public class RitualStoneBlock extends BlockWithEntity {
     }
 
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.OFF_HAND) return ItemActionResult.FAIL;
+    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (hand == Hand.OFF_HAND) return ActionResult.FAIL;
         if (!world.isClient) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
-                ritualStoneBlockEntity.onInteracted(player, stack, world, pos);
-                return ItemActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+                ritualStoneBlockEntity.onInteracted(player, stack, ((ServerWorld) world), pos);
+                return ActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
             }
         }
-        return ItemActionResult.SUCCESS;
+        return ActionResult.SUCCESS;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class RitualStoneBlock extends BlockWithEntity {
         if (!world.isClient) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
-                ritualStoneBlockEntity.onInteracted(player, ItemStack.EMPTY, world, pos);
+                ritualStoneBlockEntity.onInteracted(player, ItemStack.EMPTY, ((ServerWorld) world), pos);
                 return ActionResult.SUCCESS;
             }
         }

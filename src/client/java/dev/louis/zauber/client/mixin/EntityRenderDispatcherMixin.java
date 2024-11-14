@@ -22,7 +22,7 @@ public class EntityRenderDispatcherMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V")
     )
     public void renderTelekinesisAroundTelekinesed(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int light, CallbackInfo ci, @Local EntityRenderer<Entity> entityRenderer) {
-        if (((EntityExtension) entity).zauber$isTelekinesed()) {
+        if (entity.zauber$isTelekinesed()) {
             VertexConsumerProvider fakeVertexConsumerProvider = (layer) -> {
                 if (!layer.name.equals("leash")) {
                     return vertexConsumerProvider.getBuffer(ZauberRenderLayers.getBrrrrrrrr(entity, tickDelta));

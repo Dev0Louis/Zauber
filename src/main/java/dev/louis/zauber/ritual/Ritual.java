@@ -11,6 +11,7 @@ import net.minecraft.entity.passive.CatVariant;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -61,15 +62,15 @@ public abstract class Ritual {
         register("summon_glow_squid", new SummonEntityRitual.Starter(EntityType.GLOW_SQUID, Ingredient.ofItems(Items.GLOW_INK_SAC)));
         register("summon_chicken", new SummonEntityRitual.Starter(EntityType.CHICKEN, Ingredient.ofItems(Items.CHICKEN)));
 
-        register("summon_cat", new SummonEntityRitual.Starter((world1, itemStack) -> {
-            var cat = EntityType.CAT.create(world1);
+        register("summon_cat", new SummonEntityRitual.Starter((world1, spawnReason, itemStack) -> {
+            var cat = EntityType.CAT.create(world1, spawnReason);
             if (cat == null) {
                 Zauber.LOGGER.error("THE CAT IS NULL; HOW WHAT THE FRICK?");
                 throw new IllegalStateException();
             }
 
             if (itemStack.getName().contains(Text.of("diced"))) {
-                var persianCatVariant = Registries.CAT_VARIANT.getEntry(CatVariant.PERSIAN);
+                var persianCatVariant = Registries.CAT_VARIANT.getOptional(CatVariant.PERSIAN);
                 persianCatVariant.ifPresent(cat::setVariant);
                 cat.setCustomName(Text.of("dicedpixels"));
             }
@@ -111,7 +112,7 @@ public abstract class Ritual {
     ;
 
     public interface Starter {
-        Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity);
+        Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity);
     }
 
 }

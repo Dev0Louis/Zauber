@@ -1,6 +1,7 @@
 package dev.louis.zauber.ritual;
 
 import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
 public class TestRitual extends Ritual implements ManaPullingRitual {
@@ -8,7 +9,7 @@ public class TestRitual extends Ritual implements ManaPullingRitual {
         super(world, ritualStoneBlockEntity);
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         return new TestRitual(world, ritualStoneBlockEntity);
     }
 

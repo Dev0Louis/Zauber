@@ -22,7 +22,7 @@ public class BlockEntityWithItemStack extends BlockEntity implements SingleStack
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         if (!this.storedStack.isEmpty()) {
-            nbt.put("storedStack", this.storedStack.encodeAllowEmpty(registryLookup));
+            nbt.put("storedStack", this.storedStack.toNbtAllowEmpty(registryLookup));
         }
     }
 

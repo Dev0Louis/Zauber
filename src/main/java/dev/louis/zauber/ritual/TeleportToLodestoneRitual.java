@@ -90,7 +90,7 @@ public class TeleportToLodestoneRitual extends Ritual implements ManaPullingRitu
         return collectedMana >= 40 || failedToFindMana;
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         boolean hasOneEnderPearl = ritualStoneBlockEntity.getAvailableItemStacks().anyMatch(itemStack -> itemStack.isOf(Items.ENDER_PEARL));

@@ -16,9 +16,4 @@ accessible field net/minecraft/entity/decoration/DisplayEntity$ItemDisplayEntity
 accessible field net/minecraft/entity/decoration/DisplayEntity INTERPOLATION_DURATION Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/decoration/DisplayEntity TELEPORT_DURATION Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/decoration/DisplayEntity BILLBOARD Lnet/minecraft/entity/data/TrackedData;
-accessible method net/minecraft/entity/LivingEntity applyDamage (Lnet/minecraft/entity/damage/DamageSource;F)V
 accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
-accessible class net/minecraft/client/font/FontManager$Providers
-accessible method net/minecraft/client/font/FontManager$Providers <init> (Ljava/util/List;)V
-accessible method net/minecraft/entity/FallingBlockEntity <init> (Lnet/minecraft/world/World;DDDLnet/minecraft/block/BlockState;)V
-accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;

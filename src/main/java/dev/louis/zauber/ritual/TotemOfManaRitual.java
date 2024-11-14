@@ -6,6 +6,7 @@ import dev.louis.zauber.ritual.mana.ManaPool;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
@@ -54,7 +55,7 @@ public class TotemOfManaRitual extends Ritual implements ManaPullingRitual {
         }
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         Optional<ManaPool> manaPool = ritualStoneBlockEntity.acquireManaPool(4);

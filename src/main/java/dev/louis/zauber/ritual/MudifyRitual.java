@@ -4,6 +4,7 @@ import dev.louis.zauber.block.entity.RitualStoneBlockEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -98,7 +99,7 @@ public class MudifyRitual extends Ritual {
         return transformableBlocks <= 0 || age > 1000 || ranOutOfMana;
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var manaCauldrons = ritualStoneBlockEntity.getManaStoragesStream().collect(Collectors.toList());

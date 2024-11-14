@@ -9,6 +9,7 @@ import dev.louis.zauber.tag.ZauberItemTags;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -18,6 +19,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -25,15 +27,15 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class SummonEntityRitual extends Ritual {
-    public static final Vector3f RED_COLOR = new Vector3f(0.9f, 0, 0);
-    private final BiFunction<World, ItemStack, Entity> entityFunction;
+    public static final int RED_COLOR = 0xFF1919;
+    private final TriFunction<World, SpawnReason, ItemStack, Entity> entityFunction;
     private final Ingredient mainIngredient;
 
     @Nullable
     private BlockPos itemSacrificerPos;
     private int blood;
 
-    public SummonEntityRitual(World world, RitualStoneBlockEntity ritualStoneBlockEntity, BiFunction<World, ItemStack, Entity> entityFunction, Ingredient mainIngredient) {
+    public SummonEntityRitual(World world, RitualStoneBlockEntity ritualStoneBlockEntity, TriFunction<World, SpawnReason, ItemStack, Entity> entityFunction, Ingredient mainIngredient) {
         super(world, ritualStoneBlockEntity);
         this.entityFunction = entityFunction;
         this.mainIngredient = mainIngredient;
@@ -105,7 +107,7 @@ public class SummonEntityRitual extends Ritual {
     @Override
     public void finish() {
         if (this.mainIngredient.test(this.ritualStoneBlockEntity.getStoredStack()) && blood >= 10) {
-            Entity entity = entityFunction.apply(world, this.ritualStoneBlockEntity.getStoredStack());
+            Entity entity = entityFunction.apply(world, SpawnReason.MOB_SUMMONED, this.ritualStoneBlockEntity.getStoredStack());
             entity.setPosition(pos.up().toCenterPos());
             world.spawnEntity(entity);
 
@@ -132,25 +134,25 @@ public class SummonEntityRitual extends Ritual {
     }
 
     public static class Starter implements Ritual.Starter {
-        private final BiFunction<World, ItemStack, Entity> entityFunction;
+        private final TriFunction<World, SpawnReason, ItemStack, Entity> entityFunction;
         private final Ingredient mainIngredient;
 
         public Starter(EntityType<?> entityType, Ingredient mainIngredient) {
-            this(entityType::create, mainIngredient);
+            this(((world1, itemStack) -> entityType.create(world1, SpawnReason.MOB_SUMMONED)), mainIngredient);
         }
 
-        public Starter(Function<World, Entity> entityFunction, Ingredient mainIngredient) {
-            this((world1, ingredient) -> entityFunction.apply(world1), mainIngredient);
+        public Starter(BiFunction<World, SpawnReason, Entity> entityFunction, Ingredient mainIngredient) {
+            this((world1, spawnReason, itemStack) -> entityFunction.apply(world1, spawnReason), mainIngredient);
         }
 
-        public Starter(BiFunction<World, ItemStack, Entity> entityFunction, Ingredient mainIngredient) {
+        public Starter(TriFunction<World, SpawnReason, ItemStack, Entity> entityFunction, Ingredient mainIngredient) {
             this.entityFunction = entityFunction;
             this.mainIngredient = mainIngredient;
         }
 
 
         @Override
-        public Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+        public Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
             if (!mainIngredient.test(ritualStoneBlockEntity.getStoredStack())) return null;
             return new SummonEntityRitual(world, ritualStoneBlockEntity, entityFunction, mainIngredient);
         }

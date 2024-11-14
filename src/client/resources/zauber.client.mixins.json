@@ -15,7 +15,6 @@
     "ItemStackNameMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
-    "ModelLoaderMixin",
     "PlayerEntityMixin",
     "ProjectileEntityRendererMixin"
   ],

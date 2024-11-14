@@ -8,6 +8,7 @@ import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.ritual.Ritual;
 import dev.louis.zauber.spell.type.SpellType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -58,7 +59,7 @@ public class HailSpellRitual extends Ritual {
         return Stream.of(connectionPos);
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var optionalItemSacrificer = ritualStoneBlockEntity.getItemSacrificers().filter(itemSacrificer -> itemSacrificer.getStoredStack().isOf(ZauberItems.HEART_OF_THE_ICE)).findAny();

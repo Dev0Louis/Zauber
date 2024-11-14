@@ -7,9 +7,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class LostBookItem extends Item {
@@ -18,20 +18,20 @@ public class LostBookItem extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         var itemStack = user.getStackInHand(hand);
-        if (world.isClient()) return TypedActionResult.pass(itemStack);
+        if (world.isClient()) return ActionResult.PASS;
         var lostBookContent = itemStack.get(ZauberDataComponentTypes.LOST_BOOK_CONTENT);
         if (lostBookContent != null) {
             LostBookType.getById(lostBookContent.id()).ifPresent(user::openHandledScreen);
-            return TypedActionResult.consume(itemStack);
+            return ActionResult.CONSUME;
         } else {
             if (user.isCreative()) {
                 itemStack.set(ZauberDataComponentTypes.LOST_BOOK_CONTENT, new LostBookIdComponent(LostBookType.getRandom(user.getRandom()).id()));
-                user.sendMessage(Text.literal("Generating random book...").formatted(Formatting.BLUE));
+                user.sendMessage(Text.literal("Generating random book...").formatted(Formatting.BLUE), false);
                 return use(world, user, hand);
             }
-            return TypedActionResult.fail(itemStack);
+            return ActionResult.FAIL;
         }
     }
 }

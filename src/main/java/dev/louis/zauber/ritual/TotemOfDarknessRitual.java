@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TotemOfDarknessRitual extends Ritual {
-    private static final Vector3f BLACK_PARTICLE_COLOR = new Vector3f(0, 0, 0);
+    private static final int BLACK_PARTICLE_COLOR = 0;
     private List<BlockPos> darknessAccumulators;
     @Nullable
     private BlockPos nextAccumulatorPos;
@@ -122,7 +122,7 @@ public class TotemOfDarknessRitual extends Ritual {
         return this.age > 200;
     }
 
-    public static Ritual tryStart(World world, RitualStoneBlockEntity ritualStoneBlockEntity) {
+    public static Ritual tryStart(ServerWorld world, RitualStoneBlockEntity ritualStoneBlockEntity) {
         var ritualItemStack = ritualStoneBlockEntity.getStoredStack();
 
         var darknessAccumulators = ritualStoneBlockEntity.getFilledDarknessAccumulators().collect(Collectors.toList());

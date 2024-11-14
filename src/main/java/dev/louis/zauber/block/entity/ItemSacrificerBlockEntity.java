@@ -3,6 +3,7 @@ package dev.louis.zauber.block.entity;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.helper.SoundHelper;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -20,7 +21,7 @@ import net.minecraft.world.World;
 import org.joml.Vector3f;
 
 public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
-    public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = BlockEntityType.Builder.create(ItemSacrificerBlockEntity::new, ZauberBlocks.ITEM_SACRIFICER).build(null);
+    public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(ItemSacrificerBlockEntity::new, ZauberBlocks.ITEM_SACRIFICER).build(null);
     public boolean firstTick = true;
     private int ticksSinceItemsAdded;
 
@@ -72,11 +73,11 @@ public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
             setStoredStack(ItemStack.EMPTY);
             //player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);
             SoundHelper.playPlayerSound((ServerPlayerEntity) player, sound, volume, pitch);
-            player.getItemCooldownManager().set(offeredStack.getItem(), 5);
+            player.getItemCooldownManager().set(offeredStack, 5);
         }
 
         if (offeredStack.isEmpty()) return ActionResult.FAIL;
-        player.getItemCooldownManager().set(offeredStack.getItem(), 5);
+        player.getItemCooldownManager().set(offeredStack, 5);
 
         setStoredStack(offeredStack.copyWithCount(1));
         //player.playSound(sound, SoundCategory.PLAYERS, volume, pitch);

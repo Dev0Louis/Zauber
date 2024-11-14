@@ -23,7 +23,7 @@ public class ZauberClientPlayNetworkHandler {
                             );
                             ((PlayerEntityExtension) player).zauber$startTelekinesisOn(telekinesed);
                             System.out.println(
-                                    "After: " + ((PlayerEntityExtension) player).zauber$getTelekinesisAffected()
+                                    "After: " + ((PlayerEntityExtension) player).zauber$getTelekined()
                             );
                         });
                     },

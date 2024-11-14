@@ -50,7 +50,7 @@ public class EntityMixin implements EntityExtension {
 
     private void checkTelekinesis() {
         if (telekineser == null) return;
-        var isStillTelekinesed = ((PlayerEntityExtension) telekineser).zauber$getTelekinesisAffected().map(entity -> entity == (Entity) (Object) EntityMixin.this).orElse(false);
+        var isStillTelekinesed = ((PlayerEntityExtension) telekineser).zauber$getTelekined().map(entity -> entity == (Entity) (Object) EntityMixin.this).orElse(false);
         if (!isStillTelekinesed) telekineser = null;
     }
 

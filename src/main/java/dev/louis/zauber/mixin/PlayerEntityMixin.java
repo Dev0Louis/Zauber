@@ -211,7 +211,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
     }
 
     @Override
-    public Optional<Entity> zauber$getTelekinesisAffected() {
+    public Optional<Entity> zauber$getTelekined() {
         return Optional.ofNullable(telekined);
     }
 }
