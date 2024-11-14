@@ -43,8 +43,6 @@ public class ZauberItems {
             registerCreativeTab("mana_bow", new ManaBowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxDamage(384)));
     public static final Item LOST_BOOK =
             register("lost_book", new LostBookItem(new Item.Settings().rarity(Rarity.COMMON)));
-    public static final Item STAFF =
-            register("staff", new StaffItem(new Item.Settings().rarity(Rarity.COMMON)));
 
 
     private static Item registerCreativeTab(String path, Item item) {

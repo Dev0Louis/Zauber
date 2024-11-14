@@ -9,13 +9,9 @@ import dev.louis.zauber.client.render.item.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
 import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.client.screen.RippedPageScreen;
-import dev.louis.zauber.client.telekinesis.ClientTargetingHelper;
 import dev.louis.zauber.client.telekinesis.TelekinesisPad;
 import dev.louis.zauber.entity.*;
 import dev.louis.zauber.extension.PlayerEntityExtension;
-import dev.louis.zauber.item.StaffItem;
-import dev.louis.zauber.networking.play.c2s.StartTelekinesisPayload;
-import dev.louis.zauber.networking.play.c2s.StopTelekinesisPayload;
 import dev.louis.zauber.networking.play.s2c.TelekinesisStatePayload;
 import dev.louis.zauber.spell.type.SpellType;
 
@@ -33,17 +29,18 @@ import dev.louis.zauber.item.ZauberItems;
 import dev.louis.zauber.networking.configuration.c2s.OptionSyncCompletePayload;
 import dev.louis.zauber.networking.configuration.s2c.OptionSyncPayload;
 import dev.louis.zauber.recipe.ZauberRecipes;
+import dev.louis.zauber.telekinesis.TelekinesisTarget;
 import io.wispforest.accessories.api.AccessoriesCapability;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
@@ -60,8 +57,9 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
@@ -69,26 +67,26 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class ZauberClient implements ClientModInitializer {
     private static SpellKeybindManager spellKeybindManager;
     public static PlayerEntity playerInView;
     public static EntityModelLayer STAFF_MODEL_LAYER = new EntityModelLayer(Identifier.of(Zauber.MOD_ID, "staff"), "staff");
-    public static TelekinesisPad telekinesisPad = new TelekinesisPad(new Vec3d(0, 0, 0));
+    public static TelekinesisPad telekinesisPad = new TelekinesisPad();
 
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             telekinesisPad.tick(client);
         });
+        ItemTooltipCallback.EVENT
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             telekinesisPad.render(context.world(), context.camera(), context.matrixStack(), context.consumers());
 
             var player = context.world().client.player;
             if (player.isSneaking()) {
-                ((PlayerEntityExtension) player).zauber$getTelekinesisAffected().ifPresent(telekinesed -> {
+                player.zauber$getTelekinesisAffected().ifPresent(telekinesed -> {
                     if (telekinesed instanceof TelekinedBlockEntity) {
                         var camera = context.camera();
                         var matrices = context.matrixStack();
