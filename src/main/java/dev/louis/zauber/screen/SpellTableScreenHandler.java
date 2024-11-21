@@ -196,9 +196,12 @@ public class SpellTableScreenHandler extends ScreenHandler {
         this.selectedRecipe.set(-1);
         this.outputSlot.setStackNoCallbacks(ItemStack.EMPTY);
         if (!stack.isEmpty() && hasCharge()) {
-            this.availableRecipes = this.world.getRecipeManager().listAllOfType(ZauberRecipes.SPELL_RECIPE).stream()
-                    .filter(recipe -> recipe.value().matches(createRecipeInputWrapper(inventory), world))
-                    .sorted(Comparator.comparing(RecipeEntry::id))
+            this.availableRecipes = this.world.getServer().getRecipeManager().values().stream()
+                    .map(recipeEntry -> (((RecipeEntry<SpellRecipe>) recipeEntry)))
+                    .filter(recipeEntry -> recipeEntry.value().getType().equals(ZauberRecipes.SPELL_RECIPE))
+
+                    .filter(recipeEntry -> recipeEntry.value().matches(createRecipeInputWrapper(inventory), world))
+                    .sorted(Comparator.comparing(recipeEntry -> recipeEntry.id().getValue()))
                     .collect(Collectors.toList());
         }
     }
@@ -211,7 +214,7 @@ public class SpellTableScreenHandler extends ScreenHandler {
             }
 
             @Override
-            public int getSize() {
+            public int size() {
                 return inventory.size();
             }
 
@@ -270,7 +273,7 @@ public class SpellTableScreenHandler extends ScreenHandler {
             } else {
                 //WARNING AHEAD!!!
                 //DEAMONS MAY JUMP OUT OF THIS CODE AND ATTACK YOU THROUGH YOUR COMPUTER SCREEN PROCEED WITH CAUTION!
-                boolean moveIntoSpellTableSlots = slot == 0 || slot == 1 ? !this.insertItem(itemStack2, 3, 39, false) : (this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, createRecipeInputWrapper(new SimpleInventory(itemStack2, this.heartInputSlot.getStack())), this.world).isPresent() || this.world.getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, createRecipeInputWrapper(new SimpleInventory(this.bookInputSlot.getStack(), itemStack2)), this.world).isPresent());
+                boolean moveIntoSpellTableSlots = slot == 0 || slot == 1 ? !this.insertItem(itemStack2, 3, 39, false) : (this.world.getServer().getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, createRecipeInputWrapper(new SimpleInventory(itemStack2, this.heartInputSlot.getStack())), this.world).isPresent() || this.world.getServer().getRecipeManager().getFirstMatch(ZauberRecipes.SPELL_RECIPE, createRecipeInputWrapper(new SimpleInventory(this.bookInputSlot.getStack(), itemStack2)), this.world).isPresent());
                 boolean b;
                 if (moveIntoSpellTableSlots) {
                     b = !this.insertItem(itemStack2, 0, 2, false);

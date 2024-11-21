@@ -6,7 +6,6 @@ import dev.louis.nebula.api.spell.Spell;
 import dev.louis.zauber.client.extension.MinecraftClientExtension;
 import dev.louis.zauber.client.model.StaffItemModel;
 import dev.louis.zauber.client.networking.ZauberClientPlayNetworkHandler;
-import dev.louis.zauber.client.render.item.StaffItemRenderer;
 import dev.louis.zauber.client.render.entity.TelekinesisEntityRenderer;
 import dev.louis.zauber.client.render.misc.ZauberRenderLayers;
 import dev.louis.zauber.client.screen.RippedPageScreen;
@@ -39,10 +38,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworkin
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.StatusEffectsDisplay;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -53,7 +52,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
@@ -122,8 +120,6 @@ public class ZauberClient implements ClientModInitializer {
             ConfigManager.setOverrideConfig(packet.overrideConfig());
             context.responseSender().sendPacket(new OptionSyncCompletePayload());
         });
-        StaffItemRenderer staffItemRenderer = new StaffItemRenderer(STAFF_MODEL_LAYER);
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(staffItemRenderer);
         //BuiltinItemRendererRegistry.INSTANCE.register(ZauberItems.STAFF, staffItemRenderer);
 
         ClientTickEvents.END_WORLD_TICK.register(world -> {
@@ -156,7 +152,7 @@ public class ZauberClient implements ClientModInitializer {
                 });
 
                 if (!sortedList.isEmpty()) {
-                    if (client.currentScreen instanceof AbstractInventoryScreen<?> abstractInventoryScreen && abstractInventoryScreen.hideStatusEffectHud())
+                    if (client.currentScreen instanceof InventoryScreen inventoryScreen && inventoryScreen.shouldHideStatusEffectHud())
                         return;
                     RenderSystem.enableBlend();
                     int i = 0;
@@ -176,20 +172,20 @@ public class ZauberClient implements ClientModInitializer {
                         if (!playerTotemData.activityChecker().isActive(MinecraftClient.getInstance().player)) {
                             int age = MinecraftClient.getInstance().player.age;
                             totemAlpha = MathHelper.cos(age / (float) Math.PI * 20.0F) * 0.1f + 0.4f;
-                            context.setShaderColor(1.0F, 1.0F, 1.0F, 0.6f);
+                            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.6f);
                         }
-                        context.drawGuiTexture(Identifier.of(Zauber.MOD_ID, "artifact/icon_background"), x, y, 22, 22);
-                        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                        context.drawGuiTexture(RenderLayer::getGuiTextured, Identifier.of(Zauber.MOD_ID, "artifact/icon_background"), x, y, 22, 22);
+                        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
                         int n = x;
                         int o = y;
                         float finalTotemAlpha = totemAlpha;
                         list.add(() -> {
                             context.getMatrices().push();
-                            context.setShaderColor(1.0F, 1.0F, 1.0F, finalTotemAlpha);
+                            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, finalTotemAlpha);
                             context.getMatrices().translate(0, -0.25, 0);
-                            context.drawGuiTexture(texture, n + 3, o + 3, 0, 16, 16);
-                            context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                            context.drawGuiTexture(RenderLayer::getGuiTextured, texture, n + 3, o + 3, 0, 16, 16);
+                            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                             context.getMatrices().pop();
                         });
                     }

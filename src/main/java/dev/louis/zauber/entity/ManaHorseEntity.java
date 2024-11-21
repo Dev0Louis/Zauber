@@ -1,6 +1,7 @@
 package dev.louis.zauber.entity;
 
 import dev.louis.nebula.api.mana.pool.ManaPoolHolder;
+import dev.louis.zauber.Zauber;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -14,9 +15,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -24,8 +28,8 @@ import org.joml.Vector3f;
 
 public class ManaHorseEntity extends HorseEntity implements Ownable {
     public static final EntityType<ManaHorseEntity> TYPE =
-            EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).dimensions(1.3964844F, 1.6F).maxTrackingRange(10).build("mana_horse");
-    private static final ParticleEffect PARTICLE_EFFECT = new DustParticleEffect(new Vector3f(0, 0, 0.8f), 1f);
+            EntityType.Builder.<ManaHorseEntity>create(ManaHorseEntity::new, SpawnGroup.CREATURE).dimensions(1.3964844F, 1.6F).maxTrackingRange(10).build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "mana_house")));
+    private static final ParticleEffect PARTICLE_EFFECT = new DustParticleEffect(0x0000FF, 1f);
     private LivingEntity owner;
 
     public ManaHorseEntity(EntityType<? extends ManaHorseEntity> entityType, World world) {
@@ -42,16 +46,16 @@ public class ManaHorseEntity extends HorseEntity implements Ownable {
 
     @Override
     protected void initAttributes(Random random) {
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(12);
-        this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.6);
-        this.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH).setBaseValue(1.0);
+        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(12);
+        this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED).setBaseValue(0.6);
+        this.getAttributeInstance(EntityAttributes.JUMP_STRENGTH).setBaseValue(1.0);
     }
 
     public static DefaultAttributeContainer.Builder createBaseHorseAttributes() {
         return MobEntity.createMobAttributes()
-                .add(EntityAttributes.GENERIC_JUMP_STRENGTH)
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 0.01)
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.6);
+                .add(EntityAttributes.JUMP_STRENGTH)
+                .add(EntityAttributes.MAX_HEALTH, 0.01)
+                .add(EntityAttributes.MOVEMENT_SPEED, 0.6);
     }
 
     @Override

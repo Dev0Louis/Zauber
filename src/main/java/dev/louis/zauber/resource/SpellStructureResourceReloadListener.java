@@ -28,7 +28,7 @@ public class SpellStructureResourceReloadListener implements SimpleSynchronousRe
         var resource = manager.getResource(Identifier.of("zauber", "spell_structures/ice_spike.nbt"));
         try {
             iceSpikeStructure.readNbt(
-                    Registries.BLOCK.getReadOnlyWrapper(), NbtIo.readCompressed(resource.orElseThrow().getInputStream(), NbtSizeTracker.ofUnlimitedBytes())
+                    Registries.BLOCK, NbtIo.readCompressed(resource.orElseThrow().getInputStream(), NbtSizeTracker.ofUnlimitedBytes())
             );
             IcePeakEntity.ICE_SPIKE_ARRAY = this.generateArray(iceSpikeStructure, true);
         } catch (IOException e) {

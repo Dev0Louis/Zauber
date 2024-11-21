@@ -8,7 +8,10 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
@@ -17,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SpellArrowEntity extends PersistentProjectileEntity {
     private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
-    public static final EntityType<SpellArrowEntity> TYPE = EntityType.Builder.<SpellArrowEntity>create(SpellArrowEntity::new, SpawnGroup.MISC).dimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build("spell_arrow");
+    public static final EntityType<SpellArrowEntity> TYPE = EntityType.Builder.<SpellArrowEntity>create(SpellArrowEntity::new, SpawnGroup.MISC).dimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "spell_arrow")));
 
     @Nullable
     private final Entity caster;

@@ -1,5 +1,6 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.Zauber;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
@@ -11,8 +12,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
@@ -20,7 +24,7 @@ import net.minecraft.world.World;
 public class HailStoneEntity extends ThrownItemEntity {
     public static final EntityType<HailStoneEntity> TYPE = FabricEntityTypeBuilder
             .create(SpawnGroup.MISC, HailStoneEntity::new)
-            .build();
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "hail_stone")));
     private static final int BASE_DAMAGE = 4;
     private boolean bounce = this.random.nextBoolean();
     public boolean castedWithIceTotem;
@@ -75,7 +79,7 @@ public class HailStoneEntity extends ThrownItemEntity {
         var damageSource = entity.getDamageSources().create(entity.getDamageSources().freeze().getTypeRegistryEntry().getKey().get(), this.getOwner());
         float damage = BASE_DAMAGE;
 
-        if (entity.getWorld().getBiome(entity.getBlockPos()).value().isCold(entity.getBlockPos())) {
+        if (entity.getWorld().getBiome(entity.getBlockPos()).value().isCold(entity.getBlockPos(), entity.getWorld().getSeaLevel())) {
             damage = damage * 2;
         }
 
@@ -83,6 +87,6 @@ public class HailStoneEntity extends ThrownItemEntity {
             damage = damage * 2;
         }
 
-        entity.damage(damageSource, damage);
+        entity.damage((ServerWorld) this.getWorld(), damageSource, damage);
     }
 }

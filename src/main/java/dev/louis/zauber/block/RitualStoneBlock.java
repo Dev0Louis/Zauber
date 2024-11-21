@@ -39,7 +39,7 @@ public class RitualStoneBlock extends BlockWithEntity {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof RitualStoneBlockEntity ritualStoneBlockEntity) {
                 ritualStoneBlockEntity.onInteracted(player, stack, ((ServerWorld) world), pos);
-                return ActionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+                return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
             }
         }
         return ActionResult.SUCCESS;

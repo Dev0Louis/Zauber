@@ -16,6 +16,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.collection.DefaultedList;
@@ -43,7 +44,7 @@ public class JuggernautSpellEffect extends SpellEffect {
             generateJuggernautItemAndSetToSlot(player, 2, Items.NETHERITE_AXE, tick);
             generateJuggernautItemAndSetToSlot(player, 3, Items.BOW, tick);
 
-            RegistryWrapper<Enchantment> registry = player.getServer().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT);
+            RegistryWrapper<Enchantment> registry = player.getServer().getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
             ItemStack goldenApple = generateJuggernautItem(Items.GOLDEN_APPLE, registry, tick);
             goldenApple.setCount(26);
             player.getInventory().setStack(3, goldenApple);
@@ -80,13 +81,13 @@ public class JuggernautSpellEffect extends SpellEffect {
     public void onEnd() {
         JuggernautSpellEffect.clearJuggernautItems(target);
         if (target.isAlive()) {
-            target.damage(target.getDamageSources().magic(), 100f);
+            target.damage((ServerWorld) target.getWorld(), target.getDamageSources().magic(), 100f);
             target.setHealth(0);
         }
     }
 
     public static void generateJuggernautItemAndSetToSlot(PlayerEntity player, int slot, Item item, long tick) {
-        player.getInventory().setStack(slot, generateJuggernautItem(item, player.getWorld().getServer().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT), tick));
+        player.getInventory().setStack(slot, generateJuggernautItem(item, player.getWorld().getServer().getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT), tick));
     }
 
     public static ItemStack generateJuggernautItem(Item item, RegistryWrapper<Enchantment> registry, long tickWorldtime) {

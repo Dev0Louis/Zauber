@@ -1,5 +1,6 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.Zauber;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -13,6 +14,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +30,7 @@ public class HauntingDamageEntity extends PersistentProjectileEntity {
     private static final int TICKS_TILL_IMPACT = 20 * 30;
     public static final EntityType<HauntingDamageEntity> TYPE = EntityType.Builder
             .create(HauntingDamageEntity::new, SpawnGroup.MISC)
-            .build();
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "haunting_damage")));
     private static final ItemStack STACK = new ItemStack(Items.TRIDENT);
     private DamageSource damageSource;
     private float damageAmount;
@@ -141,7 +146,7 @@ public class HauntingDamageEntity extends PersistentProjectileEntity {
         this.setVelocity(vec3d.multiply(m));
 
         this.setPosition(h, j, k);
-        this.checkBlockCollision();
+        this.tickBlockCollision();
     }
 
     @Override
@@ -183,7 +188,7 @@ public class HauntingDamageEntity extends PersistentProjectileEntity {
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
         if (entity instanceof LivingEntity livingEntity && entity.equals(this.getOwner())) {
-            livingEntity.applyDamage(damageSource, damageAmount);
+            livingEntity.applyDamage((ServerWorld) livingEntity.getWorld(), damageSource, damageAmount);
             this.discard();
         }
     }

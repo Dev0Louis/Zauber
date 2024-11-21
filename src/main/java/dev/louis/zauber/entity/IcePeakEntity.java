@@ -1,5 +1,6 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.Zauber;
 import dev.louis.zauber.helper.ParticleHelper;
 import dev.louis.zauber.helper.SoundHelper;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -9,13 +10,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -26,7 +31,7 @@ public class IcePeakEntity extends StructureEntity {
     public static BlockState[][][] ICE_SPIKE_ARRAY = createEmptyArray();
     public static final EntityType<IcePeakEntity> TYPE = FabricEntityTypeBuilder
             .create(SpawnGroup.MISC, IcePeakEntity::new)
-            .build();
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "ice_peak")));
     private static final int TICKS_TO_GROW_FULL = 30;
     private static final float FINAL_SIZE = 1;
     private static final int delay = 20;
@@ -99,7 +104,7 @@ public class IcePeakEntity extends StructureEntity {
             Vec3d velocity;
             //We check the progress here as the push box is really jumpy at first
             if (pushBox.contains(entity.getPos()) || this.getProgress() < 5) {
-                entity.damage(world.getDamageSources().freeze(), 10);
+                entity.damage((ServerWorld) world, world.getDamageSources().freeze(), 10);
                 velocity = new Vec3d(0, 6, 0);
             } else {
                 //In box, but not in push box
@@ -117,6 +122,11 @@ public class IcePeakEntity extends StructureEntity {
             entity.velocityModified = true;
 
         });
+    }
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
     }
 
     private void onBreaking() {

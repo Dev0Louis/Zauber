@@ -16,7 +16,7 @@ public record StoredSpellComponent(RegistryEntry<SpellType<?>> spellType) implem
     );
     public static final PacketCodec<RegistryByteBuf, StoredSpellComponent> PACKET_CODEC = new PacketCodec<>() {
         public StoredSpellComponent decode(RegistryByteBuf registryByteBuf) {
-            return new StoredSpellComponent(SpellType.REGISTRY.getEntry(registryByteBuf.readRegistryKey(SpellType.REGISTRY_KEY)).orElseThrow());
+            return new StoredSpellComponent(SpellType.REGISTRY.getOrThrow(registryByteBuf.readRegistryKey(SpellType.REGISTRY_KEY)));
         }
 
         public void encode(RegistryByteBuf registryByteBuf, StoredSpellComponent itemSpellComponent) {

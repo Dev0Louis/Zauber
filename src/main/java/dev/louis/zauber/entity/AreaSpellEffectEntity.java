@@ -1,5 +1,6 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.Zauber;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
@@ -8,10 +9,13 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -21,7 +25,7 @@ public class AreaSpellEffectEntity extends Entity {
     public static final EntityType<AreaSpellEffectEntity> TYPE = EntityType.Builder
             .<AreaSpellEffectEntity>create(AreaSpellEffectEntity::new, SpawnGroup.MISC)
             .dimensions(3, 1)
-            .build();
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "area_effect_spell")));
 
     public enum Type {
         ICE(ParticleTypes.SNOWFLAKE) {
@@ -107,6 +111,11 @@ public class AreaSpellEffectEntity extends Entity {
         }
     }
 
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
+    }
+
     protected void spawnParticles(ServerWorld world) {
         var spellCastingBox = this.getBoundingBox();
         for (double x = spellCastingBox.minX; x < spellCastingBox.maxX; x = x + 0.7) {
@@ -120,7 +129,7 @@ public class AreaSpellEffectEntity extends Entity {
 
     private void affect(LivingEntity entity) {
         if (entity.isAlive() && entity.isMobOrPlayer()) {
-            entity.damage(this.getDamageSource(), 1);
+            entity.damage((ServerWorld) entity.getWorld(), this.getDamageSource(), 1);
             type.affectEntity(this.getWorld(), entity);
         }
     }

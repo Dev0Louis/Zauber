@@ -50,7 +50,7 @@ public record SpellType<S extends Spell<?>> (SpellFactory<S> factory) {
     }
 
     public static Optional<SpellType<?>> get(Identifier identifier) {
-        return REGISTRY.getOrEmpty(identifier);
+        return REGISTRY.getOptionalValue(identifier);
     }
 
     public static Optional<RegistryEntry.Reference<SpellType<?>>> getEntry(Identifier identifier) {

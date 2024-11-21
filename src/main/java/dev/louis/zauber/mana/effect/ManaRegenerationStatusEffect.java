@@ -4,6 +4,7 @@ import dev.louis.nebula.api.mana.pool.ManaPoolHolder;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.server.world.ServerWorld;
 
 public class ManaRegenerationStatusEffect extends StatusEffect {
     public ManaRegenerationStatusEffect() {
@@ -21,12 +22,11 @@ public class ManaRegenerationStatusEffect extends StatusEffect {
 
     // This method is called when it applies the status effect. We implement custom functionality here.
     @Override
-    public boolean applyUpdateEffect(LivingEntity entity, int amplifier) {
-        if (!entity.getWorld().isClient() && entity instanceof ManaPoolHolder manaPoolHolder) {
+    public boolean applyUpdateEffect(ServerWorld world, LivingEntity entity, int amplifier) {
+        if (entity instanceof ManaPoolHolder manaPoolHolder) {
             var pool = manaPoolHolder.getManaPool();
             pool.insertMana(1 + amplifier);
         }
         return true;
     }
-
 }

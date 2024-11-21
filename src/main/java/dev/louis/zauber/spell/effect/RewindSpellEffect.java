@@ -28,9 +28,9 @@ public class RewindSpellEffect extends SpellEffect {
 
     @Override
     public void onEnd() {
-        double x = rewindTarget.pos().getX();
-        double y = rewindTarget.pos().getY();
-        double z = rewindTarget.pos().getY();
+        double x = rewindTarget.position().getX();
+        double y = rewindTarget.position().getY();
+        double z = rewindTarget.position().getY();
 
         this.playRewindSound(target);
         rewindTarget.world().spawnParticles(

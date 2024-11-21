@@ -3,9 +3,11 @@ package dev.louis.zauber.client.render.entity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.louis.zauber.Zauber;
 import dev.louis.zauber.entity.ManaHorseEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.HorseEntityRenderer;
+import net.minecraft.client.render.entity.state.HorseEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.util.Identifier;
@@ -29,12 +31,10 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
 
 
     @Override
-    public void render(HorseEntity mobEntity, float f, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light) {
+    public void render(HorseEntityRenderState renderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light) {
         matrixStack.push();
-        float lerpAngleDegrees = MathHelper.lerpAngleDegrees(tickDelta, mobEntity.prevBodyYaw, mobEntity.bodyYaw);
-        float animationProgress = this.getAnimationProgress(mobEntity, tickDelta);
-
-        this.setupTransforms(mobEntity, matrixStack, animationProgress, lerpAngleDegrees, tickDelta, mobEntity.getScale());
+        var tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+        this.setupTransforms(renderState, matrixStack, renderState.bodyYaw, renderState.baseScale);
 
 
         renderSymbol(
@@ -93,7 +93,7 @@ public class ManaHorseEntityRenderer extends HorseEntityRenderer implements RGBA
         bufferBuilder.vertex(positionMatrix, 1, 0, 0).color(0, 0, 255, alpha).texture(1f, 1f);
         bufferBuilder.vertex(positionMatrix, 1, 1, 0).color(0, 0, 255, alpha).texture(1f, 0f);
 
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        //RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         RenderSystem.setShaderTexture(0, texture);
         RenderSystem.enableDepthTest();
         //RenderSystem.disableCull();

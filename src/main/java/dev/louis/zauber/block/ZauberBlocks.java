@@ -78,7 +78,6 @@ public class ZauberBlocks {
                             .noCollision()
                             .breakInstantly()
                             .sounds(BlockSoundGroup.WOOD)
-                            .dropsLike(EXTINGUISHED_TORCH)
                             .pistonBehavior(PistonBehavior.DESTROY)
             )
     );

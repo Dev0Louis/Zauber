@@ -45,7 +45,7 @@ public class HeartOfTheDarknessItem extends Item {
         ParticleHelper.spawn20Particles(
                 world,
                 pos,
-                new DustParticleEffect(new Vector3f(), 1f)
+                new DustParticleEffect(0, 1f)
         );
         var entityBox = Box.of(pos, 6, 6, 6);
         world.getEntitiesByClass(LivingEntity.class, entityBox, EntityPredicates.EXCEPT_SPECTATOR).forEach(entity -> {

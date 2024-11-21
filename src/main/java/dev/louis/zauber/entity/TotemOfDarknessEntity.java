@@ -13,7 +13,11 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -22,7 +26,7 @@ import java.util.ArrayList;
 public class TotemOfDarknessEntity extends FollowingEntity {
     public static final EntityType<TotemOfDarknessEntity> TYPE = FabricEntityTypeBuilder
             .<TotemOfDarknessEntity>create(SpawnGroup.MISC, TotemOfDarknessEntity::new)
-            .build();
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "totem_of_darkness")));
 
     public static final EntityAttributeModifier HALF =
             new EntityAttributeModifier(Identifier.of(Zauber.MOD_ID, "half"), -.5, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -32,8 +36,8 @@ public class TotemOfDarknessEntity extends FollowingEntity {
     public static Multimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> activeMap = Multimaps.newMultimap(Maps.newLinkedHashMap(), ArrayList::new);
 
     static {
-        activeMap.put(EntityAttributes.GENERIC_MAX_HEALTH, HALF);
-        activeMap.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, DOUBLE);
+        activeMap.put(EntityAttributes.MAX_HEALTH, HALF);
+        activeMap.put(EntityAttributes.ATTACK_DAMAGE, DOUBLE);
     }
 
     public TotemOfDarknessEntity(EntityType<?> type, World world) {
@@ -69,6 +73,11 @@ public class TotemOfDarknessEntity extends FollowingEntity {
         } else {
             owner.getAttributes().removeModifiers(this.getTotemModifiers());
         }
+    }
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
     }
 
     @Override

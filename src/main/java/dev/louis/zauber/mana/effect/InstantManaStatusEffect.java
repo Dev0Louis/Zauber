@@ -8,6 +8,7 @@ import net.minecraft.entity.effect.InstantStatusEffect;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.Nullable;
 
 public class InstantManaStatusEffect extends InstantStatusEffect {
@@ -17,9 +18,10 @@ public class InstantManaStatusEffect extends InstantStatusEffect {
     }
 
     @Override
-    public void applyInstantEffect(@Nullable Entity source, @Nullable Entity attacker, LivingEntity target, int amplifier, double proximity) {
+    public void applyInstantEffect(ServerWorld world, @Nullable Entity effectEntity, @Nullable Entity attacker, LivingEntity target, int amplifier, double proximity) {
         if (target instanceof ManaPoolHolder manaPoolHolder) {
             manaPoolHolder.getManaPool().insertMana((amplifier + 1) * 5);
         }
     }
+
 }

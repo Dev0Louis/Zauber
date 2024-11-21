@@ -1,31 +1,20 @@
 package dev.louis.zauber.recipe;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.louis.zauber.spell.type.SpellType;
-
-import dev.louis.zauber.Zauber;
-import dev.louis.zauber.item.SpellBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.*;
+import net.minecraft.recipe.book.RecipeBookCategories;
 import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Recipe<RecipeInput> {
-    public static final SpellRecipe EMPTY = new SpellRecipe(Ingredient.empty(), ItemStack.EMPTY);
+import java.util.List;
 
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup lookup) {
-        return result();
-    }
+public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Recipe<RecipeInput> {
 
     public Identifier getSpellId() {
         return Registries.ITEM.getId(result().getItem());
@@ -38,83 +27,26 @@ public record SpellRecipe(Ingredient ingredient, ItemStack result) implements Re
 
     @Override
     public ItemStack craft(RecipeInput inventory, RegistryWrapper.WrapperLookup lookup) {
-        return this.getResult(lookup).copy();
+        return this.result.copy();
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return SpellRecipeSerializer.INSTANCE;
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<? extends Recipe<RecipeInput>> getType() {
         return ZauberRecipes.SPELL_RECIPE;
     }
 
     @Override
     public IngredientPlacement getIngredientPlacement() {
-        return null;
+        return IngredientPlacement.forSingleSlot(ingredient);
     }
 
     @Override
     public RecipeBookCategory getRecipeBookCategory() {
-        return null;
-    }
-
-    public static class SpellRecipeSerializer implements RecipeSerializer<SpellRecipe> {
-        public static final Identifier ID = Identifier.of(Zauber.MOD_ID, "spell_recipe");
-        public static final SpellRecipeSerializer INSTANCE = new SpellRecipeSerializer();
-        public static final PacketCodec<RegistryByteBuf, SpellRecipe> PACKET_CODEC = new PacketCodec<>() {
-            @Override
-            public SpellRecipe decode(RegistryByteBuf buf) {
-                if (!buf.readBoolean()) return SpellRecipe.EMPTY;
-
-                Ingredient ingredient;
-                if (buf.readBoolean()) ingredient = Ingredient.PACKET_CODEC.decode(buf);
-                else ingredient = Ingredient.empty();
-
-                var spellType = SpellType.get(buf.readIdentifier());
-                return spellType.map(type -> new SpellRecipe(ingredient, SpellBookItem.createSpellBook(type))).orElse(SpellRecipe.EMPTY);
-            }
-
-            @Override
-            public void encode(RegistryByteBuf buf, SpellRecipe recipe) {
-                var spellTypeOptional = SpellBookItem.getSpellType(recipe.result);
-                buf.writeBoolean(spellTypeOptional.isPresent());
-
-                spellTypeOptional.ifPresent(spellType -> {
-                    buf.writeBoolean(!recipe.ingredient.isEmpty());
-                    if (!recipe.ingredient.isEmpty()) {
-                        Ingredient.PACKET_CODEC.encode(buf, recipe.ingredient);
-                    }
-
-                    buf.writeIdentifier(Identifier.tryParse(spellType.getIdAsString()));
-                });
-            }
-        };
-        private final MapCodec<SpellRecipe> codec;
-
-
-        private SpellRecipeSerializer() {
-            this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    Identifier.CODEC.fieldOf("spell").forGetter(SpellRecipe::getSpellId),
-                    Ingredient.DISALLOW_EMPTY_CODEC.optionalFieldOf("ingredient", Ingredient.empty()).forGetter(SpellRecipe::ingredient)
-            ).apply(instance, (identifier, ingredient) -> SpellType.get(identifier).map(type -> new SpellRecipe(ingredient, SpellBookItem.createSpellBook(type))).orElse(SpellRecipe.EMPTY)));
-        }
-
-        @Override
-        public MapCodec<SpellRecipe> codec() {
-            return codec;
-        }
-
-        @Override
-        public PacketCodec<RegistryByteBuf, SpellRecipe> packetCodec() {
-            return PACKET_CODEC;
-        }
+        return RecipeBookCategories.STONECUTTER;
     }
 }

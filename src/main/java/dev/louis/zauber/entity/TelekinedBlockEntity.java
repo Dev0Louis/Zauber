@@ -4,6 +4,7 @@ import dev.louis.zauber.Zauber;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.*;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -17,9 +18,12 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -32,7 +36,7 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
     public static final EntityType<TelekinedBlockEntity> TYPE = EntityType.Builder
             .<TelekinedBlockEntity>create(TelekinedBlockEntity::new, SpawnGroup.MISC)
             .dimensions(1, 1)
-            .build();
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "block_telekinesis")));
     BlockState blockState;
     protected static final TrackedData<BlockPos> BLOCK_POS = DataTracker.registerData(TelekinedBlockEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
     @Nullable
@@ -91,6 +95,11 @@ public class TelekinedBlockEntity extends Entity implements Ownable {
     @Override
     public boolean isFireImmune() {
         return true;
+    }
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
     }
 
     private boolean tryPlace() {

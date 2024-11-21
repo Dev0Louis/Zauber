@@ -6,6 +6,7 @@ import dev.louis.zauber.extension.EntityExtension;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Debug;
@@ -18,22 +19,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityRenderDispatcher.class)
 public class EntityRenderDispatcherMixin {
     @Inject(
-            method = "render",
+            method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V")
     )
-    public void renderTelekinesisAroundTelekinesed(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int light, CallbackInfo ci, @Local EntityRenderer<Entity> entityRenderer) {
+    public void renderTelekinesisAroundTelekinesed(Entity entity, double x, double y, double z, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, EntityRenderer<? super Entity, EntityRenderState> renderer, CallbackInfo ci, @Local(ordinal = 0) EntityRenderState state) {
         if (entity.zauber$isTelekinesed()) {
             VertexConsumerProvider fakeVertexConsumerProvider = (layer) -> {
-                if (!layer.name.equals("leash")) {
-                    return vertexConsumerProvider.getBuffer(ZauberRenderLayers.getBrrrrrrrr(entity, tickDelta));
+                if (!layer.toString().equals("leash")) {
+                    return vertexConsumers.getBuffer(ZauberRenderLayers.getBrrrrrrrr(entity, tickDelta));
                 }
-                return vertexConsumerProvider.getBuffer(layer);
+                return vertexConsumers.getBuffer(layer);
             };
 
-            entityRenderer.render(
-                    entity,
-                    yaw,
-                    tickDelta,
+            renderer.render(
+                    state,
                     matrices,
                     fakeVertexConsumerProvider,
                     light

@@ -20,8 +20,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Vector3f;
 
+import java.util.Set;
+
 public class ItemSacrificerBlockEntity extends BlockEntityWithItemStack {
-    public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(ItemSacrificerBlockEntity::new, ZauberBlocks.ITEM_SACRIFICER).build(null);
+    public static final BlockEntityType<ItemSacrificerBlockEntity> TYPE = new BlockEntityType<>(ItemSacrificerBlockEntity::new, Set.of(ZauberBlocks.ITEM_SACRIFICER));
     public boolean firstTick = true;
     private int ticksSinceItemsAdded;
 

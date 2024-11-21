@@ -9,10 +9,13 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -24,7 +27,7 @@ public class HailStormEntity extends Entity {
     public static final EntityType<AreaSpellEffectEntity> TYPE = EntityType.Builder
             .<AreaSpellEffectEntity>create(AreaSpellEffectEntity::new, SpawnGroup.MISC)
             .dimensions(16, 1)
-            .build();
+            .build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "hail_storm")));
     @Nullable
     private LivingEntity owner;
 
@@ -49,7 +52,7 @@ public class HailStormEntity extends Entity {
         for (int x = -size; x < size; x += 2) {
             for (int z = -size; z < size; z += 2) {
                 if (world.getRandom().nextFloat() < 0.75f) continue;
-                HailStoneEntity hailStoneEntity = HailStoneEntity.TYPE.create(world);
+                HailStoneEntity hailStoneEntity = HailStoneEntity.TYPE.create(world, SpawnReason.MOB_SUMMONED);
                 hailStoneEntity.setOwner(owner);
                 hailStoneEntity.setPosition(this.getPos().add(x, 3 * world.getRandom().nextDouble(), z));
                 Vec3d velocity = new Vec3d(world.getRandom().nextDouble() - .5, world.getRandom().nextDouble() - 1, world.getRandom().nextDouble() - .5).multiply(0.5);
@@ -58,6 +61,11 @@ public class HailStormEntity extends Entity {
                 world.spawnEntity(hailStoneEntity);
             }
         }
+    }
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
     }
 
     @Override

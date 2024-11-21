@@ -5,11 +5,12 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.ProjectileEntityRenderer;
+import net.minecraft.client.render.entity.state.ProjectileEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.util.Identifier;
 
-public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<PersistentProjectileEntity> {
+public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<PersistentProjectileEntity, ProjectileEntityRenderState> {
     public static final Identifier TEXTURE = Identifier.ofVanilla("textures/entity/projectiles/arrow.png");
 
     public BlueArrowEntityRenderer(EntityRendererFactory.Context context) {
@@ -17,12 +18,10 @@ public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<Persistent
     }
 
     @Override
-    public Identifier getTexture(PersistentProjectileEntity entity) {
+    public Identifier getTexture(ProjectileEntityRenderState entity) {
         return TEXTURE;
     }
 
-
-    @Override
     public void vertex(
             MatrixStack.Entry matrix,
             VertexConsumer vertexConsumer,
@@ -45,7 +44,12 @@ public class BlueArrowEntityRenderer extends ProjectileEntityRenderer<Persistent
                 .normal(matrix, normalX, normalY, normalZ);
     }
 
+    @Override
+    public ProjectileEntityRenderState createRenderState() {
+        return new ProjectileEntityRenderState();
+    }
+
     public RenderLayer getRenderLayer(Identifier texture) {
-        return RenderLayer.getEntityTranslucentCull(texture);
+        return RenderLayer.getEntityTranslucentEmissive(texture);
     }
 }

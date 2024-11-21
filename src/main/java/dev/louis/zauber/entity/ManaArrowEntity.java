@@ -1,11 +1,15 @@
 package dev.louis.zauber.entity;
 
+import dev.louis.zauber.Zauber;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -14,7 +18,7 @@ import net.minecraft.world.event.GameEvent;
 
 public class ManaArrowEntity extends PersistentProjectileEntity {
     private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
-    public static final EntityType<ManaArrowEntity> TYPE = EntityType.Builder.<ManaArrowEntity>create(ManaArrowEntity::new, SpawnGroup.MISC).dimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build("mana_arrow");
+    public static final EntityType<ManaArrowEntity> TYPE = EntityType.Builder.<ManaArrowEntity>create(ManaArrowEntity::new, SpawnGroup.MISC).dimensions(0.5F, 0.5F).maxTrackingRange(4).trackingTickInterval(20).build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(Zauber.MOD_ID, "mana_arrow")));
 
     public ManaArrowEntity(EntityType<? extends ManaArrowEntity> entityType, World world) {
         super(entityType, world);

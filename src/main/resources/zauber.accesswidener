@@ -17,3 +17,9 @@ accessible field net/minecraft/entity/decoration/DisplayEntity INTERPOLATION_DUR
 accessible field net/minecraft/entity/decoration/DisplayEntity TELEPORT_DURATION Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/decoration/DisplayEntity BILLBOARD Lnet/minecraft/entity/data/TrackedData;
 accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
+accessible method net/minecraft/recipe/SingleStackRecipe$Serializer <init> (Lnet/minecraft/recipe/SingleStackRecipe$RecipeFactory;)V
+accessible method net/minecraft/recipe/book/RecipeBookCategories register (Ljava/lang/String;)Lnet/minecraft/recipe/book/RecipeBookCategory;
+accessible method net/minecraft/entity/FallingBlockEntity <init> (Lnet/minecraft/world/World;DDDLnet/minecraft/block/BlockState;)V
+accessible method net/minecraft/entity/LivingEntity applyDamage (Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/damage/DamageSource;F)V
+accessible method net/minecraft/block/entity/BlockEntityType <init> (Lnet/minecraft/block/entity/BlockEntityType$BlockEntityFactory;Ljava/util/Set;)V
+accessible class net/minecraft/block/entity/BlockEntityType$BlockEntityFactory

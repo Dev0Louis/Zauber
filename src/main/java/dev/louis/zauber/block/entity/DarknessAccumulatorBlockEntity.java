@@ -1,5 +1,6 @@
 package dev.louis.zauber.block.entity;
 
+import dev.louis.zauber.Zauber;
 import dev.louis.zauber.block.DarknessAccumulatorBlock;
 import dev.louis.zauber.block.ZauberBlocks;
 import dev.louis.zauber.helper.ParticleHelper;
@@ -13,9 +14,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.joml.Vector3f;
 
+import java.util.Set;
+
 public class DarknessAccumulatorBlockEntity extends BlockEntity {
     public static final Vector3f COLOR = new Vector3f(0, 0, 0);
-    public static final BlockEntityType<DarknessAccumulatorBlockEntity> TYPE = BlockEntityType.Builder.create(DarknessAccumulatorBlockEntity::new, ZauberBlocks.DARKNESS_ACCUMULATOR).build(null);
+    public static final BlockEntityType<DarknessAccumulatorBlockEntity> TYPE = new BlockEntityType((DarknessAccumulatorBlockEntity::new), Set.of(ZauberBlocks.DARKNESS_ACCUMULATOR));
 
     public DarknessAccumulatorBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
@@ -35,7 +38,7 @@ public class DarknessAccumulatorBlockEntity extends BlockEntity {
                     0.1f,
                     0,
                     //ParticleTypes.MYCELIUM
-                    new DustParticleEffect(COLOR, 2.6f)
+                    new DustParticleEffect(0x000000, 2.6f)
             );
         }
     }

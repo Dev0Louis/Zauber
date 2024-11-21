@@ -31,7 +31,7 @@ public class HeartOfTheIceItem extends Item {
                 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
         );
         if (!world.isClient) {
-            ThrownHeartOfTheIceEntity thrownHeart = new ThrownHeartOfTheIceEntity(user, world);
+            ThrownHeartOfTheIceEntity thrownHeart = new ThrownHeartOfTheIceEntity(user, world, itemStack);
             thrownHeart.setItem(itemStack);
             thrownHeart.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1.5F, 1.0F);
             world.spawnEntity(thrownHeart);
